@@ -7,7 +7,6 @@ import {
   Settings,
   FolderArchive,
   ClipboardList,
-  FileText,
 } from "lucide-react";
 import type { SidebarMenuSection } from "../types/sidebar";
 
@@ -113,18 +112,7 @@ export const superAdminSidebarMenu: SidebarMenuSection[] = [
       {
         label: "Question & Statement",
         icon: ClipboardList,
-        children: [
-          {
-            label: "Questions",
-            icon: FileText,
-            path: "/superadmin/questions",
-          },
-          {
-            label: "Statements",
-            icon: FileText,
-            path: "/superadmin/statements",
-          },
-        ],
+        path: "/superadmin/questions",
       },
     ],
   },
