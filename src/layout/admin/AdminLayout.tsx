@@ -7,6 +7,8 @@ import DashboardPage from '../../page/admin/dashboard/Dashboard.tsx';
 import StudentAccountMonitoring from "../../page/admin/user-approval/StudentAccountMonitoring.tsx";
 import CourseManagement from "../../page/admin/courses/CourseManagement.tsx";
 import ReportPage from "../../page/admin/reports/ReportPage.tsx";
+import AnalyticsPage from "../../page/admin/analytics/Analytics.tsx";
+import CustomizationPage from "../../page/admin/customization/CustomizationPage.tsx";
 
 
 export default function AdminLayout() {
@@ -23,6 +25,8 @@ export default function AdminLayout() {
             <Route path="user-approval" element={<StudentAccountMonitoring />} />
             <Route path="courses" element={<CourseManagement />} />
             <Route path="reports" element={<ReportPage />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="customization" element={<CustomizationPage/>} />
           </Routes>
         </main>
       </div>

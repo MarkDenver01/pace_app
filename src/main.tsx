@@ -21,14 +21,17 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from "./context/AuthContext.tsx";
 import App from './App';
 import React from "react";
+import { ThemeProvider } from "./context/ThemeContext.tsx";
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
+      <ThemeProvider>
         <BrowserRouter>
-            <AuthProvider>
-                <App />
-            </AuthProvider>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
         </BrowserRouter>
+      </ThemeProvider>
     </React.StrictMode>
 );
 

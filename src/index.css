@@ -9,3 +9,60 @@ html, body, #root {
     margin: 0;
     padding: 0;
 }
+
+/* index.css */
+
+:root {
+    --button-color: #2563eb; /* default light */
+    --bg-color: #ffffff;
+    --text-color: #1f2937;
+    --card-color: #f9fafb;
+}
+
+[data-theme="light"] {
+    --button-color: #2563eb; /* Blue */
+    --bg-color: #ffffff;
+    --text-color: #1f2937;
+    --card-color: #f9fafb;
+}
+
+[data-theme="dark"] {
+    --button-color: #111827;
+    --bg-color: #1f2937;
+    --text-color: #f3f4f6;
+    --card-color: #374151;
+}
+
+[data-theme="redish"] {
+    --button-color: #dc2626;
+    --bg-color: #fef2f2;
+    --text-color: #7f1d1d;
+    --card-color: #fee2e2;
+}
+
+[data-theme="purplelish"] {
+    --button-color: #7c3aed;
+    --bg-color: #f5f3ff;
+    --text-color: #4c1d95;
+    --card-color: #ede9fe;
+}
+
+[data-theme="brownish"] {
+    --button-color: #92400e;
+    --bg-color: #fffbeb;
+    --text-color: #78350f;
+    --card-color: #fef3c7;
+}
+
+/* Optional transition for smooth changes */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.card-theme {
+    background-color: var(--card-color);
+    color: var(--text-color);
+}
+
