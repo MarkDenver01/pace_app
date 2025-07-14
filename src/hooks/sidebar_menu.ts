@@ -19,7 +19,7 @@ export const adminSidebarMenu: SidebarMenuSection[] = [
       {
         label: "Dashboard Overview",
         icon: LayoutDashboard,
-        path: "/dashboard",
+        path: "/admin/dashboard",
       },
     ],
   },
@@ -29,7 +29,7 @@ export const adminSidebarMenu: SidebarMenuSection[] = [
       {
         label: "User Approval",
         icon: Users,
-        path: "/dashboard/user-approval",
+        path: "/admin/user-approval",
       },
     ],
   },
@@ -39,7 +39,7 @@ export const adminSidebarMenu: SidebarMenuSection[] = [
       {
         label: "Course Management",
         icon: BookOpen,
-        path: "/dashboard/courses",
+        path: "/admin/courses",
       },
     ],
   },
@@ -49,7 +49,7 @@ export const adminSidebarMenu: SidebarMenuSection[] = [
       {
         label: "Report",
         icon: FileBarChart2,
-        path: "/dashboard/reports",
+        path: "/admin/reports",
       },
     ],
   },
@@ -59,7 +59,7 @@ export const adminSidebarMenu: SidebarMenuSection[] = [
       {
         label: "Analytics",
         icon: FileBarChart2,
-        path: "/dashboard/analytics",
+        path: "/admin/analytics",
       },
     ],
   },
@@ -69,7 +69,7 @@ export const adminSidebarMenu: SidebarMenuSection[] = [
       {
         label: "Customization",
         icon: Settings,
-        path: "/dashboard/customization",
+        path: "/admin/customization",
       },
     ],
   },
@@ -83,7 +83,7 @@ export const superAdminSidebarMenu: SidebarMenuSection[] = [
       {
         label: "Dashboard Overview",
         icon: LayoutDashboard,
-        path: "/dashboard",
+        path: "/superadmin/dashboard",
       },
     ],
   },
@@ -93,7 +93,7 @@ export const superAdminSidebarMenu: SidebarMenuSection[] = [
       {
         label: "Records",
         icon: FolderArchive,
-        path: "/dashboard/records",
+        path: "/superadmin/records",
       },
     ],
   },
@@ -103,7 +103,7 @@ export const superAdminSidebarMenu: SidebarMenuSection[] = [
       {
         label: "Course Management",
         icon: BookOpen,
-        path: "/dashboard/courses",
+        path: "/superadmin/courses",
       },
     ],
   },
@@ -117,12 +117,12 @@ export const superAdminSidebarMenu: SidebarMenuSection[] = [
           {
             label: "Questions",
             icon: FileText,
-            path: "/dashboard/questions",
+            path: "/superadmin/questions",
           },
           {
             label: "Statements",
             icon: FileText,
-            path: "/dashboard/statements",
+            path: "/superadmin/statements",
           },
         ],
       },

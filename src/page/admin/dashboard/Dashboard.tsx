@@ -4,7 +4,7 @@ import {
   ClipboardCheck,
   ServerCog,
 } from "lucide-react";
-import DashboardTable from "../../layout/dashboard/DashboardTableLayout.tsx";
+import DashboardTable from "../../../layout/admin/DashboardTableLayout.tsx";
 
 export default function Dashboard() {
   const cardClass =

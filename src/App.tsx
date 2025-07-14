@@ -3,9 +3,10 @@ import './App.css';
 
 import Login from './page/login/Login.tsx';
 import ProtectedRoute from './components/ProtectedRoute';
-import DashboardLayout from './layout/dashboard/DashboardLayout.tsx';
 import appBg from './assets/app-bg.jpg'; // import your background JPG
 import type { JSX } from 'react';
+import AdminLayout from "./layout/admin/AdminLayout.tsx";
+import SuperAdminLayout from "./layout/superadmin/SuperAdminLayout.tsx";
 
 function App(): JSX.Element {
   const location = useLocation();
@@ -30,11 +31,23 @@ function App(): JSX.Element {
       <div className={isLoginPage ? 'z-10' : ''}>
         <Routes>
           <Route path="/" element={<Login />} />
+
+          {/* Admin Layout */}
           <Route
-            path="/dashboard/*"
+            path="/admin/*"
             element={
               <ProtectedRoute>
-                <DashboardLayout />
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Super Admin Layout */}
+          <Route
+            path="/superadmin/*"
+            element={
+              <ProtectedRoute>
+                <SuperAdminLayout />
               </ProtectedRoute>
             }
           />
