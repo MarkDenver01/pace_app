@@ -1,39 +1,41 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
+// Define theme types
 export type Theme = "light" | "dark" | "redish" | "purplelish" | "brownish";
 
-interface ThemeContextType {
+// Context shape
+interface ThemeContextProps {
   themeName: Theme;
   setThemeName: (theme: Theme) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType>({
+// Create context
+const ThemeContext = createContext<ThemeContextProps>({
   themeName: "light",
   setThemeName: () => {},
 });
 
+// Provider component
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [themeName, setThemeName] = useState<Theme>("light");
+  const [themeName, setThemeNameState] = useState<Theme>("light");
 
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", themeName);
-    document.documentElement.style.setProperty("--button-color", getThemeColor(themeName));
-  }, [themeName]);
-
-  const getThemeColor = (theme: Theme) => {
-    switch (theme) {
-      case "dark":
-        return "#111827";
-      case "redish":
-        return "#DC2626";
-      case "purplelish":
-        return "#7C3AED";
-      case "brownish":
-        return "#92400E";
-      default:
-        return "#2563EB"; // light default (blue)
-    }
+  // Sync theme state with HTML attribute and localStorage
+  const setThemeName = (newTheme: Theme) => {
+    setThemeNameState(newTheme);
+    document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("themeName", newTheme);
   };
+
+  // On mount: load from localStorage and apply
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("themeName") as Theme | null;
+    if (savedTheme) {
+      setThemeName(savedTheme);
+    } else {
+      // fallback to light
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ themeName, setThemeName }}>
@@ -42,4 +44,5 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// Hook to use theme context
 export const useThemeContext = () => useContext(ThemeContext);

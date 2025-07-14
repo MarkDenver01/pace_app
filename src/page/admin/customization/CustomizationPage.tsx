@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FileInput,
   Textarea,
@@ -13,17 +13,44 @@ import { useThemeContext } from "../../../context/ThemeContext";
 type Theme = "light" | "dark" | "redish" | "purplelish" | "brownish";
 
 export default function CustomizationPage() {
-  const [logo, setLogo] = useState<File | null>(null);
-  const [aboutText, setAboutText] = useState("");
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [aboutText, setAboutText] = useState(
+    localStorage.getItem("aboutText") || ""
+  );
 
   const { themeName, setThemeName } = useThemeContext();
 
+  // Load saved logo (base64) on mount
+  useEffect(() => {
+    const savedLogo = localStorage.getItem("customLogo");
+    if (savedLogo) setLogoPreview(savedLogo);
+  }, []);
+
+  // Handle image upload and convert to base64
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setLogo(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setLogoPreview(base64); // Show immediately
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleThemeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedTheme = e.target.value as Theme;
+    setThemeName(selectedTheme); // Live preview
   };
 
   const handleSave = () => {
+    if (logoPreview) {
+      localStorage.setItem("customLogo", logoPreview);
+    }
+    localStorage.setItem("themeName", themeName);
+    localStorage.setItem("aboutText", aboutText);
+
     alert("Customization saved!");
   };
 
@@ -38,16 +65,16 @@ export default function CustomizationPage() {
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Left Column - Upload Logo */}
+        {/* Upload Logo */}
         <div className="w-full md:w-1/3 space-y-3">
           <div>
             <Label htmlFor="logo" className="text-sm text-gray-600">
               Upload Logo
             </Label>
             <div className="w-full h-40 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center overflow-hidden mt-1">
-              {logo ? (
+              {logoPreview ? (
                 <img
-                  src={URL.createObjectURL(logo)}
+                  src={logoPreview}
                   alt="Logo Preview"
                   className="h-full object-contain"
                 />
@@ -64,7 +91,7 @@ export default function CustomizationPage() {
           </div>
         </div>
 
-        {/* Right Column - Theme + About Section */}
+        {/* Theme and About Section */}
         <div className="w-full md:w-2/3 space-y-4">
           <div>
             <Label htmlFor="theme" className="text-sm text-gray-600">
@@ -73,7 +100,7 @@ export default function CustomizationPage() {
             <Select
               id="theme"
               value={themeName}
-              onChange={(e) => setThemeName(e.target.value as Theme)}
+              onChange={handleThemeChange}
               className="mt-1 w-full"
             >
               <option value="light">Light</option>

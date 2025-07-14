@@ -10,59 +10,161 @@ html, body, #root {
     padding: 0;
 }
 
-/* index.css */
-
+/* ======================
+   Base Theme Variables
+====================== */
 :root {
-    --button-color: #2563eb; /* default light */
+    --button-color: #2563eb;
     --bg-color: #ffffff;
     --text-color: #1f2937;
     --card-color: #f9fafb;
+
+    /* Sidebar defaults (light) */
+    --sidebar-bg: #D94022;
+    --sidebar-border: #b93218;
+    --sidebar-header-bg: #C2371D;
+    --sidebar-hover-bg: #e85638;
+    --sidebar-text: #ffffff;
+
+    --sidebar-active-bg: rgba(255, 255, 255, 0.1);
+    --sidebar-border-active: #ffffff;
+    --sidebar-border-hover: #ffffff88;
 }
 
+/* ========== Light Theme ========== */
 [data-theme="light"] {
-    --button-color: #2563eb; /* Blue */
+    --button-color: #2563eb;
     --bg-color: #ffffff;
     --text-color: #1f2937;
     --card-color: #f9fafb;
+
+    --sidebar-bg: #D94022;
+    --sidebar-border: #b93218;
+    --sidebar-header-bg: #C2371D;
+    --sidebar-hover-bg: #e85638;
+    --sidebar-text: #ffffff;
+
+    --sidebar-active-bg: rgba(255, 255, 255, 0.1);
+    --sidebar-border-active: #ffffff;
+    --sidebar-border-hover: #ffffff88;
 }
 
+/* ========== Dark Theme ========== */
 [data-theme="dark"] {
     --button-color: #111827;
     --bg-color: #1f2937;
     --text-color: #f3f4f6;
     --card-color: #374151;
+
+    --sidebar-bg: #1f2937;
+    --sidebar-border: #111827;
+    --sidebar-header-bg: #111827;
+    --sidebar-hover-bg: #374151;
+    --sidebar-text: #f3f4f6;
+
+    --sidebar-active-bg: rgba(255, 255, 255, 0.05);
+    --sidebar-border-active: #f3f4f6;
+    --sidebar-border-hover: #f3f4f677;
 }
 
+/* ========== Redish Theme ========== */
 [data-theme="redish"] {
     --button-color: #dc2626;
     --bg-color: #fef2f2;
     --text-color: #7f1d1d;
     --card-color: #fee2e2;
+
+    --sidebar-bg: #b91c1c;
+    --sidebar-border: #991b1b;
+    --sidebar-header-bg: #7f1d1d;
+    --sidebar-hover-bg: #ef4444;
+    --sidebar-text: #fff1f2;
+
+    --sidebar-active-bg: rgba(255, 255, 255, 0.1);
+    --sidebar-border-active: #fff1f2;
+    --sidebar-border-hover: #fff1f288;
 }
 
+/* ========== Purplelish Theme ========== */
 [data-theme="purplelish"] {
     --button-color: #7c3aed;
     --bg-color: #f5f3ff;
     --text-color: #4c1d95;
     --card-color: #ede9fe;
+
+    --sidebar-bg: #6b21a8;
+    --sidebar-border: #581c87;
+    --sidebar-header-bg: #4c1d95;
+    --sidebar-hover-bg: #8b5cf6;
+    --sidebar-text: #ede9fe;
+
+    --sidebar-active-bg: rgba(255, 255, 255, 0.08);
+    --sidebar-border-active: #ede9fe;
+    --sidebar-border-hover: #ede9feaa;
 }
 
+/* ========== Brownish Theme ========== */
 [data-theme="brownish"] {
     --button-color: #92400e;
     --bg-color: #fffbeb;
     --text-color: #78350f;
     --card-color: #fef3c7;
+
+    --sidebar-bg: #92400e;
+    --sidebar-border: #78350f;
+    --sidebar-header-bg: #78350f;
+    --sidebar-hover-bg: #fbbf24;
+    --sidebar-text: #fff7ed;
+
+    --sidebar-active-bg: rgba(255, 255, 255, 0.1);
+    --sidebar-border-active: #fff7ed;
+    --sidebar-border-hover: #fff7ed99;
 }
 
-/* Optional transition for smooth changes */
+/* ======================
+   Shared Global Styles
+====================== */
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
     transition: background-color 0.3s, color 0.3s;
 }
 
+/* Cards */
 .card-theme {
     background-color: var(--card-color);
     color: var(--text-color);
+}
+
+/* Sidebar container */
+.sidebar-theme {
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    border-color: var(--sidebar-border);
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+/* Sidebar sections text */
+.sidebar-theme .section-label {
+    color: var(--sidebar-text);
+    opacity: 0.8;
+}
+
+/* Sidebar hoverable button */
+.sidebar-hover:hover {
+    background-color: var(--sidebar-hover-bg);
+}
+
+/* Sidebar active item */
+.sidebar-active {
+    background-color: var(--sidebar-active-bg);
+    font-weight: 600;
+    border-left-color: var(--sidebar-border-active);
+}
+
+/* Sidebar hover item */
+.sidebar-hover:hover {
+    background-color: var(--sidebar-hover-bg);
+    border-left-color: var(--sidebar-border-hover);
 }
 
