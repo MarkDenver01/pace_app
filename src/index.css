@@ -10,37 +10,10 @@ html, body, #root {
     padding: 0;
 }
 
-/* ======================
-   Base Theme Variables
-====================== */
-:root {
-    --button-color: #2563eb;
-    --bg-color: #ffffff;
-    --text-color: #1f2937;
-    --card-color: #f9fafb;
-
-    /* Sidebar defaults (light) */
-    --sidebar-bg: #D94022;
-    --sidebar-border: #b93218;
-    --sidebar-header-bg: #C2371D;
-    --sidebar-hover-bg: #e85638;
-    --sidebar-text: #ffffff;
-
-    --sidebar-active-bg: rgba(255, 255, 255, 0.1);
-    --sidebar-border-active: #ffffff;
-    --sidebar-border-hover: #ffffff88;
-
-    --divider-color: rgba(255, 255, 255, 0.2); /* light */
-
-    --col-left-bg: rgba(0, 0, 0, 0.03);
-    --col-right-bg: rgba(0, 0, 0, 0.06);
-
-    --muted-text-color: #6b7280; /* Tailwind's gray-500 */
-}
 
 /* ========== Light Theme ========== */
 [data-theme="light"] {
-    --button-color: #2563eb;
+    --button-color: #D94022;
     --bg-color: #ffffff;
     --text-color: #1f2937;
     --card-color: #f9fafb;
