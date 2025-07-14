@@ -40,11 +40,14 @@ export default function ReportPage() {
   );
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-md overflow-x-auto">
+    <div
+      className="p-6 rounded-xl shadow-md overflow-x-auto border card-theme"
+      style={{ backgroundColor: "var(--card-color)" }}
+    >
       {/* Page Header */}
       <div className="flex items-center gap-2 mb-4">
-        <FileBarChart2 className="w-5 h-5 text-[#D94022]" />
-        <h2 className="text-xl font-semibold text-gray-700">
+        <FileBarChart2 className="w-5 h-5" style={{ color: "var(--button-color)" }} />
+        <h2 className="text-xl font-semibold" style={{ color: "var(--text-color)" }}>
           Engagement & Performance Report
         </h2>
       </div>
@@ -53,7 +56,7 @@ export default function ReportPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         {/* Date Filter */}
         <div className="flex items-center gap-2 w-full sm:max-w-xs">
-          <CalendarDays className="w-5 h-5 text-gray-500" />
+          <CalendarDays className="w-5 h-5" style={{ color: "var(--muted-text-color)" }} />
           <TextInput
             type="text"
             placeholder="Filter by date (mm/dd/yyyy)"
@@ -65,7 +68,7 @@ export default function ReportPage() {
 
         {/* Search Filter */}
         <div className="flex items-center gap-2 w-full sm:max-w-sm">
-          <Search className="w-5 h-5 text-gray-500" />
+          <Search className="w-5 h-5" style={{ color: "var(--muted-text-color)" }} />
           <TextInput
             type="text"
             placeholder="Search user or activity"
@@ -77,8 +80,8 @@ export default function ReportPage() {
       </div>
 
       {/* Data Table */}
-      <table className="min-w-full border border-gray-300 text-sm text-left text-gray-700">
-        <thead className="bg-[#D94022] text-white">
+      <table className="min-w-full text-sm text-left" style={{ color: "var(--text-color)" }}>
+        <thead style={{ backgroundColor: "var(--button-color)", color: "#ffffff" }}>
         <tr>
           <th className="p-3 border border-gray-300 font-medium">Date</th>
           <th className="p-3 border border-gray-300 font-medium">User</th>
@@ -86,10 +89,10 @@ export default function ReportPage() {
           <th className="p-3 border border-gray-300 font-medium">Duration (mins)</th>
         </tr>
         </thead>
-        <tbody className="bg-gray-50">
+        <tbody>
         {paginatedData.length > 0 ? (
           paginatedData.map((report, index) => (
-            <tr key={index} className="hover:bg-[#FFEFEA] transition">
+            <tr key={index} className="transition hover:bg-[var(--divider-color)]">
               <td className="p-3 border border-gray-300">{report.date}</td>
               <td className="p-3 border border-gray-300">{report.user}</td>
               <td className="p-3 border border-gray-300">{report.activity}</td>
@@ -98,7 +101,11 @@ export default function ReportPage() {
           ))
         ) : (
           <tr>
-            <td colSpan={4} className="p-4 text-center text-gray-500 border border-gray-300">
+            <td
+              colSpan={4}
+              className="p-4 text-center border border-gray-300"
+              style={{ color: "var(--muted-text-color)" }}
+            >
               No report data found.
             </td>
           </tr>
@@ -108,18 +115,20 @@ export default function ReportPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mt-6 text-sm text-gray-600">
-          <span>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mt-6 text-sm">
+          <span style={{ color: "var(--muted-text-color)" }}>
             Showing{" "}
-            <span className="font-semibold text-gray-800">
+            <span className="font-semibold" style={{ color: "var(--text-color)" }}>
               {(currentPage - 1) * pageSize + 1}
             </span>{" "}
             to{" "}
-            <span className="font-semibold text-gray-800">
+            <span className="font-semibold" style={{ color: "var(--text-color)" }}>
               {Math.min(currentPage * pageSize, filteredData.length)}
             </span>{" "}
             of{" "}
-            <span className="font-semibold text-gray-800">{filteredData.length}</span>{" "}
+            <span className="font-semibold" style={{ color: "var(--text-color)" }}>
+              {filteredData.length}
+            </span>{" "}
             entries
           </span>
 

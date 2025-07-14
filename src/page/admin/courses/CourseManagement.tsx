@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { BookOpen } from "lucide-react";
-import { Modal, Pagination, Button as FlowbiteButton, ModalHeader, ModalBody } from "flowbite-react";
+import {
+  Modal,
+  Pagination,
+  Button as FlowbiteButton,
+  ModalHeader,
+  ModalBody,
+} from "flowbite-react";
 
 interface Course {
   name: string;
@@ -61,16 +67,21 @@ export default function CourseManagement() {
   };
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-md overflow-x-auto">
+    <div
+      className="p-6 rounded-xl shadow-md overflow-x-auto border card-theme"
+      style={{ backgroundColor: "var(--card-color)" }}
+    >
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
-        <BookOpen className="w-5 h-5 text-[#D94022]" />
-        <h2 className="text-xl font-semibold text-gray-700">Course Management</h2>
+        <BookOpen className="w-5 h-5" style={{ color: "var(--button-color)" }} />
+        <h2 className="text-xl font-semibold" style={{ color: "var(--text-color)" }}>
+          Course Management
+        </h2>
       </div>
 
       {/* Table */}
-      <table className="min-w-full border border-gray-300 text-sm text-left text-gray-700">
-        <thead className="bg-[#D94022] text-white">
+      <table className="min-w-full text-sm text-left" style={{ color: "var(--text-color)" }}>
+        <thead style={{ backgroundColor: "var(--button-color)", color: "#fff" }}>
         <tr>
           <th className="p-3 border border-gray-300 font-medium">Course Name</th>
           <th className="p-3 border border-gray-300 font-medium">Description</th>
@@ -78,10 +89,10 @@ export default function CourseManagement() {
           <th className="p-3 border border-gray-300 font-medium">Actions</th>
         </tr>
         </thead>
-        <tbody className="bg-gray-50">
+        <tbody>
         {paginatedData.length > 0 ? (
           paginatedData.map((course) => (
-            <tr key={course.name} className="hover:bg-[#FFEFEA] transition">
+            <tr key={course.name} className="transition hover:bg-[var(--divider-color)]">
               <td className="p-3 border border-gray-300 font-medium">{course.name}</td>
               <td className="p-3 border border-gray-300">{course.description}</td>
               <td className="p-3 border border-gray-300">
@@ -113,7 +124,11 @@ export default function CourseManagement() {
           ))
         ) : (
           <tr>
-            <td colSpan={4} className="p-4 text-center text-gray-500 border border-gray-300">
+            <td
+              colSpan={4}
+              className="p-4 text-center border border-gray-300"
+              style={{ color: "var(--muted-text-color)" }}
+            >
               No courses available.
             </td>
           </tr>
@@ -123,21 +138,22 @@ export default function CourseManagement() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mt-6 text-sm text-gray-600">
-          <span>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mt-6 text-sm">
+          <span style={{ color: "var(--muted-text-color)" }}>
             Showing{" "}
-            <span className="font-semibold text-gray-800">
+            <span className="font-semibold" style={{ color: "var(--text-color)" }}>
               {(currentPage - 1) * pageSize + 1}
             </span>{" "}
             to{" "}
-            <span className="font-semibold text-gray-800">
+            <span className="font-semibold" style={{ color: "var(--text-color)" }}>
               {Math.min(currentPage * pageSize, courses.length)}
             </span>{" "}
             of{" "}
-            <span className="font-semibold text-gray-800">{courses.length}</span>{" "}
+            <span className="font-semibold" style={{ color: "var(--text-color)" }}>
+              {courses.length}
+            </span>{" "}
             entries
           </span>
-
           <div className="flex overflow-x-auto sm:justify-center">
             <Pagination
               currentPage={currentPage}
@@ -149,14 +165,18 @@ export default function CourseManagement() {
         </div>
       )}
 
-      {/* Confirmation Modal */}
+      {/* Modal */}
       <Modal show={showModal} onClose={() => setShowModal(false)} size="md" popup>
         <ModalHeader />
         <ModalBody>
           <div className="text-center">
-            <h3 className="mb-5 text-lg font-normal text-gray-700">
+            <h3 className="mb-5 text-lg font-normal" style={{ color: "var(--text-color)" }}>
               Are you sure you want to{" "}
-              <span className={actionType === "activate" ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>
+              <span
+                className={`font-semibold ${
+                  actionType === "activate" ? "text-green-600" : "text-red-600"
+                }`}
+              >
                 {actionType === "activate" ? "activate" : "deactivate"}
               </span>{" "}
               the course:{" "}

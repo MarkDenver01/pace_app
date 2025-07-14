@@ -9,10 +9,9 @@ import {
 import { Paintbrush } from "lucide-react";
 import { useThemeContext } from "../../../context/ThemeContext";
 
-// Define valid theme types
 type Theme = "light" | "dark" | "redish" | "purplelish" | "brownish";
 
-export default function CustomizationPage() {
+export default function Customization() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [aboutText, setAboutText] = useState(
     localStorage.getItem("aboutText") || ""
@@ -20,20 +19,17 @@ export default function CustomizationPage() {
 
   const { themeName, setThemeName } = useThemeContext();
 
-  // Load saved logo (base64) on mount
   useEffect(() => {
     const savedLogo = localStorage.getItem("customLogo");
     if (savedLogo) setLogoPreview(savedLogo);
   }, []);
 
-  // Handle image upload and convert to base64
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64 = reader.result as string;
-        setLogoPreview(base64); // Show immediately
+        setLogoPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -41,7 +37,7 @@ export default function CustomizationPage() {
 
   const handleThemeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTheme = e.target.value as Theme;
-    setThemeName(selectedTheme); // Live preview
+    setThemeName(selectedTheme);
   };
 
   const handleSave = () => {
@@ -50,16 +46,18 @@ export default function CustomizationPage() {
     }
     localStorage.setItem("themeName", themeName);
     localStorage.setItem("aboutText", aboutText);
-
     alert("Customization saved!");
   };
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-md">
+    <div
+      className="p-6 rounded-xl shadow-md border card-theme"
+      style={{ backgroundColor: "var(--card-color)" }}
+    >
       {/* Page Header */}
       <div className="flex items-center gap-2 mb-6">
-        <Paintbrush className="w-5 h-5 text-[#D94022]" />
-        <h2 className="text-xl font-semibold text-gray-700">
+        <Paintbrush className="w-5 h-5" style={{ color: "var(--button-color)" }} />
+        <h2 className="text-xl font-semibold" style={{ color: "var(--text-color)" }}>
           Site Customization
         </h2>
       </div>
@@ -68,18 +66,19 @@ export default function CustomizationPage() {
         {/* Upload Logo */}
         <div className="w-full md:w-1/3 space-y-3">
           <div>
-            <Label htmlFor="logo" className="text-sm text-gray-600">
+            <Label htmlFor="logo" className="text-sm" style={{ color: "var(--muted-text-color)" }}>
               Upload Logo
             </Label>
-            <div className="w-full h-40 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center overflow-hidden mt-1">
+            <div
+              className="w-full h-40 border rounded-lg flex items-center justify-center overflow-hidden mt-1"
+              style={{ backgroundColor: "var(--divider-color)", borderColor: "var(--divider-color)" }}
+            >
               {logoPreview ? (
-                <img
-                  src={logoPreview}
-                  alt="Logo Preview"
-                  className="h-full object-contain"
-                />
+                <img src={logoPreview} alt="Logo Preview" className="h-full object-contain" />
               ) : (
-                <span className="text-sm text-gray-400">Image Preview</span>
+                <span className="text-sm" style={{ color: "var(--muted-text-color)" }}>
+                  Image Preview
+                </span>
               )}
             </div>
             <FileInput
@@ -94,7 +93,7 @@ export default function CustomizationPage() {
         {/* Theme and About Section */}
         <div className="w-full md:w-2/3 space-y-4">
           <div>
-            <Label htmlFor="theme" className="text-sm text-gray-600">
+            <Label htmlFor="theme" className="text-sm" style={{ color: "var(--muted-text-color)" }}>
               Choose Theme
             </Label>
             <Select
@@ -112,7 +111,7 @@ export default function CustomizationPage() {
           </div>
 
           <div>
-            <Label htmlFor="about" className="text-sm text-gray-600">
+            <Label htmlFor="about" className="text-sm" style={{ color: "var(--muted-text-color)" }}>
               About Section
             </Label>
             <Textarea
@@ -130,7 +129,10 @@ export default function CustomizationPage() {
       {/* Save Button */}
       <div className="mt-6 text-right">
         <Button
-          style={{ backgroundColor: "var(--button-color)", color: "white" }}
+          style={{
+            backgroundColor: "var(--button-color)",
+            color: "white",
+          }}
           onClick={handleSave}
         >
           Save Customization

@@ -29,6 +29,13 @@ html, body, #root {
     --sidebar-active-bg: rgba(255, 255, 255, 0.1);
     --sidebar-border-active: #ffffff;
     --sidebar-border-hover: #ffffff88;
+
+    --divider-color: rgba(255, 255, 255, 0.2); /* light */
+
+    --col-left-bg: rgba(0, 0, 0, 0.03);
+    --col-right-bg: rgba(0, 0, 0, 0.06);
+
+    --muted-text-color: #6b7280; /* Tailwind's gray-500 */
 }
 
 /* ========== Light Theme ========== */
@@ -47,6 +54,10 @@ html, body, #root {
     --sidebar-active-bg: rgba(255, 255, 255, 0.1);
     --sidebar-border-active: #ffffff;
     --sidebar-border-hover: #ffffff88;
+
+    --divider-color: rgba(31, 41, 55, 0.1); /* dim gray */
+
+    --muted-text-color: #6b7280; /* gray-500 */
 }
 
 /* ========== Dark Theme ========== */
@@ -65,6 +76,10 @@ html, body, #root {
     --sidebar-active-bg: rgba(255, 255, 255, 0.05);
     --sidebar-border-active: #f3f4f6;
     --sidebar-border-hover: #f3f4f677;
+
+    --divider-color: rgba(255, 255, 255, 0.2); /* light */
+
+    --muted-text-color: #d1d5db; /* gray-300 */
 }
 
 /* ========== Redish Theme ========== */
@@ -83,6 +98,10 @@ html, body, #root {
     --sidebar-active-bg: rgba(255, 255, 255, 0.1);
     --sidebar-border-active: #fff1f2;
     --sidebar-border-hover: #fff1f288;
+
+    --divider-color: rgba(31, 41, 55, 0.1); /* dim gray */
+
+    --muted-text-color: #7f1d1d; /* dark red */
 }
 
 /* ========== Purplelish Theme ========== */
@@ -101,6 +120,10 @@ html, body, #root {
     --sidebar-active-bg: rgba(255, 255, 255, 0.08);
     --sidebar-border-active: #ede9fe;
     --sidebar-border-hover: #ede9feaa;
+
+    --divider-color: rgba(31, 41, 55, 0.1); /* dim gray */
+
+    --muted-text-color: #6b21a8; /* medium purple */
 }
 
 /* ========== Brownish Theme ========== */
@@ -119,6 +142,10 @@ html, body, #root {
     --sidebar-active-bg: rgba(255, 255, 255, 0.1);
     --sidebar-border-active: #fff7ed;
     --sidebar-border-hover: #fff7ed99;
+
+    --divider-color: rgba(31, 41, 55, 0.1); /* dim gray */
+
+    --muted-text-color: #78350f; /* deep brown */
 }
 
 /* ======================

@@ -4,15 +4,28 @@ import {
   ClipboardCheck,
   ServerCog,
 } from "lucide-react";
-import DashboardTable from "../../../layout/admin/DashboardTableLayout.tsx";
+import DashboardTable from "./DashboardDataTable.tsx";
 
 export default function Dashboard() {
   const cardClass =
-    "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition bg-white border border-orange-200";
+    "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border";
 
-  const labelClass = "text-sm text-[#D94022] font-semibold";
-  const valueClass = "text-4xl font-bold text-gray-800";
-  const descClass = "text-xs text-gray-500";
+  const iconWrapperStyle = {
+    backgroundColor: "var(--button-color, #D94022)10",
+    color: "var(--button-color)",
+  };
+
+  const labelStyle = {
+    color: "var(--button-color)",
+  };
+
+  const valueStyle = {
+    color: "var(--text-color)",
+  };
+
+  const descStyle = {
+    color: "var(--muted-text-color, #6b7280)", // fallback to gray-500
+  };
 
   return (
     <div className="p-4 flex flex-col gap-8">
@@ -21,54 +34,81 @@ export default function Dashboard() {
         {/* Card 1: Total Students */}
         <div className={cardClass}>
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-full bg-orange-100 text-[#D94022]">
+            <div className="p-3 rounded-full" style={iconWrapperStyle}>
               <GraduationCap size={28} />
             </div>
-            <span className={labelClass}>Total Students</span>
+            <span className="text-sm font-semibold" style={labelStyle}>
+              Total Students
+            </span>
           </div>
-          <div className={valueClass}>1,234</div>
-          <div className={descClass}>Updated 1 min ago</div>
+          <div className="text-4xl font-bold" style={valueStyle}>
+            1,234
+          </div>
+          <div className="text-xs" style={descStyle}>
+            Updated 1 min ago
+          </div>
         </div>
 
         {/* Card 2: Active Courses */}
         <div className={cardClass}>
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-full bg-orange-100 text-[#D94022]">
+            <div className="p-3 rounded-full" style={iconWrapperStyle}>
               <BookOpen size={28} />
             </div>
-            <span className={labelClass}>Active Courses</span>
+            <span className="text-sm font-semibold" style={labelStyle}>
+              Active Courses
+            </span>
           </div>
-          <div className={valueClass}>26</div>
-          <div className={descClass}>Live courses currently running</div>
+          <div className="text-4xl font-bold" style={valueStyle}>
+            26
+          </div>
+          <div className="text-xs" style={descStyle}>
+            Live courses currently running
+          </div>
         </div>
 
         {/* Card 3: Assessments Completed */}
         <div className={cardClass}>
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-full bg-orange-100 text-[#D94022]">
+            <div className="p-3 rounded-full" style={iconWrapperStyle}>
               <ClipboardCheck size={28} />
             </div>
-            <span className={labelClass}>Assessments Completed</span>
+            <span className="text-sm font-semibold" style={labelStyle}>
+              Assessments Completed
+            </span>
           </div>
-          <div className={valueClass}>430</div>
-          <div className={descClass}>Since last month</div>
+          <div className="text-4xl font-bold" style={valueStyle}>
+            430
+          </div>
+          <div className="text-xs" style={descStyle}>
+            Since last month
+          </div>
         </div>
 
         {/* Card 4: System Update */}
         <div className={cardClass}>
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-full bg-orange-100 text-[#D94022]">
+            <div className="p-3 rounded-full" style={iconWrapperStyle}>
               <ServerCog size={28} />
             </div>
-            <span className={labelClass}>System Update</span>
+            <span className="text-sm font-semibold" style={labelStyle}>
+              System Update
+            </span>
           </div>
-          <div className={valueClass}>99.95%</div>
-          <div className={descClass}>Last 28 days</div>
+          <div className="text-4xl font-bold" style={valueStyle}>
+            99.95%
+          </div>
+          <div className="text-xs" style={descStyle}>
+            Last 28 days
+          </div>
         </div>
       </div>
 
       {/* Divider */}
-      <div className="border-t border-gray-200" />
+      <div
+        className="border-t my-2"
+        style={{ borderColor: "var(--divider-color)" }}
+      />
 
       {/* Table Section */}
       <div className="p-2">
