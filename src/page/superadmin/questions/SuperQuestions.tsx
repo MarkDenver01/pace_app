@@ -18,9 +18,12 @@ const initialData = [
   },
 ];
 
+const categorized = ["General Interest", "Career Interest", "Personal Quantities"];
+
 export default function StatementQuestionPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedCategory, setSelectedCategorized] = useState("");
   const [statement, setStatement] = useState("");
 
   const pageSize = 5;
@@ -33,6 +36,7 @@ export default function StatementQuestionPage() {
   const handleSave = () => {
     alert(`Saved:\nCourse: ${selectedCourse}\nStatement: ${statement}`);
     setSelectedCourse("");
+    setSelectedCategorized("");
     setStatement("");
   };
 
@@ -96,6 +100,24 @@ export default function StatementQuestionPage() {
           <h3 className="text-lg font-semibold mb-2" style={valueStyle}>
             Statement / Questions
           </h3>
+          <div>
+            <Label htmlFor="category" className="text-sm" style={valueStyle}>
+              Category
+            </Label>
+            <Select
+              id="category"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategorized(e.target.value)}
+            >
+              <option value="">Select a category</option>
+              {categorized.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </Select>
+          </div>
+
           <div>
             <Label htmlFor="statement" className="text-sm" style={valueStyle}>
               Enter Statement / Questions
