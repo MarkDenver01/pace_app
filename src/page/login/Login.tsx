@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { HiLockClosed, HiUser, HiEye, HiEyeOff } from "react-icons/hi";
 import { Button } from "flowbite-react";
 import { login } from "../../libs/loginService";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import AlertDialog from "../../components/AlertDialog";
+//import AlertDialog from "../../components/AlertDialog";
 import { type LoginResponse } from "../../libs/models/response/LoginResponse";
+import Swal from "sweetalert2";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -14,59 +15,106 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [loginError, setLoginError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   // Alert dialog state
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertType, setAlertType] = useState<"success" | "error">("success");
-  const [alertTitle, setAlertTitle] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
-  const [redirectPath, setRedirectPath] = useState<string | null>(null);
+  //const [alertOpen, setAlertOpen] = useState(false);
+  // const [alertType, setAlertType] = useState<"success" | "error">("success");
+  // const [alertTitle, setAlertTitle] = useState("");
+  // const [alertMessage, setAlertMessage] = useState("");
+  // const [redirectPath, setRedirectPath] = useState<string | null>(null);
 
-  const showAlert = (
-    type: "success" | "error",
-    title: string,
-    message: string,
-    redirectTo?: string
-  ) => {
-    setAlertType(type);
-    setAlertTitle(title);
-    setAlertMessage(message);
-    setRedirectPath(redirectTo || null);
-    setAlertOpen(true);
-  };
+  // const showAlert = (
+  //   type: "success" | "error",
+  //   title: string,
+  //   message: string,
+  //   redirectTo?: string
+  // ) => {
+  //   setAlertType(type);
+  //   setAlertTitle(title);
+  //   setAlertMessage(message);
+  //   setRedirectPath(redirectTo || null);
+  //   setAlertOpen(true);
+  // };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage("");
+    setLoginError(false);
     setLoading(true);
-
-    try {
+        try {
       const response: LoginResponse = await login({ email, password });
       setAuth(response);
-      setLoading(false);
-
-      if (user?.role === "ADMIN") {
-        showAlert("success", "Welcome Admin!", "Tap OK to continue", "/admin/dashboard");
-      } else if (user?.role === "SUPER_ADMIN") {
-        showAlert("success", "Welcome Super Admin!", "Tap OK to continue", "/superadmin/dashboard");
-      } else {
-        showAlert("error", "Unauthorized", "Login failed: Unauthorized role");
-      }
+      setLoginSuccess(true); // Trigger useEffect
     } catch (error: any) {
       setLoading(false);
-      console.error("Login failed:", error);
-      showAlert("error", "Login Error", error.message || "Login failed");
+      //setErrorMessage(error.message || "Login failed");
+      setLoginError(true);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleAlertClose = () => {
-    setAlertOpen(false);
-    if (redirectPath) {
-      navigate(redirectPath);
+   // Safe useEffect for redirection after login
+  useEffect(() => {
+    if (loginSuccess && user) {
+      const redirect = async () => {
+        if (user.role === "ADMIN") {
+          Swal.fire({
+              icon: "success",
+              title: "Welcome " + user.username + "!",
+              text: "Tap proceed to the admin dashboard.",
+              confirmButtonText: "PROCEED",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                navigate("/admin/dashboard", { replace: true });
+              }
+            });
+        } else if (user.role === "SUPER_ADMIN") {
+          Swal.fire({
+              icon: "success",
+              title: "Welcome " + user.username + "!",
+              text: "Tap proceed to the super dashboard.",
+              confirmButtonText: "PROCEED",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                navigate("/superadmin/dashboard", { replace: true });
+              }
+            });
+        } else {
+          await Swal.fire("Unauthorized", "Login failed: Unauthorized role", "error");
+          Swal.fire({
+              icon: "error",
+              title: "Unauthorized",
+              text: "Your role is not authorized to access this application.",
+              confirmButtonText: "CLOSE",
+          });  
+        }
+      };
+
+      redirect();
     }
-  };
+  }, [loginSuccess, user, navigate]);
+
+  useEffect(() => {
+    if(loginError) {
+      setLoginError(false);
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: "Invalid email or password. Please try again.",
+        confirmButtonText: "CLOSE",
+      });
+    }
+  });
+
+  // const handleAlertClose = () => {
+  //   setAlertOpen(false);
+  //   if (redirectPath) {
+  //     navigate(redirectPath);
+  //   }
+  // };
 
   return (
     <>
@@ -87,9 +135,9 @@ const Login: React.FC = () => {
             ADMIN LOGIN
           </h3>
 
-          {errorMessage && (
+          {/* {errorMessage && (
             <div className="text-red-600 text-sm text-center">{errorMessage}</div>
-          )}
+          )} */}
 
           <div className="relative">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-[var(--button-color)]">
@@ -139,13 +187,13 @@ const Login: React.FC = () => {
       </div>
 
       {/* Alert Dialog */}
-      <AlertDialog
+      {/* <AlertDialog
         isOpen={alertOpen}
         type={alertType}
         title={alertTitle}
         message={alertMessage}
         onClose={handleAlertClose}
-      />
+      /> */}
     </>
   );
 };
