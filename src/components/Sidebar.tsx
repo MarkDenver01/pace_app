@@ -19,15 +19,15 @@ interface Props {
 }
 
 export default function AppSidebar({ collapsed, setCollapsed }: Props) {
-  const { role, logout} = useAuth();
+  const { user, logout} = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const { themeName } = useThemeContext();
 
   const sidebarMenu: SidebarMenuSection[] =
-    role === "ADMIN" ? adminSidebarMenu : 
-    role === "SUPER_ADMIN" ? superAdminSidebarMenu :
+    user?.role === "ADMIN" ? adminSidebarMenu : 
+    user?.role === "SUPER_ADMIN" ? superAdminSidebarMenu :
     []
 
   useEffect(() => {

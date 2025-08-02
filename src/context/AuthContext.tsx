@@ -1,61 +1,54 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getToken, getUserRole } from "../utils/authUtils";
 import { useNavigate } from "react-router-dom";
+import { type LoginResponse } from "../libs/models/response/LoginResponse";
 
 interface AuthContextType {
-  token: string | null;
-  role: string;
+  user: LoginResponse | null;
   isAuthenticated: boolean;
   logout: () => void;
-  setAuth: (token: string, role: string) => void;
+  setAuth: (user: LoginResponse) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
-  token: null,
-  role: "",
+  user: null,
   isAuthenticated: false,
   logout: () => {},
   setAuth: () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(getToken());
-  const [role, setRole] = useState<string>(getUserRole());
-
   const navigate = useNavigate();
+  const [user, setUser] = useState<LoginResponse | null>(() => {
+    const token = localStorage.getItem("jwtToken");
+    const role = localStorage.getItem("authorized_role");
+    const username = localStorage.getItem("authorized_username");
+    return token && role && username ? { jwtToken: token, role, username } : null;
+  });
+
+  const setAuth = (userData: LoginResponse) => {
+    localStorage.setItem("jwtToken", userData.jwtToken);
+    localStorage.setItem("authorized_role", userData.role);
+    localStorage.setItem("authorized_username", userData.username);
+    setUser(userData);
+  };
 
   const logout = () => {
-    localStorage.removeItem('jwtToken');
-    localStorage.removeItem('authorized_role');
-    localStorage.removeItem('authorized_username');
-    setToken(null);
-    setRole("");
+    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("authorized_role");
+    localStorage.removeItem("authorized_username");
+    setUser(null);
     navigate("/login");
   };
 
-  const setAuth = (newToken: string, newRole: string) => {
-    localStorage.setItem("jwtToken", newToken);
-    localStorage.setItem("authorized_role", newRole);
-    setToken(newToken);
-    setRole(newRole);
-  };
-
-  useEffect(() => {
-    const storedToken = getToken();
-    const storedRole = getUserRole();
-
-    if (storedToken && storedRole) {
-      setToken(storedToken);
-      setRole(storedRole);
-    }
+    useEffect(() => {
+    // Optional: could validate token expiration here
   }, []);
 
-  return (
+    return (
     <AuthContext.Provider
       value={{
-        token,
-        role,
-        isAuthenticated: !!token,
+        user,
+        isAuthenticated: !!user,
         logout,
         setAuth,
       }}
