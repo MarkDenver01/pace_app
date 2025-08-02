@@ -14,14 +14,14 @@ export default function SuperAdminLayout() {
 
   return (
     <div className="flex h-screen bg-gray-200">
-      <AppSidebar collapsed={collapsed} setCollapsed={setCollapsed} role="superadmin" />
+      <AppSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <div className={`flex-1 flex flex-col transition-all duration-300 ${collapsed ? 'ml-20' : 'ml-64'}`}>
         <main className="p-4 overflow-y-auto flex-1">
           <Routes>
             {/* Only define relative routes here */}
             <Route path="dashboard" element={<SuperAdminDashboard />} />
             <Route path="records" element={<SuperRecordsPage/>} />
-            <Route path="/records/view" element={<SuperAdminViewRecords />} />
+            <Route path="records/view" element={<SuperAdminViewRecords />} />
             <Route path="courses" element={<CourseTableLayout/>} />
             <Route path="questions" element={<StatementQuestionPage/>} />
           </Routes>

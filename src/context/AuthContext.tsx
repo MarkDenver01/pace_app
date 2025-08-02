@@ -1,52 +1,68 @@
-import {createContext, useState, useContext, type ReactNode, useEffect} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { getToken, getUserRole } from "../utils/authUtils";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
-    token: string | null;
-    role: string | null;
-    login: (token: string, role: string) => void;
-    logout: () => void;
+  token: string | null;
+  role: string;
+  isAuthenticated: boolean;
+  logout: () => void;
+  setAuth: (token: string, role: string) => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({
+  token: null,
+  role: "",
+  isAuthenticated: false,
+  logout: () => {},
+  setAuth: () => {},
+});
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [token, setToken] = useState<string | null>(null);
-    const [role, setRole] = useState<string | null>(null);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [token, setToken] = useState<string | null>(getToken());
+  const [role, setRole] = useState<string>(getUserRole());
 
-    useEffect(() => {
-        const savedToken = localStorage.getItem("authToken");
-        const savedRole = localStorage.getItem("authRole");
+  const navigate = useNavigate();
 
-        if (savedToken && savedToken) {
-            setToken(savedToken);
-            setRole(savedRole);
-        }
-    }, []);
+  const logout = () => {
+    localStorage.removeItem('jwtToken');
+    localStorage.removeItem('authorized_role');
+    localStorage.removeItem('authorized_username');
+    setToken(null);
+    setRole("");
+    navigate("/login");
+  };
 
+  const setAuth = (newToken: string, newRole: string) => {
+    localStorage.setItem("jwtToken", newToken);
+    localStorage.setItem("authorized_role", newRole);
+    setToken(newToken);
+    setRole(newRole);
+  };
 
-    const login = (newToken: string, newRole: string) => {
-        setToken(newToken);
-        setRole(newRole);
-        localStorage.setItem("authToken", newToken);
-        localStorage.setItem("authRole", newRole);
-    };
+  useEffect(() => {
+    const storedToken = getToken();
+    const storedRole = getUserRole();
 
-    const logout = () => {
-        setToken(null);
-        setRole(null);
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("authRole");
-    };
+    if (storedToken && storedRole) {
+      setToken(storedToken);
+      setRole(storedRole);
+    }
+  }, []);
 
-    return (
-        <AuthContext.Provider value={{ token, role, login, logout }}>
-            {children}
-        </AuthContext.Provider>
-    );
+  return (
+    <AuthContext.Provider
+      value={{
+        token,
+        role,
+        isAuthenticated: !!token,
+        logout,
+        setAuth,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) throw new Error("useAuth must be used within AuthProvider");
-    return context;
-};
+export const useAuth = () => useContext(AuthContext);

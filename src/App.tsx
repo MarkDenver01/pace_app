@@ -1,59 +1,59 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
-
-import Login from './page/login/Login.tsx';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import Login from './page/login/Login';
 import ProtectedRoute from './components/ProtectedRoute';
-import appBg from './assets/app-bg.jpg'; // import your background JPG
-import type { JSX } from 'react';
-import AdminLayout from "./layout/admin/AdminLayout.tsx";
-import SuperAdminLayout from "./layout/superadmin/SuperAdminLayout.tsx";
+import AdminLayout from './layout/admin/AdminLayout';
+import SuperAdminLayout from './layout/superadmin/SuperAdminLayout';
+import { AuthProvider } from './context/AuthContext';
+import appBg from './assets/app-bg.jpg';
 
-function App(): JSX.Element {
+function App() {
   const location = useLocation();
-  const isLoginPage = location.pathname === '/';
+  const isLoginPage = location.pathname === "/";
 
   return (
-    <div
-      className={
-        isLoginPage ? 'relative min-h-screen w-full bg-cover bg-no-repeat bg-center flex items-center justify-center' 
-          : 'min-h-screen w-full'
-      }
-      style={
-        isLoginPage
-          ? {
-            backgroundImage: `url(${appBg})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }
-          : {}
-      }
-    >
-      <div className={isLoginPage ? 'z-10' : ''}>
-        <Routes>
-          <Route path="/" element={<Login />} />
+    <AuthProvider>
+      <div
+        className={
+          isLoginPage
+            ? 'relative min-h-screen w-full bg-cover bg-no-repeat bg-center flex items-center justify-center'
+            : 'min-h-screen w-full bg-white'
+        }
+        style={
+          isLoginPage
+            ? { backgroundImage: `url(${appBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+            : {}
+        }
+      >
+        <div className={isLoginPage ? 'z-10 w-full max-w-md mx-auto' : 'w-full'}>
+          <Routes>
+            <Route path="/" element={<Login />} />
 
-          {/* Admin Layout */}
-          <Route
-            path="/admin/*"
-            element={
-              <ProtectedRoute>
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          />
+            {/* Admin routes */}
+            <Route
+              path="/admin/*"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Super Admin Layout */}
-          <Route
-            path="/superadmin/*"
-            element={
-              <ProtectedRoute>
-                <SuperAdminLayout />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+            {/* SuperAdmin routes */}
+            <Route
+              path="/superadmin/*"
+              element={
+                <ProtectedRoute allowedRoles={['SUPER_ADMIN']}>
+                  <SuperAdminLayout />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </AuthProvider>
   );
 }
 

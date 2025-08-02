@@ -16,7 +16,7 @@ export default function AdminLayout() {
 
   return (
     <div className="flex h-screen bg-gray-200">
-      <AppSidebar collapsed={collapsed} setCollapsed={setCollapsed} role="admin" />
+      <AppSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <div className={`flex-1 flex flex-col transition-all duration-300 ${collapsed ? 'ml-20' : 'ml-64'}`}>
         <main className="p-4 overflow-y-auto flex-1">
           <Routes>

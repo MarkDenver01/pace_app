@@ -11,21 +11,24 @@ import RotateIcon from "../components/sidebar/RotateIcon";
 import SidebarDropdown from "../components/sidebar/SidebarDropdown";
 import { LogOut } from "lucide-react";
 import { useThemeContext } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext"; 
 
 interface Props {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
-  role: "admin" | "superadmin";
 }
 
-export default function AppSidebar({ collapsed, setCollapsed, role }: Props) {
+export default function AppSidebar({ collapsed, setCollapsed }: Props) {
+  const { role, logout} = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const { themeName } = useThemeContext();
 
   const sidebarMenu: SidebarMenuSection[] =
-    role === "admin" ? adminSidebarMenu : superAdminSidebarMenu;
+    role === "ADMIN" ? adminSidebarMenu : 
+    role === "SUPER_ADMIN" ? superAdminSidebarMenu :
+    []
 
   useEffect(() => {
     const expanded: Record<string, boolean> = {};
@@ -148,14 +151,13 @@ export default function AppSidebar({ collapsed, setCollapsed, role }: Props) {
         )}
       </div>
 
-      {/* Logout */}
+      {/*  Logout */}
       <div className="border-t p-3">
         <button
           onClick={() => {
             const confirmLogout = confirm("Are you sure you want to logout?");
             if (confirmLogout) {
-              localStorage.removeItem("user");
-              navigate("/");
+              logout(); // clean logout from context
             }
           }}
           className="w-full flex items-center gap-3 transition-all duration-200 px-4 py-2 rounded-md hover:bg-[var(--sidebar-hover-bg)]"

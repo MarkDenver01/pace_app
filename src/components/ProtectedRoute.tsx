@@ -1,32 +1,25 @@
-// import { Navigate } from "react-router-dom";
-// import { useAuth } from "../context/AuthContext";
-import type { JSX } from "react";
-//import { Navigate, useLocation } from "react-router-dom";
-//import { useAuth } from "../context/AuthContext.tsx";
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 interface ProtectedRouteProps {
-  children: JSX.Element;
+  allowedRoles: string[];
+  children: React.ReactNode;
 }
 
-const ProtectedRoute = ({ children }: ProtectedRouteProps): JSX.Element => {
-  // const { token, role } = useAuth();
-  // const location = useLocation();
-  //
-  // if (!token) {
-  //   return <Navigate to="/" replace />;
-  // }
-  //
-  // if (role === "admin" && !location.pathname.startsWith("/admin")) {
-  //   return <Navigate to="/admin/dashboard" replace />;
-  // }
-  //
-  // if (role === "superadmin" && !location.pathname.startsWith("/superadmin")) {
-  //   return <Navigate to="/superadmin/dashboard" replace />;
-  // }
-  //
-  return children;
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, children }) => {
+  const { isAuthenticated, role } = useAuth();
+  const location = useLocation();
+
+  if (!isAuthenticated || !role) {
+    return <Navigate to="/" state={{ from: location }} replace />;
+  }
+
+  if (!allowedRoles.includes(role)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;
-
-
