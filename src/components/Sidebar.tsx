@@ -12,6 +12,8 @@ import SidebarDropdown from "../components/sidebar/SidebarDropdown";
 import { LogOut } from "lucide-react";
 import { useThemeContext } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext"; 
+import Swal from "sweetalert2";
+import { getSwalTheme } from "../utils/getSwalTheme";
 
 interface Props {
   collapsed: boolean;
@@ -29,6 +31,23 @@ export default function AppSidebar({ collapsed, setCollapsed }: Props) {
     user?.role === "ADMIN" ? adminSidebarMenu : 
     user?.role === "SUPER_ADMIN" ? superAdminSidebarMenu :
     []
+
+  const handleLogout = async () => {
+
+    const result = await Swal.fire({
+      title: "Are you sure you want to logout?",
+      icon: "warning",
+      showCancelButton: true,
+      cancelButtonColor: "#6b7280", // gray-500
+      confirmButtonText: "Yes, logout",
+      cancelButtonText: "Cancel",
+      ...getSwalTheme(),
+    });
+
+    if (result.isConfirmed) {
+      logout();
+    }
+  };
 
   useEffect(() => {
     const expanded: Record<string, boolean> = {};
@@ -154,12 +173,7 @@ export default function AppSidebar({ collapsed, setCollapsed }: Props) {
       {/*  Logout */}
       <div className="border-t p-3">
         <button
-          onClick={() => {
-            const confirmLogout = confirm("Are you sure you want to logout?");
-            if (confirmLogout) {
-              logout(); // clean logout from context
-            }
-          }}
+          onClick={handleLogout}
           className="w-full flex items-center gap-3 transition-all duration-200 px-4 py-2 rounded-md hover:bg-[var(--sidebar-hover-bg)]"
         >
           <LogOut size={18} />

@@ -1,61 +1,84 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
-import {
-  Pagination,
-  Modal,
-  Button as FlowbiteButton,
-  ModalHeader,
-  ModalBody,
-} from "flowbite-react";
+import { Pagination } from "flowbite-react";
+import { approveStudent, fetchPendingStudents } from "../../../libs/ApiResponseService";
+import { type StudentResponse } from "../../../libs/models/response/StudentResponse";
+import { format, toZonedTime  } from "date-fns-tz";
+import Swal from 'sweetalert2';
+import { getSwalTheme } from "../../../utils/getSwalTheme";
 
-interface PendingStudent {
-  name: string;
-  email: string;
-  requestedDate: string;
-}
-
-const initialStudents: PendingStudent[] = [
-  {
-    name: "Madizon Mae",
-    email: "madizon@gmail.com",
-    requestedDate: "05/23/25",
-  },
-  {
-    name: "Joanne Legazpi",
-    email: "joanne.legazpi@gmail.com",
-    requestedDate: "05/23/25",
-  },
-];
 
 type ActionType = "approve" | "reject" | null;
 
 export default function StudentAccountMonitoring() {
-  const [students, setStudents] = useState(initialStudents);
+  const [students, setStudents] = useState<StudentResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
-
-  const [showModal, setShowModal] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<PendingStudent | null>(null);
-  const [actionType, setActionType] = useState<ActionType>(null);
 
   const totalPages = Math.ceil(students.length / pageSize);
   const paginatedData = students.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  const openModal = (student: PendingStudent, type: ActionType) => {
-    setSelectedStudent(student);
-    setActionType(type);
-    setShowModal(true);
+  const timezone = 'Asia/Manila'; // GMT+8
+  
+  const handleAction = async (student: StudentResponse, type: ActionType) => {
+
+    const result = await Swal.fire({
+      title: `Are you sure you want to ${type} ${student.userName}'s account?`,
+      icon: "warning",
+      showCancelButton: true,
+      cancelButtonColor: "#6b7280", // gray-500
+      confirmButtonText: type === "approve" ? "Yes, Approve" : "Yes, Reject",
+      cancelButtonText: "Cancel",
+      ...getSwalTheme(),
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const newStatus = type === "approve" ? "APPROVED" : "REJECTED";
+        await approveStudent(student.email, newStatus);
+
+        setStudents((prev) =>
+          prev.filter((s) => s.studentId !== student.studentId)
+        );
+
+        await Swal.fire({
+          title: `${type === "approve" ? "Approved" : "Rejected"}!`,
+          text: `Student ${student.userName}'s account has been ${type}d.`,
+          icon: "success",
+          timer: 1800,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        console.error("Error updating student status:", error);
+        await Swal.fire({
+          title: "Error",
+          text: "There was a problem updating the student status.",
+          icon: "error",
+          ...getSwalTheme(),
+        });
+      }
+    }
   };
 
-  const handleConfirm = () => {
-    if (!selectedStudent || !actionType) return;
+  useEffect(() => {
+    const loadPendingStudents = async () => {
+      try {
+        const response = await fetchPendingStudents(); // Replace with fetchPendingStudents if needed
+        const pending = response.students.filter(
+          (student) => student.userAccountStatus === "PENDING"
+        );
+        setStudents(pending);
+      } catch (error) {
+        console.error("Failed to load pending students:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    setStudents((prev) => prev.filter((s) => s.email !== selectedStudent.email));
-    setShowModal(false);
-    setSelectedStudent(null);
-    setActionType(null);
-    // TODO: trigger backend API here
-  };
+    loadPendingStudents();
+  }, []);
 
   return (
     <div
@@ -83,40 +106,41 @@ export default function StudentAccountMonitoring() {
         </tr>
         </thead>
         <tbody>
-        {paginatedData.length > 0 ? (
-          paginatedData.map((student) => (
-            <tr key={student.email} className="transition hover:bg-[var(--divider-color)]">
-              <td className="p-3 border border-gray-300 font-medium">{student.name}</td>
-              <td className="p-3 border border-gray-300">{student.email}</td>
-              <td className="p-3 border border-gray-300">{student.requestedDate}</td>
-              <td className="p-3 border border-gray-300 space-x-2">
-                <button
-                  onClick={() => openModal(student, "approve")}
-                  className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded-md transition"
-                >
-                  Approve
-                </button>
-                <button
-                  onClick={() => openModal(student, "reject")}
-                  className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-md transition"
-                >
-                  Reject
-                </button>
+          {loading ? (
+            <tr>
+              <td colSpan={4} className="p-4 text-center border border-gray-300">
+                Loading...
               </td>
             </tr>
-          ))
-        ) : (
-          <tr>
-            <td
-              colSpan={4}
-              className="p-4 text-center border border-gray-300"
-              style={{ color: "var(--muted-text-color)" }}
-            >
-              No pending student accounts.
-            </td>
-          </tr>
-        )}
-        </tbody>
+            ) : paginatedData.length > 0 ? (
+              paginatedData.map((student) => (
+              <tr key={student.studentId} className="transition hover:bg-[var(--divider-color)]">
+                <td className="p-3 border border-gray-300 font-medium">{student.userName}</td>
+                <td className="p-3 border border-gray-300">{student.email}</td>
+                <td className="p-3 border border-gray-300">{student.requestedDate 
+                ? format(toZonedTime(new Date(student.requestedDate), timezone), "MMM dd, yyyy hh:mm a") : "No date"}
+                </td>
+                <td className="p-3 border border-gray-300 space-x-2">
+                  <button onClick={() => handleAction(student, "approve")}
+                  className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded-md transition"
+                  >
+                    Approve
+                    </button>
+                    <button onClick={() => handleAction(student, "reject")}
+                    className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-md transition">
+                      Reject
+                    </button>
+                </td>
+              </tr>
+              ))
+            ) : (
+            <tr>
+              <td colSpan={4} className="p-4 text-center border border-gray-300">
+                No pending student accounts.
+              </td>
+            </tr>
+          )}
+      </tbody>
       </table>
 
       {/* Pagination */}
@@ -147,37 +171,6 @@ export default function StudentAccountMonitoring() {
           </div>
         </div>
       )}
-
-      {/* Modal */}
-      <Modal show={showModal} onClose={() => setShowModal(false)} size="md" popup>
-        <ModalHeader />
-        <ModalBody>
-          <div className="text-center">
-            <h3 className="mb-5 text-lg font-normal" style={{ color: "var(--text-color)" }}>
-              Are you sure you want to{" "}
-              <span
-                className={`font-semibold ${
-                  actionType === "approve" ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {actionType === "approve" ? "approve" : "reject"}
-              </span>{" "}
-              <span className="font-semibold">{selectedStudent?.name}</span>'s account?
-            </h3>
-            <div className="flex justify-center gap-4 mt-6">
-              <FlowbiteButton color="gray" onClick={() => setShowModal(false)}>
-                Cancel
-              </FlowbiteButton>
-              <FlowbiteButton
-                color={actionType === "approve" ? "success" : "failure"}
-                onClick={handleConfirm}
-              >
-                {actionType === "approve" ? "Yes, Approve" : "Yes, Reject"}
-              </FlowbiteButton>
-            </div>
-          </div>
-        </ModalBody>
-      </Modal>
     </div>
   );
 }

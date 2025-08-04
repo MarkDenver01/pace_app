@@ -46,6 +46,27 @@ export async function fetchApprovedStudents(): Promise<StudentListResponse> {
 }
 
 /**
+ * Approves a student account.
+ * @param email The email of the student to approve.
+ * @param accountStatus The new account status for the student.
+ * @returns Promise<void>
+ */
+export async function approveStudent(email: string, accountStatus: string): Promise<void> {
+  try {
+    await api.post('/admin/api/student_approve', null, {
+      params: {
+        email,
+        user_account_status: accountStatus,
+      },
+    });
+  } catch (error: any) {
+    console.error('Error approving student:', error);
+    throw error.response?.data || { message: 'Failed to approve student' };
+  }
+}
+
+
+/**
  *  * Logs in a user with the provided credentials. 
  * @param request LoginRequest
  */

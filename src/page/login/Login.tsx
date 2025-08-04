@@ -7,6 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 //import AlertDialog from "../../components/AlertDialog";
 import { type LoginResponse } from "../../libs/models/response/LoginResponse";
 import Swal from "sweetalert2";
+import { getSwalTheme } from "../../utils/getSwalTheme";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -66,6 +67,7 @@ const Login: React.FC = () => {
               title: "Welcome " + user.username + "!",
               text: "Tap proceed to the admin dashboard.",
               confirmButtonText: "PROCEED",
+              ...getSwalTheme(),
             }).then((result) => {
               if (result.isConfirmed) {
                 navigate("/admin/dashboard", { replace: true });
@@ -77,6 +79,7 @@ const Login: React.FC = () => {
               title: "Welcome " + user.username + "!",
               text: "Tap proceed to the super dashboard.",
               confirmButtonText: "PROCEED",
+              ...getSwalTheme(),
             }).then((result) => {
               if (result.isConfirmed) {
                 navigate("/superadmin/dashboard", { replace: true });
@@ -89,6 +92,7 @@ const Login: React.FC = () => {
               title: "Unauthorized",
               text: "Your role is not authorized to access this application.",
               confirmButtonText: "CLOSE",
+              ...getSwalTheme(),
           });  
         }
       };
