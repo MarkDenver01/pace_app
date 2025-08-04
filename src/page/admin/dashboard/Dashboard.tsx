@@ -5,8 +5,32 @@ import {
   ServerCog,
 } from "lucide-react";
 import DashboardTable from "./DashboardDataTable.tsx";
+import { useEffect, useState } from "react";
+import { type StudentListResponse } from "../../../libs/models/response/StudentListResponse.ts";
+import { fetchApprovedStudents } from "../../../libs/ApiResponseService";
+import { utils } from "../../../utils/utils.ts";
 
 export default function Dashboard() {
+  const [approvedStudents, setApprovedStudents] = useState<StudentListResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  useEffect(() => {
+    const loadApprovedStudents = async () => {
+      try {
+        const studentResponse = await fetchApprovedStudents();
+        setApprovedStudents(studentResponse);
+        setLastUpdated(new Date()); // update timestamp
+      } catch (error) {
+        console.error("Failed to fetch pending students:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadApprovedStudents();
+  }, []);
+
   const cardClass =
     "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border";
 
@@ -42,10 +66,10 @@ export default function Dashboard() {
             </span>
           </div>
           <div className="text-4xl font-bold" style={valueStyle}>
-            1,234
+            {loading ? "Loading..." : approvedStudents?.total || 0}
           </div>
           <div className="text-xs" style={descStyle}>
-            Updated 1 min ago
+            {utils.getTimeAgo(lastUpdated)}
           </div>
         </div>
 
