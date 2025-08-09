@@ -4,6 +4,7 @@ import { type LoginRequest } from './models/request/LoginRequest';
 import type { StudentListResponse } from './models/response/StudentListResponse';
 import type { CustomizationResponse, CustomizationRequest } from './models/Customization';
 import type { UniversityResponse, UniversityRequest } from './models/University';
+import type { CourseResponse, CourseRequest } from './models/Course';
 
 /**
 * Fetches a list of students from the API.
@@ -143,7 +144,7 @@ export async function updateTheme(
  */
 export async function getUniversities(): Promise<UniversityResponse[]> {
   try {
-    const response = await api.get<UniversityResponse[]>('/superadmin/api/university/get_all_university');
+    const response = await api.get<UniversityResponse[]>('/superadmin/api/university/all');
     return response.data;
   } catch (error: any) {
     console.error('Error fetching universities:', error);
@@ -195,6 +196,38 @@ export async function deleteUniversity(id: number): Promise<void> {
     throw error.response?.data || { message: "Failed to delete university" };
   }
 };
+
+/**
+ * Saves a course to the API.
+ * @param course CourseRequest
+ * @returns Promise<CourseResponse>
+ */
+export async function saveCourse(course: CourseRequest): Promise<CourseResponse> {
+  try {
+    const response = await api.post('/superadmin/api/course/save', course);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error saving course:', error);
+    throw error.response?.data || { message: 'Failed to save course' };
+  }
+}
+
+/**
+ * Fetches all courses from the API.
+ * @returns Promise<CourseResponse[]>
+ */
+export async function getAllCourses(): Promise<CourseResponse[]> {
+  try {
+    const response = await api.get<CourseResponse[]>('/superadmin/api/course/all');
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching courses:', error);
+    throw error.response?.data || { message: 'Failed to fetch courses' };
+  }
+};
+
+
+
 
 
 
