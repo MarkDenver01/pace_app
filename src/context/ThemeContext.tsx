@@ -1,41 +1,59 @@
-import { createContext, useContext, useState, useEffect } from "react";
+// ThemeContext.tsx
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 
-// Define theme types
-export type Theme = "light" | "dark" | "redish" | "purplelish" | "brownish";
+export type Theme =
+  | "light"
+  | "dark"
+  | "redish"
+  | "purplelish"
+  | "brownish"
+  | "super_admin"
+  | "custom_admin";
 
-// Context shape
 interface ThemeContextProps {
   themeName: Theme;
   setThemeName: (theme: Theme) => void;
 }
 
-// Create context
+const defaultTheme: Theme = "light";
+
+const ALL_THEMES: Theme[] = [
+  "light",
+  "dark",
+  "redish",
+  "purplelish",
+  "brownish",
+  "super_admin",
+  "custom_admin",
+];
+
+function isTheme(value: string): value is Theme {
+  return ALL_THEMES.includes(value as Theme);
+}
+
 const ThemeContext = createContext<ThemeContextProps>({
-  themeName: "light",
+  themeName: defaultTheme,
   setThemeName: () => {},
 });
 
-// Provider component
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [themeName, setThemeNameState] = useState<Theme>("light");
+  const [themeName, setThemeNameState] = useState<Theme>(defaultTheme);
 
-  // Sync theme state with HTML attribute and localStorage
-  const setThemeName = (newTheme: Theme) => {
+  const setThemeName = useCallback((newTheme: Theme) => {
+    console.log("[ThemeContext] Setting theme:", newTheme);
     setThemeNameState(newTheme);
     document.documentElement.setAttribute("data-theme", newTheme);
     localStorage.setItem("themeName", newTheme);
-  };
+  }, []);
 
-  // On mount: load from localStorage and apply
   useEffect(() => {
-    const savedTheme = localStorage.getItem("themeName") as Theme | null;
-    if (savedTheme) {
+    const savedTheme = localStorage.getItem("themeName");
+    if (savedTheme && isTheme(savedTheme)) {
       setThemeName(savedTheme);
     } else {
-      // fallback to light
-      document.documentElement.setAttribute("data-theme", "light");
+      document.documentElement.setAttribute("data-theme", defaultTheme);
     }
-  }, []);
+  }, [setThemeName]);
 
   return (
     <ThemeContext.Provider value={{ themeName, setThemeName }}>
@@ -44,5 +62,4 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// Hook to use theme context
 export const useThemeContext = () => useContext(ThemeContext);

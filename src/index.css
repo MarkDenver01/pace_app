@@ -10,6 +10,27 @@ html, body, #root {
     padding: 0;
 }
 
+/* ========== Can be used only by SUPER ADMIN ========== */
+[data-theme="super_admin"] {
+    /* Map super_admin variables to generic theme variables */
+    --button-color: #D94022;
+    --bg-color: #ffffff;
+    --text-color: #1f2937;
+    --card-color: #f9fafb;
+
+    --sidebar-bg: #D94022;
+    --sidebar-border: #b93218;
+    --sidebar-header-bg: #C2371D;
+    --sidebar-hover-bg: #e85638;
+    --sidebar-text: #ffffff;
+
+    --sidebar-active-bg: rgba(255, 255, 255, 0.1);
+    --sidebar-border-active: #ffffff;
+    --sidebar-border-hover: #ffffff88;
+
+    --divider-color: rgba(31, 41, 55, 0.1);
+    --muted-text-color: #6b7280;
+}
 
 /* ========== Light Theme ========== */
 [data-theme="light"] {
@@ -28,9 +49,8 @@ html, body, #root {
     --sidebar-border-active: #ffffff;
     --sidebar-border-hover: #ffffff88;
 
-    --divider-color: rgba(31, 41, 55, 0.1); /* dim gray */
-
-    --muted-text-color: #6b7280; /* gray-500 */
+    --divider-color: rgba(31, 41, 55, 0.1);
+    --muted-text-color: #6b7280;
 }
 
 /* ========== Dark Theme ========== */
@@ -50,9 +70,8 @@ html, body, #root {
     --sidebar-border-active: #f3f4f6;
     --sidebar-border-hover: #f3f4f677;
 
-    --divider-color: rgba(255, 255, 255, 0.2); /* light */
-
-    --muted-text-color: #d1d5db; /* gray-300 */
+    --divider-color: rgba(255, 255, 255, 0.2);
+    --muted-text-color: #d1d5db;
 }
 
 /* ========== Redish Theme ========== */
@@ -72,9 +91,8 @@ html, body, #root {
     --sidebar-border-active: #fff1f2;
     --sidebar-border-hover: #fff1f288;
 
-    --divider-color: rgba(31, 41, 55, 0.1); /* dim gray */
-
-    --muted-text-color: #7f1d1d; /* dark red */
+    --divider-color: rgba(31, 41, 55, 0.1);
+    --muted-text-color: #7f1d1d;
 }
 
 /* ========== Purplelish Theme ========== */
@@ -94,9 +112,8 @@ html, body, #root {
     --sidebar-border-active: #ede9fe;
     --sidebar-border-hover: #ede9feaa;
 
-    --divider-color: rgba(31, 41, 55, 0.1); /* dim gray */
-
-    --muted-text-color: #6b21a8; /* medium purple */
+    --divider-color: rgba(31, 41, 55, 0.1);
+    --muted-text-color: #6b21a8;
 }
 
 /* ========== Brownish Theme ========== */
@@ -116,9 +133,8 @@ html, body, #root {
     --sidebar-border-active: #fff7ed;
     --sidebar-border-hover: #fff7ed99;
 
-    --divider-color: rgba(31, 41, 55, 0.1); /* dim gray */
-
-    --muted-text-color: #78350f; /* deep brown */
+    --divider-color: rgba(31, 41, 55, 0.1);
+    --muted-text-color: #78350f;
 }
 
 /* ======================
@@ -169,22 +185,20 @@ body {
 }
 
 .swal-theme {
-  background-color: var(--card-color) !important;
-  color: var(--text-color) !important;
-  border-radius: 0.75rem;
+    background-color: var(--card-color) !important;
+    color: var(--text-color) !important;
+    border-radius: 0.75rem;
 }
 
 .swal-confirm-button {
-  background-color: var(--button-color) !important;
-  color: white !important;
-  border-radius: 9999px;
-  padding: 0.5rem 1.25rem;
+    background-color: var(--button-color) !important;
+    color: white !important;
+    border-radius: 9999px;
+    padding: 0.5rem 1.25rem;
 }
 
 .swal-cancel-button {
-  background-color: #6b7280 !important; /* optional for cancel buttons */
-  color: white !important;
-  border-radius: 9999px;
+    background-color: #6b7280 !important;
+    color: white !important;
+    border-radius: 9999px;
 }
-
-
