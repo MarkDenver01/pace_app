@@ -4,6 +4,7 @@ import {
   Button,
   Label,
   Pagination,
+  Select,
   Textarea,
   TextInput,
 } from "flowbite-react";
@@ -13,6 +14,12 @@ interface Course {
   name: string;
   description: string;
   status: "Active" | "Inactive";
+  universityId?: number;
+}
+
+interface University {
+  id: number;
+  name: string;
 }
 
 const initialCourses: Course[] = [
@@ -22,10 +29,18 @@ const initialCourses: Course[] = [
   { id: 4, name: "Education", description: "Teaching and pedagogy", status: "Inactive" },
 ];
 
+const universities: University[] = [
+  { id: 1, name: "Harvard University" },
+  { id: 2, name: "MIT" },
+  { id: 3, name: "Stanford University" },
+  { id: 4, name: "Oxford University" },
+];
+
 export default function CourseTableLayout() {
   const [currentPage, setCurrentPage] = useState(1);
   const [courseName, setCourseName] = useState("");
   const [description, setDescription] = useState("");
+  const [selectedUniversity, setSelectedUniversity] = useState<number | "">("");
 
   const pageSize = 5;
   const totalPages = Math.ceil(initialCourses.length / pageSize);
@@ -35,13 +50,19 @@ export default function CourseTableLayout() {
   );
 
   const handleSave = () => {
-    alert(`Course Saved:\nName: ${courseName}\nDescription: ${description}`);
+    alert(
+      `Course Saved:\nName: ${courseName}\nDescription: ${description}\nUniversity: ${
+        universities.find((u) => u.id === selectedUniversity)?.name || "N/A"
+      }`
+    );
     setCourseName("");
     setDescription("");
+    setSelectedUniversity("");
   };
 
   // THEME styles
-  const cardClass = "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md card-theme border";
+  const cardClass =
+    "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md card-theme border";
   const iconWrapperStyle = {
     backgroundColor: "var(--button-color, #D94022)10",
     color: "var(--button-color)",
@@ -64,6 +85,27 @@ export default function CourseTableLayout() {
             Add New Course
           </h3>
           <div className="space-y-4">
+            {/* University Dropdown */}
+            <div>
+              <Label htmlFor="university" className="text-sm" style={valueStyle}>
+                University
+              </Label>
+              <Select
+                id="university"
+                value={selectedUniversity}
+                onChange={(e) => setSelectedUniversity(Number(e.target.value))}
+                className="mt-1"
+              >
+                <option value="">Select a university...</option>
+                {universities.map((uni) => (
+                  <option key={uni.id} value={uni.id}>
+                    {uni.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+
+            {/* Course Name */}
             <div>
               <Label htmlFor="courseName" className="text-sm" style={valueStyle}>
                 Course Name
@@ -76,6 +118,8 @@ export default function CourseTableLayout() {
                 className="mt-1"
               />
             </div>
+
+            {/* Save Button */}
             <div className="flex justify-center pt-2">
               <Button
                 onClick={handleSave}
@@ -104,7 +148,7 @@ export default function CourseTableLayout() {
             <Textarea
               id="description"
               placeholder="Brief course description..."
-              rows={5}
+              rows={8}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="mt-1"
@@ -130,25 +174,25 @@ export default function CourseTableLayout() {
       <div className="overflow-auto border rounded-xl mt-3">
         <table className="min-w-full text-sm text-left" style={valueStyle}>
           <thead style={{ backgroundColor: "var(--button-color)", color: "#fff" }}>
-          <tr>
-            <th className="p-3 font-medium">ID</th>
-            <th className="p-3 font-medium">Course Name</th>
-            <th className="p-3 font-medium">Description</th>
-            <th className="p-3 font-medium">Status</th>
-            <th className="p-3 font-medium text-center">Action</th>
-          </tr>
+            <tr>
+              <th className="p-3 font-medium">ID</th>
+              <th className="p-3 font-medium">Course Name</th>
+              <th className="p-3 font-medium">Description</th>
+              <th className="p-3 font-medium">Status</th>
+              <th className="p-3 font-medium text-center">Action</th>
+            </tr>
           </thead>
           <tbody style={{ backgroundColor: "var(--card-color)" }}>
-          {paginatedCourses.length > 0 ? (
-            paginatedCourses.map((course) => (
-              <tr
-                key={course.id}
-                className="hover:bg-[#FFEFEA] dark:hover:bg-gray-700 transition"
-              >
-                <td className="p-3">{course.id}</td>
-                <td className="p-3">{course.name}</td>
-                <td className="p-3">{course.description}</td>
-                <td className="p-3">
+            {paginatedCourses.length > 0 ? (
+              paginatedCourses.map((course) => (
+                <tr
+                  key={course.id}
+                  className="hover:bg-[#FFEFEA] dark:hover:bg-gray-700 transition"
+                >
+                  <td className="p-3">{course.id}</td>
+                  <td className="p-3">{course.name}</td>
+                  <td className="p-3">{course.description}</td>
+                  <td className="p-3">
                     <span
                       className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
                         course.status === "Active"
@@ -158,23 +202,23 @@ export default function CourseTableLayout() {
                     >
                       {course.status}
                     </span>
-                </td>
-                <td className="p-3">
-                  <div className="flex justify-center">
-                    <button className="text-xs font-medium text-white bg-[var(--button-color)] px-6 py-1.5 rounded hover:opacity-90">
-                      Edit
-                    </button>
-                  </div>
+                  </td>
+                  <td className="p-3">
+                    <div className="flex justify-center">
+                      <button className="text-xs font-medium text-white bg-[var(--button-color)] px-6 py-1.5 rounded hover:opacity-90">
+                        Edit
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="p-4 text-center text-gray-500">
+                  No courses found.
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={5} className="p-4 text-center text-gray-500">
-                No courses found.
-              </td>
-            </tr>
-          )}
+            )}
           </tbody>
         </table>
       </div>

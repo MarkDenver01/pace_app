@@ -7,6 +7,7 @@ import {
   Settings,
   FolderArchive,
   ClipboardList,
+  School,
 } from "lucide-react";
 import type { SidebarMenuSection } from "../types/sidebar";
 
@@ -93,6 +94,16 @@ export const superAdminSidebarMenu: SidebarMenuSection[] = [
         label: "Records",
         icon: FolderArchive,
         path: "/superadmin/records",
+      },
+    ],
+  },
+   {
+    section: "University",
+    items: [
+      {
+        label: "University Management",
+        icon: School,
+        path: "/superadmin/school_university",
       },
     ],
   },

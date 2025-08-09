@@ -7,6 +7,7 @@ import SuperRecordsPage from "../../page/superadmin/records/SuperRecordsPage.tsx
 import SuperAdminViewRecords from "../../page/superadmin/records/SuperViewRecords.tsx";
 import CourseTableLayout from "../../page/superadmin/courses/SuperCourseManagement.tsx";
 import StatementQuestionPage from "../../page/superadmin/questions/SuperQuestions.tsx";
+import UniversityLayout from '../../page/superadmin/university/SuperUniversityManagement.tsx';
 
 
 export default function SuperAdminLayout() {
@@ -22,6 +23,7 @@ export default function SuperAdminLayout() {
             <Route path="dashboard" element={<SuperAdminDashboard />} />
             <Route path="records" element={<SuperRecordsPage/>} />
             <Route path="records/view" element={<SuperAdminViewRecords />} />
+            <Route path="school_university" element={<UniversityLayout />} />
             <Route path="courses" element={<CourseTableLayout/>} />
             <Route path="questions" element={<StatementQuestionPage/>} />
           </Routes>

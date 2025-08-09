@@ -2,6 +2,8 @@ import api from './api';
 import { type StudentResponse }from './models/response/StudentResponse';
 import { type LoginRequest } from './models/request/LoginRequest';
 import type { StudentListResponse } from './models/response/StudentListResponse';
+import type { CustomizationResponse, CustomizationRequest } from './models/Customization';
+import type { UniversityResponse, UniversityRequest } from './models/University';
 
 /**
 * Fetches a list of students from the API.
@@ -94,5 +96,110 @@ export async function login(request: LoginRequest) {
     throw error.response?.data || { message: 'Login failed' };
   }
 }
+
+/**
+ * Fetches the current theme customization settings.
+ */
+export async function getTheme(): Promise<CustomizationResponse> {
+  try {
+    const response = await api.get('/user/public/get_themes');
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching theme:', error);
+    throw error.response?.data || { message: 'Failed to fetch theme' };
+  }
+}
+
+/**
+ * Updates the current theme customization.
+ */
+export async function updateTheme(
+  request: CustomizationRequest
+): Promise<CustomizationResponse> {
+  try {
+    const formData = new FormData();
+    formData.append('theme', request.themeName);
+    formData.append('aboutText', request.aboutText);
+
+    if (request.logoFile) {
+      formData.append('logo', request.logoFile);
+    }
+
+    const response = await api.post('/admin/api/save_themes', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('Error updating theme:', error);
+    throw error.response?.data || { message: 'Failed to update theme' };
+  }
+}
+
+/**
+ * 
+ * @returns Promise<UniversityResponse[]>
+ * Fetches all universities from the API.
+ */
+export async function getUniversities(): Promise<UniversityResponse[]> {
+  try {
+    const response = await api.get<UniversityResponse[]>('/superadmin/api/university/get_all_university');
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching universities:', error);
+    throw error.response?.data || { message: 'Failed to fetch universities' };
+  }
+};
+
+
+/**
+ * Add a new university to the API.
+ * @param data UniversityRequest.
+ * @returns Promise<UniversityResponse> The created university response.  
+ */
+export async function addUniversity(data: UniversityRequest): Promise<UniversityResponse>  {
+ try {
+   const response = await api.post<UniversityResponse>('/superadmin/api/university/save', data);
+    return response.data;
+ } catch (error: any) {
+   console.error('Error adding university:', error);
+   throw error.response?.data || { message: 'Failed to add university' };
+ }
+};
+
+/**
+ * Updates an existing university.
+ * @param id The ID of the university to update.
+ * @param data UniversityRequest.
+ * @returns Promise<UniversityResponse>
+ */
+export async function updateUniversity(id: number, data: UniversityRequest): Promise<UniversityResponse> {
+  try {
+    const response = await api.put<UniversityResponse>(`/superadmin/api/university/update/${id}`, data); // removed superadmin/
+    return response.data;
+  } catch (error: any) {
+    console.error("Error updating university:", error);
+    throw error.response?.data || { message: "Failed to update university" };
+  }
+};
+
+/**
+ * Deletes a university by ID.
+ * @param id The ID of the university to delete.
+ */
+export async function deleteUniversity(id: number): Promise<void> {
+  try {
+    await api.delete(`/superadmin/api/university/delete/${id}`);
+  } catch (error: any) {
+    console.error("Error deleting university:", error);
+    throw error.response?.data || { message: "Failed to delete university" };
+  }
+};
+
+
+
+
+
+
 
 
