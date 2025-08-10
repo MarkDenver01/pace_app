@@ -1,7 +1,7 @@
 export interface StudentResponse {
     studentId: number;
     userName: string;
-    email: string;
+    email: string; 
     requestedDate: string;
     userAccountStatus: string;
 }

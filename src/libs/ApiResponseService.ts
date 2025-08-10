@@ -5,6 +5,7 @@ import type { StudentListResponse } from './models/response/StudentListResponse'
 import type { CustomizationResponse, CustomizationRequest } from './models/Customization';
 import type { UniversityResponse, UniversityRequest } from './models/University';
 import type { CourseResponse, CourseRequest } from './models/Course';
+import type { UserAccountResponse, UserAccountRequest } from './models/UserAccount';
 
 /**
 * Fetches a list of students from the API.
@@ -210,7 +211,7 @@ export async function saveCourse(course: CourseRequest): Promise<CourseResponse>
     console.error('Error saving course:', error);
     throw error.response?.data || { message: 'Failed to save course' };
   }
-}
+};
 
 /**
  * Fetches all courses from the API.
@@ -225,6 +226,38 @@ export async function getAllCourses(): Promise<CourseResponse[]> {
     throw error.response?.data || { message: 'Failed to fetch courses' };
   }
 };
+
+/**
+ * Saves an account (ADMIN-only endpoint).
+ * @param data AccountRequest
+ * @returns Promise<AccountResponse>
+ */
+export async function saveAccount(data: UserAccountRequest): Promise<UserAccountResponse> {
+  try {
+    const response = await api.post<UserAccountResponse>('/superadmin/api/admin_account/register', data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error saving account:', error);
+    throw error.response?.data || { message: 'Failed to save account' };
+  }
+};
+
+/**
+ * Fetches all accounts (ADMIN-only).
+ * Can optionally be filtered by query params.
+ * @param params Optional filter params
+ * @returns Promise<AccountResponse[]>
+ */
+export async function getAccounts(params?: Record<string, any>): Promise<UserAccountResponse[]> {
+  try {
+    const response = await api.get<UserAccountResponse[]>('/superadmin/api/admin_account/list', { params });
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching accounts:', error);
+    throw error.response?.data || { message: 'Failed to fetch accounts' };
+  }
+};
+
 
 
 

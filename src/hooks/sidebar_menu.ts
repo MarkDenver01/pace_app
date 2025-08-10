@@ -97,7 +97,17 @@ export const superAdminSidebarMenu: SidebarMenuSection[] = [
       },
     ],
   },
-   {
+  {
+    section: "Account",
+    items: [
+      {
+        label: "Account Management",
+        icon: Users,
+        path: "/superadmin/admin_account",
+      },
+    ],
+  },
+  {
     section: "University",
     items: [
       {
