@@ -11,6 +11,9 @@ import type {
   UserAccountRequest,
   UserAccountResponse,
 } from "../../../libs/models/UserAccount";
+import Swal from "sweetalert2";
+import { getSwalTheme } from "../../../utils/getSwalTheme";
+import { set } from "date-fns";
 
 export default function AdminUserLayout() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,6 +24,7 @@ export default function AdminUserLayout() {
 
   const [universities, setUniversities] = useState<UniversityResponse[]>([]);
   const [loadingUnis, setLoadingUnis] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [errorUnis, setErrorUnis] = useState<string | null>(null);
 
   const [users, setUsers] = useState<UserAccountResponse[]>([]);
@@ -76,7 +80,13 @@ export default function AdminUserLayout() {
       !email.trim() ||
       !tempPassword.trim()
     ) {
-      alert("Please fill in all fields.");
+      Swal.fire({
+                    icon: "warning",
+                    title: "Fields Empty",
+                    text: "Please fill in all fields.",
+                    confirmButtonText: "CLOSE",
+                    ...getSwalTheme(),
+                }).then(() => setLoading(false));  
       return;
     }
 
@@ -89,8 +99,15 @@ export default function AdminUserLayout() {
     };
 
     try {
+      setLoading(true);
       await saveAccount(newAccount);
-      alert("User saved successfully!");
+      Swal.fire({
+                    icon: "success",
+                    title: "Account Created",
+                    text: "Account has been successfully created.",
+                    confirmButtonText: "CLOSE",
+                    ...getSwalTheme(),
+                }).then (() => setLoading(false));  
       await fetchUsers(); // Refresh table from backend
 
       // Reset form
@@ -99,7 +116,13 @@ export default function AdminUserLayout() {
       setEmail("");
       setTempPassword("");
     } catch (error: any) {
-      alert(error.message || "Failed to save user");
+         Swal.fire({
+                    icon: "error",
+                    title: "Failed",
+                    text: "Account creation is failed.",
+                    confirmButtonText: "CLOSE",
+                    ...getSwalTheme(),
+                }).then(() => setLoading(false));  
     }
   };
 
@@ -184,11 +207,12 @@ export default function AdminUserLayout() {
         {/* Save Button */}
         <div className="flex justify-end mt-6">
           <Button
+          disabled={loading}
             style={{ backgroundColor: accentColor }}
             className="text-white font-medium px-6"
             onClick={handleSave}
           >
-            Save
+            {loading ? "Creating account..." : "Create Account"}
           </Button>
         </div>
       </div>
