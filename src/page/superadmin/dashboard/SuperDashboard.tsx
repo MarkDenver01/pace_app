@@ -1,48 +1,54 @@
 import { useEffect, useState } from "react";
 import { GraduationCap, Users, BookOpenCheck } from "lucide-react";
+import {
+  getUniversities,
+  getCourseCountByUniversity,
+  getAllCourses
+} from "../../../libs/ApiResponseService";
+import type { UniversityResponse } from "../../../libs/models/University";
+import type { CourseResponse } from "../../../libs/models/Course";
 
 export default function SuperAdminDashboard() {
-  const [universities, setUniversities] = useState(12);
-
-  const [studentsPerCourse, setStudentsPerCourse] = useState({
-    BSIT: 194,
-    BSCS: 100,
-    BASIS: 80,
-    BSA: 76,
-  });
-
-  const [coursesPerUniversity, setCoursesPerUniversity] = useState({
-    "University A": 8,
-    "University B": 5,
-    "University C": 10,
-    "University D": 4,
-  });
+  const [universities, setUniversities] = useState<UniversityResponse[]>([]);
+  const [studentsPerCourse, setStudentsPerCourse] = useState<Record<string, number>>({});
+  const [coursesPerUniversity, setCoursesPerUniversity] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setUniversities((prev) => prev + Math.floor(Math.random() * 2));
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
 
-      setStudentsPerCourse((prev) => ({
-        ...prev,
-        BSIT: prev.BSIT + Math.floor(Math.random() * 3),
-        BSCS: prev.BSCS + Math.floor(Math.random() * 2),
-        BASIS: prev.BASIS + Math.floor(Math.random() * 2),
-        BSA: prev.BSA + Math.floor(Math.random() * 2),
-      }));
+        // 1️⃣ Fetch all universities
+        const uniData = await getUniversities();
+        setUniversities(uniData);
 
-      setCoursesPerUniversity((prev) => ({
-        ...prev,
-        "University A": prev["University A"] + Math.floor(Math.random() * 2),
-        "University B": prev["University B"] + Math.floor(Math.random() * 2),
-        "University C": prev["University C"] + Math.floor(Math.random() * 2),
-        "University D": prev["University D"] + Math.floor(Math.random() * 2),
-      }));
-    }, 3000);
+        // 2️⃣ Fetch all courses to calculate students per course
+        const courseData: CourseResponse[] = await getAllCourses();
+        const studentsByCourse: Record<string, number> = {};
+        courseData.forEach(course => {
+          studentsByCourse[course.courseName] = (studentsByCourse[course.courseName] || 0) + (course.assessed || 0);
+        });
+        setStudentsPerCourse(studentsByCourse);
 
-    return () => clearInterval(interval);
+        // 3️⃣ Fetch active course count for each university
+        const courseCountMap: Record<string, number> = {};
+        for (const uni of uniData) {
+          const count = await getCourseCountByUniversity(uni.universityId);
+          courseCountMap[uni.universityName] = count;
+        }
+        setCoursesPerUniversity(courseCountMap);
+
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
   }, []);
 
-  // Shared styles
   const cardClass =
     "w-full flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border";
 
@@ -51,21 +57,15 @@ export default function SuperAdminDashboard() {
     color: "var(--button-color)",
   };
 
-  const labelStyle = {
-    color: "var(--button-color)",
-  };
+  const labelStyle = { color: "var(--button-color)" };
+  const valueStyle = { color: "var(--text-color)" };
+  const descStyle = { color: "var(--muted-text-color, #6b7280)" };
 
-  const valueStyle = {
-    color: "var(--text-color)",
-  };
-
-  const descStyle = {
-    color: "var(--muted-text-color, #6b7280)",
-  };
+  if (loading) return <p className="p-4">Loading dashboard...</p>;
 
   return (
     <div className="p-4 flex flex-col gap-6">
-      {/* Card 1: Total Universities */}
+      {/* Total Universities */}
       <div className={cardClass}>
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-full" style={iconWrapperStyle}>
@@ -76,14 +76,14 @@ export default function SuperAdminDashboard() {
           </span>
         </div>
         <div className="text-4xl font-bold" style={valueStyle}>
-          {universities}
+          {universities.length}
         </div>
         <div className="text-xs" style={descStyle}>
-          Updated live
+          Fetched from backend
         </div>
       </div>
 
-      {/* Card 2: Students Per Course */}
+      {/* Students Per Course */}
       <div className={cardClass}>
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-full" style={iconWrapperStyle}>
@@ -104,11 +104,11 @@ export default function SuperAdminDashboard() {
           </ul>
         </div>
         <div className="text-xs" style={descStyle}>
-          Assessment-based live count
+          From course assessment data
         </div>
       </div>
 
-      {/* Card 3: Courses Per University */}
+      {/* Courses Per University */}
       <div className={cardClass}>
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-full" style={iconWrapperStyle}>
