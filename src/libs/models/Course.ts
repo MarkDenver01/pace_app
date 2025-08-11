@@ -1,7 +1,10 @@
 export interface CourseResponse {
-    courseName: String;
-    courseDescription: String;
-    status: String;
+    courseName: string;
+    courseDescription: string;
+    status: string;
+    universityId: number;
+    max: number;
+    assessed: number;
 }
 
 export interface CourseRequest {

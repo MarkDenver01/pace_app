@@ -2,60 +2,66 @@ import { useEffect, useState } from "react";
 import { Button } from "flowbite-react";
 import { BookOpen, Users } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
-
-// Dummy data
-const universityCourses: Record<
-  string,
-  { name: string; assessed: number; max: number }[]
-> = {
-  "University A": [
-    { name: "IT", assessed: 20, max: 100 },
-    { name: "Crim", assessed: 50, max: 100 },
-    { name: "NURSE", assessed: 70, max: 100 },
-    { name: "EDUC", assessed: 60, max: 150 },
-    { name: "ENGINEERING", assessed: 10, max: 100 },
-    { name: "Business", assessed: 90, max: 100 },
-    { name: "Psych", assessed: 100, max: 100 },
-    { name: "HRM", assessed: 45, max: 80 },
-    { name: "Tourism", assessed: 30, max: 90 },
-    { name: "Accountancy", assessed: 55, max: 100 },
-    { name: "Marketing", assessed: 28, max: 80 },
-    { name: "Political Science", assessed: 32, max: 70 },
-    { name: "Agriculture", assessed: 18, max: 60 },
-  ],
-  "University B": [
-    { name: "Law", assessed: 25, max: 100 },
-    { name: "Nursing", assessed: 30, max: 80 },
-    { name: "Marine Biology", assessed: 40, max: 85 },
-    { name: "Physics", assessed: 12, max: 50 },
-  ],
-  "University C": [
-    { name: "CS", assessed: 40, max: 90 },
-    { name: "IT", assessed: 60, max: 100 },
-    { name: "Chemistry", assessed: 20, max: 60 },
-    { name: "Mathematics", assessed: 25, max: 65 },
-    { name: "Architecture", assessed: 22, max: 70 },
-  ],
-  "University D": [
-    { name: "Education", assessed: 80, max: 120 },
-    { name: "Fine Arts", assessed: 35, max: 60 },
-    { name: "Philosophy", assessed: 10, max: 40 },
-  ],
-};
+import { getUniversities, getAllCourses } from "../../../libs/ApiResponseService";
+import type { UniversityResponse } from "../../../libs/models/University";
+import type { CourseResponse } from "../../../libs/models/Course";
 
 export default function SuperViewRecords() {
-  const [searchParams] = useSearchParams();
-  const defaultUniversity = searchParams.get("university") || "University A";
-  const [selectedUniversity, setSelectedUniversity] = useState(defaultUniversity);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [universities, setUniversities] = useState<UniversityResponse[]>([]);
+  const [courses, setCourses] = useState<CourseResponse[]>([]);
+  const [selectedUniversityId, setSelectedUniversityId] = useState<number | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const activeCourses = universityCourses[selectedUniversity] || [];
+  // Fetch universities
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      try {
+        const univData = await getUniversities();
+        setUniversities(univData);
 
+        const queryUnivId = Number(searchParams.get("university"));
+        if (queryUnivId && univData.some(u => u.universityId === queryUnivId)) {
+          setSelectedUniversityId(queryUnivId);
+        } else if (univData.length > 0) {
+          // default to first university if query param invalid/missing
+          setSelectedUniversityId(univData[0].universityId);
+          setSearchParams({ university: String(univData[0].universityId) });
+        }
+      } catch (err) {
+        console.error("Error loading universities:", err);
+      }
+    };
+    fetchUniversities();
+  }, [searchParams, setSearchParams]);
+
+  // Fetch courses whenever selectedUniversityId changes
+  useEffect(() => {
+    const fetchCourses = async () => {
+      if (!selectedUniversityId) return;
+      setLoading(true);
+      try {
+        const allCourses = await getAllCourses();
+        const filtered = allCourses.filter(
+          (c: CourseResponse) =>
+            c.status === "Active" && c.universityId === selectedUniversityId
+        );
+        setCourses(filtered);
+      } catch (err) {
+        console.error("Error loading courses:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, [selectedUniversityId]);
+
+  // Reset selected course when university changes
   useEffect(() => {
     setSelectedCourse(null);
-  }, [selectedUniversity]);
+  }, [selectedUniversityId]);
 
-  // Match dashboard theme exactly
   const cardClass =
     "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border";
 
@@ -64,17 +70,13 @@ export default function SuperViewRecords() {
     color: "var(--button-color)",
   };
 
-  const labelStyle = {
-    color: "var(--button-color)",
-  };
+  const labelStyle = { color: "var(--button-color)" };
+  const valueStyle = { color: "var(--text-color)" };
+  const descStyle = { color: "var(--muted-text-color, #6b7280)" };
 
-  const valueStyle = {
-    color: "var(--text-color)",
-  };
-
-  const descStyle = {
-    color: "var(--muted-text-color, #6b7280)",
-  };
+  if (loading) {
+    return <div className="p-4">Loading records...</div>;
+  }
 
   return (
     <div className="p-4 flex flex-col gap-8">
@@ -88,22 +90,26 @@ export default function SuperViewRecords() {
             University:
           </label>
           <select
-            value={selectedUniversity}
-            onChange={(e) => setSelectedUniversity(e.target.value)}
+            value={selectedUniversityId ?? ""}
+            onChange={(e) => {
+              const newId = Number(e.target.value);
+              setSelectedUniversityId(newId);
+              setSearchParams({ university: String(newId) });
+            }}
             className="w-64 border rounded-md p-2 bg-white text-sm"
           >
-            {Object.keys(universityCourses).map((univ) => (
-              <option key={univ} value={univ}>
-                {univ}
+            {universities.map((univ) => (
+              <option key={univ.universityId} value={univ.universityId}>
+                {univ.universityName}
               </option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* Grid layout matching dashboard theme */}
+      {/* Grid layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Card: Active Courses */}
+        {/* Active Courses */}
         <div className={cardClass}>
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-full" style={iconWrapperStyle}>
@@ -115,29 +121,29 @@ export default function SuperViewRecords() {
           </div>
 
           <div className="flex-1 overflow-y-auto flex flex-col items-center gap-3 max-h-[460px] mt-2 pr-1">
-            {activeCourses.map((course) => (
+            {courses.map((course) => (
               <Button
-                key={course.name}
-                onClick={() => setSelectedCourse(course.name)}
+                key={course.courseId ?? course.courseName}
+                onClick={() => setSelectedCourse(course.courseName)}
                 style={{
                   width: "100%",
                   height: "42px",
                   backgroundColor:
-                    selectedCourse === course.name
+                    selectedCourse === course.courseName
                       ? "var(--button-color)"
                       : "var(--card-color)",
                   color:
-                    selectedCourse === course.name
+                    selectedCourse === course.courseName
                       ? "#ffffff"
                       : "var(--text-color)",
                   border:
-                    selectedCourse === course.name
+                    selectedCourse === course.courseName
                       ? "none"
                       : "1px solid var(--divider-color)",
                 }}
                 className="rounded-md text-sm font-medium transition-all flex items-center justify-center"
               >
-                {course.name}
+                {course.courseName}
               </Button>
             ))}
           </div>
@@ -147,7 +153,7 @@ export default function SuperViewRecords() {
           </div>
         </div>
 
-        {/* Card: Result Viewer */}
+        {/* Result Viewer */}
         <div className={cardClass}>
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-full" style={iconWrapperStyle}>
@@ -169,12 +175,11 @@ export default function SuperViewRecords() {
                   Student Assessed:
                   <span className="font-semibold ml-1">
                     {
-                      activeCourses.find((c) => c.name === selectedCourse)?.assessed
+                      courses.find((c) => c.courseName === selectedCourse)
+                        ?.assessed
                     }
                     /
-                    {
-                      activeCourses.find((c) => c.name === selectedCourse)?.max
-                    }
+                    {courses.find((c) => c.courseName === selectedCourse)?.max}
                   </span>
                 </p>
               </div>

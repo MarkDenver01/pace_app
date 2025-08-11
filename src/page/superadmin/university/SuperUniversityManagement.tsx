@@ -134,7 +134,7 @@ export default function UniversityLayout() {
             />
           </div>
           <div className="flex justify-center pt-2">
-            <ThemedButton onClick={handleSave} loading={saving} >Save</ThemedButton>
+            <ThemedButton onClick={handleSave} loading={saving} >Add New University</ThemedButton>
           </div>
         </div>
 

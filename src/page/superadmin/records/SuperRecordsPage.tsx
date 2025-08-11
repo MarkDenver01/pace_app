@@ -1,41 +1,71 @@
-import { useState } from "react";
-import { Select, Button } from "flowbite-react";
+import { useEffect, useState } from "react";
+import { Select, Button, Spinner } from "flowbite-react";
 import { School2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-const universityData = {
-  "University A": 15,
-  "University B": 12,
-  "University C": 8,
-  "University D": 19,
-} as const;
-
-type UniversityName = keyof typeof universityData;
+import type { UniversityResponse } from "../../../libs/models/University";
+import { getUniversities, getCourseCountByUniversity } from "../../../libs/ApiResponseService";
 
 export default function SuperRecordsPage() {
-  const [selectedUniversity, setSelectedUniversity] = useState<UniversityName>("University A");
+  const [universities, setUniversities] = useState<UniversityResponse[]>([]);
+  const [selectedUniversity, setSelectedUniversity] = useState<number | null>(null);
+  const [loadingUniversities, setLoadingUniversities] = useState(true);
+  const [loadingCourses, setLoadingCourses] = useState(false);
+  const [courseCount, setCourseCount] = useState<number>(0);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      try {
+        setLoadingUniversities(true);
+        const data = await getUniversities();
+        setUniversities(data);
+        if (data.length > 0) {
+          setSelectedUniversity(data[0].universityId);
+        }
+      } catch (error) {
+        console.error("Error loading universities:", error);
+      } finally {
+        setLoadingUniversities(false);
+      }
+    };
+    fetchUniversities();
+  }, []);
+
+  // Fetch course count whenever university changes
+  useEffect(() => {
+    const fetchCourseCount = async () => {
+      if (selectedUniversity) {
+        try {
+          setLoadingCourses(true);
+          const count = await getCourseCountByUniversity(selectedUniversity);
+          setCourseCount(count);
+        } catch (error) {
+          console.error("Error loading course count:", error);
+          setCourseCount(0);
+        } finally {
+          setLoadingCourses(false);
+        }
+      }
+    };
+    fetchCourseCount();
+  }, [selectedUniversity]);
+
   const handleViewClick = () => {
-    navigate(`/superadmin/records/view?university=${encodeURIComponent(selectedUniversity)}`);
+    if (selectedUniversity) {
+      navigate(`/superadmin/records/view?university=${selectedUniversity}`);
+    }
   };
 
-  // Themed shared styles
+  // Shared styles
   const cardClass =
     "w-full flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border";
   const iconWrapperStyle = {
     backgroundColor: "var(--button-color, #D94022)10",
     color: "var(--button-color)",
   };
-  const labelStyle = {
-    color: "var(--button-color)",
-  };
-  const valueStyle = {
-    color: "var(--text-color)",
-  };
-  const descStyle = {
-    color: "var(--muted-text-color, #6b7280)",
-  };
+  const labelStyle = { color: "var(--button-color)" };
+  const valueStyle = { color: "var(--text-color)" };
+  const descStyle = { color: "var(--muted-text-color, #6b7280)" };
 
   return (
     <div className="p-6 space-y-6">
@@ -44,17 +74,22 @@ export default function SuperRecordsPage() {
         <h2 className="text-2xl font-bold" style={valueStyle}>
           Records
         </h2>
-        <Select
-          value={selectedUniversity}
-          onChange={(e) => setSelectedUniversity(e.target.value as UniversityName)}
-          className="w-64"
-        >
-          {Object.keys(universityData).map((univ) => (
-            <option key={univ} value={univ}>
-              {univ}
-            </option>
-          ))}
-        </Select>
+
+        {loadingUniversities ? (
+          <Spinner />
+        ) : (
+          <Select
+            value={selectedUniversity ?? ""}
+            onChange={(e) => setSelectedUniversity(Number(e.target.value))}
+            className="w-64"
+          >
+            {universities.map((univ) => (
+              <option key={univ.universityId} value={univ.universityId}>
+                {univ.universityName}
+              </option>
+            ))}
+          </Select>
+        )}
       </div>
 
       {/* Themed Card */}
@@ -65,7 +100,7 @@ export default function SuperRecordsPage() {
             <School2 size={24} />
           </div>
           <h3 className="text-sm font-semibold" style={labelStyle}>
-            {selectedUniversity}
+            {universities.find((u) => u.universityId === selectedUniversity)?.universityName || "—"}
           </h3>
         </div>
 
@@ -75,7 +110,7 @@ export default function SuperRecordsPage() {
             Active Courses
           </p>
           <p className="text-4xl font-bold mt-1" style={valueStyle}>
-            {universityData[selectedUniversity]}
+            {loadingCourses ? "…" : courseCount}
           </p>
         </div>
 
@@ -94,6 +129,7 @@ export default function SuperRecordsPage() {
               minWidth: "100px",
             }}
             onClick={handleViewClick}
+            disabled={!selectedUniversity}
           >
             View
           </Button>

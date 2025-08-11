@@ -11,6 +11,9 @@ import {
 import { getUniversities, saveCourse, getAllCourses } from "../../../libs/ApiResponseService";
 import type { UniversityResponse } from "../../../libs/models/University";
 import type { CourseResponse, CourseRequest } from "../../../libs/models/Course";
+import Swal from "sweetalert2";
+import { getSwalTheme } from "../../../utils/getSwalTheme";
+
 
 interface CourseUI {
   id: number; // UI only, generated locally
@@ -27,7 +30,7 @@ export default function CourseTableLayout() {
   const [universities, setUniversities] = useState<UniversityResponse[]>([]);
   const [loadingUnis, setLoadingUnis] = useState(false);
   const [errorUnis, setErrorUnis] = useState<string | null>(null);
-
+  const [loading, setLoading] = useState(false);
   const [courses, setCourses] = useState<CourseUI[]>([]);
   const [loadingCourses, setLoadingCourses] = useState(false);
   const [errorCourses, setErrorCourses] = useState<string | null>(null);
@@ -82,7 +85,13 @@ export default function CourseTableLayout() {
 
   const handleSave = async () => {
     if (!courseName.trim() || !description.trim() || !selectedUniversity) {
-      alert("Please fill in all fields and select a university.");
+       Swal.fire({
+                          icon: "warning",
+                          title: "Fields Empty",
+                          text: "Please fill in all fields.",
+                          confirmButtonText: "CLOSE",
+                          ...getSwalTheme(),
+                      }).then(() => setLoading(false));  
       return;
     }
 
@@ -93,8 +102,15 @@ export default function CourseTableLayout() {
     };
 
     try {
+      setLoading(true);
       const savedCourse: CourseResponse = await saveCourse(newCourseRequest);
-      alert("Course saved successfully!");
+      Swal.fire({
+                          icon: "success",
+                          title: "Success",
+                          text: "New course has been added successfully.",
+                          confirmButtonText: "CLOSE",
+                          ...getSwalTheme(),
+                      }).then(() => setLoading(false));  
 
       // Append new saved course to the list with generated id
       setCourses((prev) => [
@@ -113,7 +129,13 @@ export default function CourseTableLayout() {
       setDescription("");
       setSelectedUniversity("");
     } catch (error: any) {
-      alert(error.message || "Failed to save course");
+      Swal.fire({
+                          icon: "error",
+                          title: "Failed",
+                          text: "Failed to add new course.",
+                          confirmButtonText: "CLOSE",
+                          ...getSwalTheme(),
+                      }).then(() => setLoading(false));  
     }
   };
 
@@ -201,14 +223,14 @@ export default function CourseTableLayout() {
                 fontWeight: 600,
                 padding: "0.5rem 2rem",
               }}
-              disabled={!courseName || !selectedUniversity || !description}
+              disabled={!courseName || !selectedUniversity || !description || loading}
               title={
                 !courseName || !selectedUniversity || !description
                   ? "Fill all required fields"
                   : undefined
               }
             >
-              Save
+              {loading ? "Saving new course..." : "Add New Course"}
             </Button>
           </div>
         </div>

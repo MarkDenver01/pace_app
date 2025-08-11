@@ -153,6 +153,23 @@ export async function getUniversities(): Promise<UniversityResponse[]> {
   }
 };
 
+/**
+ * @param universityId number
+ * @returns Promise<number>
+ * Fetches the number of active courses for a given university.
+ */
+export async function getCourseCountByUniversity(universityId: number): Promise<number> {
+  try {
+    const response = await api.get<{ count: number }>(
+      `/superadmin/api/course/count?universityId=${universityId}`
+    );
+    return response.data.count;
+  } catch (error: any) {
+    console.error('Error fetching course count:', error);
+    throw error.response?.data || { message: 'Failed to fetch course count' };
+  }
+}
+
 
 /**
  * Add a new university to the API.
