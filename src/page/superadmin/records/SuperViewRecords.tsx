@@ -123,7 +123,7 @@ export default function SuperViewRecords() {
           <div className="flex-1 overflow-y-auto flex flex-col items-center gap-3 max-h-[460px] mt-2 pr-1">
             {courses.map((course) => (
               <Button
-                key={course.courseId ?? course.courseName}
+                key={ course.courseName}
                 onClick={() => setSelectedCourse(course.courseName)}
                 style={{
                   width: "100%",
