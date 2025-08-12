@@ -58,7 +58,7 @@ export default function SuperRecordsPage() {
 
   // Shared styles
   const cardClass =
-    "w-full flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border";
+    "w-full flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border border-orange-600";
   const iconWrapperStyle = {
     backgroundColor: "var(--button-color, #D94022)10",
     color: "var(--button-color)",

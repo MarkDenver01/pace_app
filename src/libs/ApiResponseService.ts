@@ -275,6 +275,23 @@ export async function getAccounts(params?: Record<string, any>): Promise<UserAcc
   }
 };
 
+/**
+ * Toggles an admin account's status between ACTIVE and DEACTIVE.
+ * @param adminId The ID of the admin account to toggle.
+ * @returns Promise<UserAccountResponse> The updated admin account details.
+ */
+export async function toggleAdminStatus(adminId: number): Promise<UserAccountResponse> {
+  try {
+    const response = await api.put<UserAccountResponse>(
+      `/superadmin/api/admin_account/${adminId}/status`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error toggling admin status:', error);
+    throw error.response?.data || { message: 'Failed to toggle admin status' };
+  }
+}
+
 
 
 

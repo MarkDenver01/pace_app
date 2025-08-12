@@ -5,6 +5,7 @@ import {
   getUniversities,
   saveAccount,
   getAccounts,
+  toggleAdminStatus,
 } from "../../../libs/ApiResponseService";
 import type { UniversityResponse } from "../../../libs/models/University";
 import type {
@@ -13,6 +14,7 @@ import type {
 } from "../../../libs/models/UserAccount";
 import Swal from "sweetalert2";
 import { getSwalTheme } from "../../../utils/getSwalTheme";
+import ThemedButton from "../../../components/ThemedButton";
 
 export default function AdminUserLayout() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,8 +32,33 @@ export default function AdminUserLayout() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [errorUsers, setErrorUsers] = useState<string | null>(null);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   const pageSize = 5;
   const accentColor = "var(--button-color, #D94022)";
+
+  const handleToggleStatus = async (adminId: number) => {
+  try {
+    await toggleAdminStatus(adminId);
+    Swal.fire({
+      icon: "success",
+      title: "Status Updated",
+      text: "Admin account status changed successfully.",
+      confirmButtonText: "CLOSE",
+      ...getSwalTheme(),
+    });
+    await fetchUsers(); // refresh table
+  } catch (error: any) {
+    Swal.fire({
+      icon: "error",
+      title: "Failed",
+      text: error.message || "Failed to toggle account status.",
+      confirmButtonText: "CLOSE",
+      ...getSwalTheme(),
+    });
+  }
+};
+
 
   /** Fetch universities */
   const fetchUniversities = async () => {
@@ -124,10 +151,16 @@ export default function AdminUserLayout() {
                 }).then(() => setLoading(false));  
     }
   };
-
-  /** Pagination logic */
-  const totalPages = Math.ceil(users.length / pageSize);
-  const paginatedUsers = users.slice(
+  
+  const filteredUsers = users.filter((user) =>
+    user.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.universityName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  const totalPages = Math.ceil(filteredUsers.length / pageSize);
+  
+  const paginatedUsers = filteredUsers.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
@@ -135,7 +168,7 @@ export default function AdminUserLayout() {
   return (
     <div className="p-6 space-y-8 min-h-screen">
       {/* Add User Card */}
-      <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+      <div className="bg-white rounded-xl shadow-md p-6 border border-orange-600">
         <h3 className="text-lg font-semibold text-gray-700 mb-4">Add New User</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -235,7 +268,21 @@ export default function AdminUserLayout() {
         ) : errorUsers ? (
           <p className="text-red-500">{errorUsers}</p>
         ) : (
-          <div className="overflow-hidden rounded-lg shadow border border-gray-100">
+          <>
+          <div className="flex justify-between items-center mb-4">
+            <TextInput
+            type="text"
+            placeholder="Search by name, email, or university..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="w-64 border border-orange-600 rounded-lg"
+            />
+          </div>
+          
+          <div className="overflow-hidden rounded-lg shadow border border-orange-600">
             <table className="min-w-full text-sm">
               <thead
                 style={{ backgroundColor: accentColor }}
@@ -246,6 +293,8 @@ export default function AdminUserLayout() {
                   <th className="px-4 py-3 text-left font-medium">University</th>
                   <th className="px-4 py-3 text-left font-medium">Username</th>
                   <th className="px-4 py-3 text-left font-medium">Email</th>
+                  <th className="px-4 py-3 text-left font-medium">Account Status</th>
+                  <th className="px-4 py-3 text-left font-medium">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
@@ -261,6 +310,27 @@ export default function AdminUserLayout() {
                       <td className="px-4 py-3">{user.universityName}</td>
                       <td className="px-4 py-3">{user.userName}</td>
                       <td className="px-4 py-3">{user.email}</td>
+                      <td className="px-4 py-3">{user.accountStatus}</td>
+                      <td className="px-4 py-3">
+                        {user.accountStatus === "PENDING" ? (
+                          <span className="text-gray-500 italic">No action</span>
+                        ) : (
+                        <ThemedButton
+                          size="xs"
+                          onClick={() => handleToggleStatus(user.adminId)}
+                          bgColor={
+                            (user.accountStatus === "ACTIVATE" || user.accountStatus === "VERIFIED") 
+                            ? "#ea2e21ff" : "#1c6a1fff"}
+                          textColor="#fff"
+                          padding="0.75rem 3rem" 
+                          borderRadius="1rem"
+                          width="100%">
+                             {(user.accountStatus === "ACTIVATE"
+                             || user.accountStatus == "VERIFIED") ? "DEACTIVATE" : "ACTIVATE"}
+                        </ThemedButton>
+                      )}
+                      </td>
+
                     </tr>
                   ))
                 ) : (
@@ -276,6 +346,7 @@ export default function AdminUserLayout() {
               </tbody>
             </table>
           </div>
+        </>
         )}
 
         {/* Pagination */}

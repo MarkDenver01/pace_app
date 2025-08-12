@@ -34,6 +34,7 @@ export default function CourseTableLayout() {
   const [courses, setCourses] = useState<CourseUI[]>([]);
   const [loadingCourses, setLoadingCourses] = useState(false);
   const [errorCourses, setErrorCourses] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch universities on mount
   useEffect(() => {
@@ -76,9 +77,16 @@ export default function CourseTableLayout() {
     fetchCourses();
   }, []);
 
+   // Filtered courses before pagination
+  const filteredCourses = courses.filter(
+    (course) =>
+      course.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.courseDescription.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const pageSize = 5;
-  const totalPages = Math.ceil(courses.length / pageSize);
-  const paginatedCourses = courses.slice(
+  const totalPages = Math.ceil(filteredCourses.length / pageSize);
+  const paginatedCourses = filteredCourses.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
@@ -141,7 +149,7 @@ export default function CourseTableLayout() {
 
   // THEME styles
   const cardClass =
-    "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md card-theme border";
+    "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md card-theme border border-orange-600";
   const iconWrapperStyle = {
     backgroundColor: "var(--button-color, #D94022)10",
     color: "var(--button-color)",
@@ -249,13 +257,25 @@ export default function CourseTableLayout() {
         </h3>
       </div>
 
+      <TextInput
+          type="text"
+          placeholder="Search courses..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1); // reset pagination when searching
+          }}
+          className="w-64  border border-orange-600 rounded-lg"
+        />
+      
+
       {/* Loading or error for courses */}
       {loadingCourses && <p>Loading courses...</p>}
       {errorCourses && <p className="text-red-500">{errorCourses}</p>}
 
       {/* Courses Table */}
       {!loadingCourses && !errorCourses && (
-        <div className="overflow-auto border rounded-xl mt-3">
+        <div className="overflow-auto rounded-lg shadow border border-orange-600 mt-3">
           <table className="min-w-full text-sm text-left" style={valueStyle}>
             <thead style={{ backgroundColor: "var(--button-color)", color: "#fff" }}>
               <tr>

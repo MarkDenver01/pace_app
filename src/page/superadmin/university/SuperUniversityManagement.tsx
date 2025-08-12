@@ -100,7 +100,7 @@ export default function UniversityLayout() {
   };
 
   const cardClass =
-    "flex flex-col gap-4 p-6 rounded-2xl shadow-md card-theme border";
+    "flex flex-col gap-4 p-6 rounded-2xl shadow-md card-theme border border-orange-600";
   const iconWrapperStyle = {
     backgroundColor: "var(--button-color, #D94022)10",
     color: "var(--button-color)",
@@ -149,7 +149,7 @@ export default function UniversityLayout() {
             </h3>
           </div>
 
-          <div className="overflow-auto border rounded-xl">
+          <div className="overflow-auto rounded-lg shadow border border-orange-600 rounded-xl">
             {loading ? (
               <div className="p-6 flex justify-center">
                 <Spinner size="lg" />
