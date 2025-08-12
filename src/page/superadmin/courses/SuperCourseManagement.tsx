@@ -7,20 +7,18 @@ import {
   Select,
   Textarea,
   TextInput,
+  Modal,
 } from "flowbite-react";
-import { getUniversities, saveCourse, getAllCourses } from "../../../libs/ApiResponseService";
+import {
+  getUniversities,
+  saveCourse,
+  getAllCourses,
+} from "../../../libs/ApiResponseService";
 import type { UniversityResponse } from "../../../libs/models/University";
 import type { CourseResponse, CourseRequest } from "../../../libs/models/Course";
 import Swal from "sweetalert2";
 import { getSwalTheme } from "../../../utils/getSwalTheme";
-
-
-interface CourseUI {
-  id: number; // UI only, generated locally
-  courseName: string;
-  courseDescription: string;
-  status: string;
-}
+import EditCourseForm from "./SuperUpdateCourse";
 
 export default function CourseTableLayout() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,57 +29,108 @@ export default function CourseTableLayout() {
   const [loadingUnis, setLoadingUnis] = useState(false);
   const [errorUnis, setErrorUnis] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [courses, setCourses] = useState<CourseUI[]>([]);
+  const [courses, setCourses] = useState<CourseResponse[]>([]);
   const [loadingCourses, setLoadingCourses] = useState(false);
   const [errorCourses, setErrorCourses] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch universities on mount
-  useEffect(() => {
-    async function fetchUniversities() {
-      setLoadingUnis(true);
-      setErrorUnis(null);
-      try {
-        const data = await getUniversities();
-        setUniversities(data);
-      } catch (error: any) {
-        setErrorUnis(error.message || "Failed to fetch universities");
-      } finally {
-        setLoadingUnis(false);
-      }
-    }
-    fetchUniversities();
-  }, []);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<CourseResponse | null>(null);
 
-  // Fetch courses on mount
   useEffect(() => {
-    async function fetchCourses() {
-      setLoadingCourses(true);
-      setErrorCourses(null);
-      try {
-        const data: CourseResponse[] = await getAllCourses();
-        // Map backend response to UI Course array with generated ids
-        const mapped = data.map((c, index) => ({
-          id: index + 1,
-          courseName: c.courseName as string,
-          courseDescription: c.courseDescription as string,
-          status: c.status as string,
-        }));
-        setCourses(mapped);
-      } catch (error: any) {
-        setErrorCourses(error.message || "Failed to fetch courses");
-      } finally {
-        setLoadingCourses(false);
-      }
-    }
+    fetchUniversities();
     fetchCourses();
   }, []);
 
-   // Filtered courses before pagination
+  const fetchUniversities = async () => {
+    setLoadingUnis(true);
+    setErrorUnis(null);
+    try {
+      const data = await getUniversities();
+      setUniversities(data);
+    } catch (error: any) {
+      setErrorUnis(error.message || "Failed to fetch universities");
+    } finally {
+      setLoadingUnis(false);
+    }
+  };
+
+  const fetchCourses = async () => {
+    setLoadingCourses(true);
+    setErrorCourses(null);
+    try {
+      const data: CourseResponse[] = await getAllCourses();
+      setCourses(data);
+    } catch (error: any) {
+      setErrorCourses(error.message || "Failed to fetch courses");
+    } finally {
+      setLoadingCourses(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!courseName.trim() || !description.trim() || !selectedUniversity) {
+      Swal.fire({
+        icon: "warning",
+        title: "Fields Empty",
+        text: "Please fill in all fields.",
+        confirmButtonText: "CLOSE",
+        ...getSwalTheme(),
+      });
+      return;
+    }
+
+    const newCourseRequest: CourseRequest = {
+      courseName: courseName.trim(),
+      courseDescription: description.trim(),
+      universityId: selectedUniversity as number,
+      status: "Active",
+    };
+
+    try {
+      setLoading(true);
+      const savedCourse: CourseResponse = await saveCourse(newCourseRequest);
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "New course has been added successfully.",
+        confirmButtonText: "CLOSE",
+        ...getSwalTheme(),
+      });
+
+      setCourses((prev) => [...prev, savedCourse]);
+      setCurrentPage(1);
+      setCourseName("");
+      setDescription("");
+      setSelectedUniversity("");
+    } catch {
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Failed to add new course.",
+        confirmButtonText: "CLOSE",
+        ...getSwalTheme(),
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditClick = (course: CourseResponse) => {
+    setSelectedCourse(course);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateSuccess = () => {
+    setIsEditModalOpen(false);
+    fetchCourses();
+  };
+
   const filteredCourses = courses.filter(
     (course) =>
       course.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.courseDescription.toLowerCase().includes(searchTerm.toLowerCase())
+      course.courseDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.universityName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const pageSize = 5;
@@ -91,63 +140,6 @@ export default function CourseTableLayout() {
     currentPage * pageSize
   );
 
-  const handleSave = async () => {
-    if (!courseName.trim() || !description.trim() || !selectedUniversity) {
-       Swal.fire({
-                          icon: "warning",
-                          title: "Fields Empty",
-                          text: "Please fill in all fields.",
-                          confirmButtonText: "CLOSE",
-                          ...getSwalTheme(),
-                      }).then(() => setLoading(false));  
-      return;
-    }
-
-    const newCourseRequest: CourseRequest = {
-      courseName: courseName.trim(),
-      courseDescription: description.trim(),
-      universityId: selectedUniversity as number,
-    };
-
-    try {
-      setLoading(true);
-      const savedCourse: CourseResponse = await saveCourse(newCourseRequest);
-      Swal.fire({
-                          icon: "success",
-                          title: "Success",
-                          text: "New course has been added successfully.",
-                          confirmButtonText: "CLOSE",
-                          ...getSwalTheme(),
-                      }).then(() => setLoading(false));  
-
-      // Append new saved course to the list with generated id
-      setCourses((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          courseName: savedCourse.courseName as string,
-          courseDescription: savedCourse.courseDescription as string,
-          status: savedCourse.status as string,
-        },
-      ]);
-      setCurrentPage(1);
-
-      // Clear form fields
-      setCourseName("");
-      setDescription("");
-      setSelectedUniversity("");
-    } catch (error: any) {
-      Swal.fire({
-                          icon: "error",
-                          title: "Failed",
-                          text: "Failed to add new course.",
-                          confirmButtonText: "CLOSE",
-                          ...getSwalTheme(),
-                      }).then(() => setLoading(false));  
-    }
-  };
-
-  // THEME styles
   const cardClass =
     "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md card-theme border border-orange-600";
   const iconWrapperStyle = {
@@ -164,7 +156,7 @@ export default function CourseTableLayout() {
         Course Management
       </h2>
 
-      {/* Add Course Form - FULL WIDTH */}
+      {/* Add Course Form */}
       <div className={cardClass}>
         <h3 className="text-lg font-semibold mb-2" style={valueStyle}>
           Add New Course
@@ -232,11 +224,6 @@ export default function CourseTableLayout() {
                 padding: "0.5rem 2rem",
               }}
               disabled={!courseName || !selectedUniversity || !description || loading}
-              title={
-                !courseName || !selectedUniversity || !description
-                  ? "Fill all required fields"
-                  : undefined
-              }
             >
               {loading ? "Saving new course..." : "Add New Course"}
             </Button>
@@ -244,10 +231,8 @@ export default function CourseTableLayout() {
         </div>
       </div>
 
-      {/* Divider */}
+      {/* Course List */}
       <div className="border-t" style={{ borderColor: "var(--divider-color)" }} />
-
-      {/* Course List Header */}
       <div className="flex items-center gap-3">
         <div className="p-3 rounded-full" style={iconWrapperStyle}>
           <ChevronUpSquareIcon size={20} />
@@ -258,28 +243,26 @@ export default function CourseTableLayout() {
       </div>
 
       <TextInput
-          type="text"
-          placeholder="Search courses..."
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1); // reset pagination when searching
-          }}
-          className="w-64  border border-orange-600 rounded-lg"
-        />
-      
+        type="text"
+        placeholder="Search university or courses..."
+        value={searchTerm}
+        onChange={(e) => {
+          setSearchTerm(e.target.value);
+          setCurrentPage(1);
+        }}
+        className="w-64 border border-orange-600 rounded-lg"
+      />
 
-      {/* Loading or error for courses */}
       {loadingCourses && <p>Loading courses...</p>}
       {errorCourses && <p className="text-red-500">{errorCourses}</p>}
 
-      {/* Courses Table */}
       {!loadingCourses && !errorCourses && (
         <div className="overflow-auto rounded-lg shadow border border-orange-600 mt-3">
           <table className="min-w-full text-sm text-left" style={valueStyle}>
             <thead style={{ backgroundColor: "var(--button-color)", color: "#fff" }}>
               <tr>
                 <th className="p-3 font-medium">ID</th>
+                <th className="p-3 font-medium">University</th>
                 <th className="p-3 font-medium">Course Name</th>
                 <th className="p-3 font-medium">Description</th>
                 <th className="p-3 font-medium">Status</th>
@@ -290,10 +273,11 @@ export default function CourseTableLayout() {
               {paginatedCourses.length > 0 ? (
                 paginatedCourses.map((course) => (
                   <tr
-                    key={course.id}
+                    key={course.courseId}
                     className="hover:bg-[#FFEFEA] dark:hover:bg-gray-700 transition"
                   >
-                    <td className="p-3">{course.id}</td>
+                    <td className="p-3">{course.courseId}</td>
+                    <td className="p-3">{course.universityName}</td>
                     <td className="p-3">{course.courseName}</td>
                     <td className="p-3">{course.courseDescription}</td>
                     <td className="p-3">
@@ -309,7 +293,10 @@ export default function CourseTableLayout() {
                     </td>
                     <td className="p-3">
                       <div className="flex justify-center">
-                        <button className="text-xs font-medium text-white bg-[var(--button-color)] px-6 py-1.5 rounded hover:opacity-90">
+                        <button
+                          onClick={() => handleEditClick(course)}
+                          className="text-xs font-medium text-white bg-[var(--button-color)] px-6 py-1.5 rounded hover:opacity-90"
+                        >
                           Edit
                         </button>
                       </div>
@@ -318,7 +305,7 @@ export default function CourseTableLayout() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="p-4 text-center text-gray-500">
+                  <td colSpan={6} className="p-4 text-center text-gray-500">
                     No courses found.
                   </td>
                 </tr>
@@ -328,7 +315,6 @@ export default function CourseTableLayout() {
         </div>
       )}
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-6 text-sm text-gray-600">
           <span>
@@ -352,6 +338,19 @@ export default function CourseTableLayout() {
           />
         </div>
       )}
+
+      {/* Edit Modal */}
+      <Modal show={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} popup>
+        <div className="p-6">
+          {selectedCourse && (
+            <EditCourseForm
+              courseId={selectedCourse.courseId}
+              existingCourse={selectedCourse}
+              onSuccess={handleUpdateSuccess}
+            />
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }

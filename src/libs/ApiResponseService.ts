@@ -292,6 +292,22 @@ export async function toggleAdminStatus(adminId: number): Promise<UserAccountRes
   }
 }
 
+/**
+ * Updates an existing course.
+ * @param id The ID of the course to update.
+ * @param data CourseRequest object with updated course data.
+ * @returns Promise<CourseResponse>
+ */
+export async function updateCourse(id: number, data: CourseRequest): Promise<CourseResponse> {
+  try {
+    const response = await api.put<CourseResponse>(`/superadmin/api/course/update/${id}`, data);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error updating course:", error);
+    throw error.response?.data || { message: "Failed to update course" };
+  }
+}
+
 
 
 
