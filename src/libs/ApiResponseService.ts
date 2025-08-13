@@ -1,6 +1,6 @@
 import api from './api';
 import { type StudentResponse }from './models/response/StudentResponse';
-import { type LoginRequest } from './models/request/LoginRequest';
+import type { LoginResponse, LoginRequest } from './models/Login';
 import type { StudentListResponse } from './models/response/StudentListResponse';
 import type { CustomizationResponse, CustomizationRequest } from './models/Customization';
 import type { UniversityResponse, UniversityRequest } from './models/University';
@@ -70,34 +70,17 @@ export async function approveStudent(email: string, accountStatus: string): Prom
 }
 
 
-/**
- *  * Logs in a user with the provided credentials. 
- * @param request LoginRequest
- */
-export async function login(request: LoginRequest) {
+export async function login(request: LoginRequest): Promise<LoginResponse> {
   try {
-    const response = await api.post('/user/public/login', request);
-    
-    // Save token to localStorage or cookie
-    const username = response.data.username;
-    const role = response.data.role;
-    const token = response.data.jwtToken;
-    if (token) {
-      localStorage.setItem('jwtToken', token);
-    }
-    if (role) {
-      localStorage.setItem('authorized_role', role);
-    }
-    if (username) {
-      localStorage.setItem('authorized_username', username);
-    }
-
+    const response = await api.post("/user/public/login", request);
     return response.data;
   } catch (error: any) {
-    console.error('Login error:', error);
-    throw error.response?.data || { message: 'Login failed' };
+    console.error("Login error:", error);
+    throw error.response?.data || { message: "Login failed" };
   }
 }
+
+
 
 /**
  * Fetches the current theme customization settings.

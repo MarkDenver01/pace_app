@@ -1,7 +1,6 @@
-// AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { type LoginResponse } from "../libs/models/response/LoginResponse";
+import type { LoginResponse } from "../libs/models/Login";
 import { useThemeContext, type Theme } from "./ThemeContext";
 
 interface AuthContextType {
@@ -39,31 +38,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const token = localStorage.getItem("jwtToken");
     const role = localStorage.getItem("authorized_role");
     const username = localStorage.getItem("authorized_username");
-    return token && role && username ? { jwtToken: token, role, username } : null;
+    const adminInfo = localStorage.getItem("authorized_admin_info");
+
+    if (!token || !role || !username || !adminInfo) return null;
+
+    let parsedAdmin = {} as any;
+    try {
+      parsedAdmin = JSON.parse(adminInfo);
+    } catch {
+      parsedAdmin = { accountStatus: "UNKNOWN" };
+    }
+
+    return { jwtToken: token, role, username, adminResponse: parsedAdmin };
   });
 
   const getSavedTheme = (): Theme => {
     const savedTheme = localStorage.getItem("themeName");
-    if (savedTheme && isTheme(savedTheme)) {
-      return savedTheme;
-    }
+    if (savedTheme && isTheme(savedTheme)) return savedTheme;
     return "light";
   };
 
   useEffect(() => {
-    if (user?.role === "SUPER_ADMIN") {
-      setThemeName("super_admin");
-    } else if (user) {
-      setThemeName(getSavedTheme());
-    } else {
-      setThemeName("light");
-    }
+    if (user?.role === "SUPER_ADMIN") setThemeName("super_admin");
+    else if (user) setThemeName(getSavedTheme());
+    else setThemeName("light");
   }, [user, setThemeName]);
 
   const setAuth = (userData: LoginResponse) => {
     localStorage.setItem("jwtToken", userData.jwtToken);
     localStorage.setItem("authorized_role", userData.role);
     localStorage.setItem("authorized_username", userData.username);
+    localStorage.setItem("authorized_admin_info", JSON.stringify(userData.adminResponse));
     setUser(userData);
   };
 
@@ -71,20 +76,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem("jwtToken");
     localStorage.removeItem("authorized_role");
     localStorage.removeItem("authorized_username");
+    localStorage.removeItem("authorized_admin_info");
     setUser(null);
     setThemeName("light");
     navigate("/login");
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        logout,
-        setAuth,
-      }}
-    >
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, logout, setAuth }}>
       {children}
     </AuthContext.Provider>
   );
