@@ -70,6 +70,11 @@ export async function approveStudent(email: string, accountStatus: string): Prom
 }
 
 
+/**
+ * Login.
+ * @param request 
+ * @returns Login response
+ */
 export async function login(request: LoginRequest): Promise<LoginResponse> {
   try {
     const response = await api.post("/user/public/login", request);
@@ -80,7 +85,25 @@ export async function login(request: LoginRequest): Promise<LoginResponse> {
   }
 }
 
+/**
+ * Updates the password for a user.
+ * @param userId The ID of the user whose password is being updated.
+ * @param newPassword The new password.
+ * @returns Promise<boolean> Returns true if update succeeded, false otherwise.
+ */
+export async function updatePassword(userId: number, newPassword: string): Promise<boolean> {
+  try {
+    const response = await api.put(`/user/public/update-password/${userId}`, null, {
+      params: { newPassword },
+    });
 
+    // Backend returns "success" on success
+    return response?.data === "success";
+  } catch (error: any) {
+    console.error("Error updating password:", error);
+    return false; // Return false on any failure
+  }
+}
 
 /**
  * Fetches the current theme customization settings.

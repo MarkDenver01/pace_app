@@ -9,7 +9,6 @@ import CourseManagement from "../../page/admin/courses/CourseManagement.tsx";
 import ReportPage from "../../page/admin/reports/ReportPage.tsx";
 import AnalyticsPage from "../../page/admin/analytics/Analytics.tsx";
 import Customization from "../../page/admin/customization/Customization.tsx";
-import UpdatePasswordPage from '../../page/admin/account/UpdatePassword.tsx';
 
 
 export default function AdminLayout() {
@@ -23,7 +22,6 @@ export default function AdminLayout() {
           <Routes>
             {/* Only define relative routes here */}
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="account" element={<UpdatePasswordPage />} />
             <Route path="user-approval" element={<StudentAccountMonitoring />} />
             <Route path="courses" element={<CourseManagement />} />
             <Route path="reports" element={<ReportPage />} />

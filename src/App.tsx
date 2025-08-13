@@ -6,28 +6,31 @@ import AdminLayout from './layout/admin/AdminLayout';
 import SuperAdminLayout from './layout/superadmin/SuperAdminLayout';
 import { AuthProvider } from './context/AuthContext';
 import appBg from './assets/app-bg.jpg';
+import UpdatePasswordPage from './page/login/UpdatePassword';
 
 function App() {
   const location = useLocation();
   const isLoginPage = location.pathname === "/";
+  const isUpdatePasswordPage = location.pathname === "/login/update-password"
 
   return (
     <AuthProvider>
       <div
         className={
-          isLoginPage
+          (isLoginPage || isUpdatePasswordPage)
             ? 'relative min-h-screen w-full bg-cover bg-no-repeat bg-center flex items-center justify-center'
             : 'min-h-screen w-full bg-white'
         }
         style={
-          isLoginPage
+        (isLoginPage || isUpdatePasswordPage)
             ? { backgroundImage: `url(${appBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }
             : {}
         }
       >
-        <div className={isLoginPage ? 'z-10 w-full max-w-md mx-auto' : 'w-full'}>
+        <div className={(isLoginPage || isUpdatePasswordPage) ? 'z-10 w-full max-w-md mx-auto' : 'w-full'}>
           <Routes>
             <Route path="/" element={<Login />} />
+            <Route path="/login/update-password" element={<UpdatePasswordPage />} />
 
             {/* Admin routes */}
             <Route

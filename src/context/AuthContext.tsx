@@ -7,7 +7,7 @@ interface AuthContextType {
   user: LoginResponse | null;
   isAuthenticated: boolean;
   logout: () => void;
-  setAuth: (user: LoginResponse) => void;
+  setAuth: (user: LoginResponse | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -64,11 +64,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     else setThemeName("light");
   }, [user, setThemeName]);
 
-  const setAuth = (userData: LoginResponse) => {
-    localStorage.setItem("jwtToken", userData.jwtToken);
-    localStorage.setItem("authorized_role", userData.role);
-    localStorage.setItem("authorized_username", userData.username);
-    localStorage.setItem("authorized_admin_info", JSON.stringify(userData.adminResponse));
+  const setAuth = (userData: LoginResponse | null) => {
+    if (userData) {
+      localStorage.setItem("jwtToken", userData.jwtToken);
+      localStorage.setItem("authorized_role", userData.role);
+      localStorage.setItem("authorized_username", userData.username);
+      localStorage.setItem("authorized_admin_info", JSON.stringify(userData.adminResponse));
+    } else {
+      localStorage.removeItem("jwtToken");
+      localStorage.removeItem("authorized_role");
+      localStorage.removeItem("authorized_username");
+      localStorage.removeItem("authorized_admin_info");
+    }
     setUser(userData);
   };
 

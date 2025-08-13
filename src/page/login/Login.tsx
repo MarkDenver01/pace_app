@@ -27,30 +27,41 @@ const Login: React.FC = () => {
 
       if (response.role === "ADMIN") {
         const adminStatus = response.adminResponse.accountStatus;
-
-        Swal.fire({
-          icon: "success",
-          title: `Welcome ${response.username} - ${response.adminResponse.universityName}!`,
-          text: "Tap proceed to continue.",
-          confirmButtonText: "PROCEED",
-          ...getSwalTheme(),
-        }).then((result) => {
+        if (adminStatus === "PENDING") {  
+          const result = await Swal.fire({
+            title: `Hi ${response.username}! Please update your password before LOGIN.`,
+            icon: "warning",
+            showCancelButton: true,
+            cancelButtonColor: "#6b7280", // gray-500
+            confirmButtonText: "Yes, PROCEED",
+            cancelButtonText: "Cancel",
+            ...getSwalTheme(),
+          });
+          
           if (result.isConfirmed) {
-            if (adminStatus === "PENDING") {
-              navigate("/admin/account", {replace: true});
-            } else if(adminStatus  === "VERIFIED" || adminStatus  === "ACTIVATE") {
-              navigate("/admin/dashboard", { replace: true });
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Access Denied",
-                text: `Your account status "${adminStatus}" does not allow access.`,
-                confirmButtonText: "CLOSE",
-                ...getSwalTheme(),
-              });
-            }
+            navigate("/login/update-password", { replace: true });
           }
-        });
+        } else if(adminStatus  === "VERIFIED" || adminStatus  === "ACTIVATE") {
+          Swal.fire({
+            icon: "success",
+            title: `Welcome ${response.username} - ${response.adminResponse.universityName}!`,
+            text: "Tap proceed to continue.",
+            confirmButtonText: "PROCEED",
+            ...getSwalTheme(),
+          }).then((result) => {
+            if (result.isConfirmed) {
+              navigate("/admin/dashboard", { replace: true });
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Access Denied",
+            text: `Your account status "${adminStatus}" does not allow access.`,
+            confirmButtonText: "CLOSE",
+            ...getSwalTheme(),
+          });
+        }
       } else if (response.role === "SUPER_ADMIN") {
         Swal.fire({
           icon: "success",

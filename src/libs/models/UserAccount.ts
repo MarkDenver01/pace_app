@@ -6,6 +6,7 @@ export interface UserAccountResponse {
     accountStatus: string,
     universityId: number;
     universityName: string;
+    userId: number;
 }
 
 export interface UserAccountRequest {
