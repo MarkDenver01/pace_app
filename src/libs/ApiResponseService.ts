@@ -308,6 +308,83 @@ export async function updateCourse(id: number, data: CourseRequest): Promise<Cou
   }
 }
 
+// Save question API
+export async function saveQuestion(data: {
+  courseId: number;
+  category: string; // e.g., "GENERAL_INTEREST"
+  question: string;
+}) {
+  try {
+    const response = await api.post('/superadmin/api/questions/save', data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error saving question:', error);
+    throw error.response?.data || { message: 'Failed to save question' };
+  }
+}
+
+// Fetch all questions API (with university info)
+export async function getAllQuestions() {
+  try {
+    const response = await api.get('/superadmin/api/questions/all');
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching questions:', error);
+    throw error.response?.data || { message: 'Failed to fetch questions' };
+  }
+}
+
+/**
+ * Fetches active courses by university ID.
+ * @param universityId number
+ * @returns Promise<CourseResponse[]>
+ */
+export async function getActiveCoursesByUniversity(universityId: number): Promise<CourseResponse[]> {
+  try {
+    const response = await api.get<CourseResponse[]>(
+      `/superadmin/api/course/active?universityId=${universityId}`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching active courses:', error);
+    throw error.response?.data || { message: 'Failed to fetch active courses' };
+  }
+}
+
+/**
+ * Deletes a question by ID.
+ * @param questionId 
+ * @returns Promise<void>
+ */
+export async function deleteQuestion(questionId: number): Promise<void> {
+  try {
+    await api.delete(`/superadmin/api/questions/delete/${questionId}`);
+  } catch (error: any) {
+    console.error('Error deleting question:', error);
+    throw error.response?.data || { message: 'Failed to delete question' };
+  }
+}
+
+/**
+ * Updates a question by ID.
+ * @param questionId The ID of the question to update.
+ * @param data The updated question data.
+ * @returns Promise<void>
+ */
+export async function updateQuestion(questionId: number, data: {
+  courseId: number;
+  category: string;
+  question: string;
+}): Promise<void> {
+  try {
+    await api.put(`/superadmin/api/questions/update/${questionId}`, data);
+  } catch (error: any) {
+    console.error('Error updating question:', error);
+    throw error.response?.data || { message: 'Failed to update question' };
+  }
+}
+
+
 
 
 
