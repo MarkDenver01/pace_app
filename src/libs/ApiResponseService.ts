@@ -390,7 +390,64 @@ export async function updateQuestion(questionId: number, data: {
   }
 }
 
+/**
+ * @param universityId number
+ * @returns Promise<number>
+ * Fetches the number of active courses for a given university.
+ */
+export async function totalActiveCourseByUniversity(universityId: number): Promise<number> {
+  try {
+    const response = await api.get<{ count: number }>(
+      `/admin/api/course/count/${universityId}`
+    );
+    return response.data.count;
+  } catch (error: any) {
+    console.error('Error fetching course count:', error);
+    throw error.response?.data || { message: 'Failed to fetch course count' };
+  }
+}
 
+/**
+ * Fetches active courses by university ID.
+ * @param universityId number
+ * @returns Promise<CourseResponse[]>
+ */
+export async function getAllActiveCoursesByUniversity(universityId: number): Promise<CourseResponse[]> {
+  try {
+    const response = await api.get<CourseResponse[]>(
+      `/admin/api/course/all/active?universityId=${universityId}`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching active courses:', error);
+    throw error.response?.data || { message: 'Failed to fetch active courses' };
+  }
+};
+
+/**
+ * Fetches active courses by university ID.
+ * @param universityId number
+ * @returns Promise<CourseResponse[]>
+ */
+export async function getAllCoursesByUniversity(universityId: number): Promise<CourseResponse[]> {
+  try {
+    const response = await api.get<CourseResponse[]>(
+      `/admin/api/course/all/${universityId}`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching active courses:', error);
+    throw error.response?.data || { message: 'Failed to fetch active courses' };
+  }
+};
+
+export async function activateCourse(courseId: number) {
+  return api.put(`/admin/api/course/${courseId}/activate`);
+}
+
+export async function deactivateCourse(courseId: number) {
+  return api.put(`/admin/api/course/${courseId}/deactivate`);
+}
 
 
 

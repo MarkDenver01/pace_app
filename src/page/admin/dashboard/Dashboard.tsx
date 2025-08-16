@@ -7,29 +7,51 @@ import {
 import DashboardTable from "./DashboardDataTable.tsx";
 import { useEffect, useState } from "react";
 import { type StudentListResponse } from "../../../libs/models/response/StudentListResponse.ts";
-import { fetchApprovedStudents } from "../../../libs/ApiResponseService";
+import {
+  fetchApprovedStudents,
+  totalActiveCourseByUniversity,
+} from "../../../libs/ApiResponseService";
 import { utils } from "../../../utils/utils.ts";
+import { useAuth } from "../../../context/AuthContext.tsx";
 
 export default function Dashboard() {
-  const [approvedStudents, setApprovedStudents] = useState<StudentListResponse | null>(null);
+   const { user } = useAuth();
+  const [approvedStudents, setApprovedStudents] =
+    useState<StudentListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [activeCourseCount, setActiveCourseCount] = useState<number>(0);
+
+  // Fetch approved students
+  const loadApprovedStudents = async () => {
+    try {
+      const studentResponse = await fetchApprovedStudents();
+      setApprovedStudents(studentResponse);
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error("Failed to fetch approved students: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch active courses by university
+  const loadActiveCourses = async () => {
+    if (!user?.adminResponse?.universityId) return;
+    try {
+      const count = await totalActiveCourseByUniversity(
+        Number(user.adminResponse.universityId)
+      );
+      setActiveCourseCount(count);
+    } catch (error) {
+      console.error("Failed to fetch the active courses: ", error);
+    }
+  };
 
   useEffect(() => {
-    const loadApprovedStudents = async () => {
-      try {
-        const studentResponse = await fetchApprovedStudents();
-        setApprovedStudents(studentResponse);
-        setLastUpdated(new Date()); // update timestamp
-      } catch (error) {
-        console.error("Failed to fetch pending students:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadApprovedStudents();
-  }, []);
+    loadActiveCourses();
+  }, [user]);
 
   const cardClass =
     "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border";
@@ -48,7 +70,7 @@ export default function Dashboard() {
   };
 
   const descStyle = {
-    color: "var(--muted-text-color, #6b7280)", // fallback to gray-500
+    color: "var(--muted-text-color, #6b7280)",
   };
 
   return (
@@ -84,7 +106,7 @@ export default function Dashboard() {
             </span>
           </div>
           <div className="text-4xl font-bold" style={valueStyle}>
-            26
+            {loading ? "Loading..." : activeCourseCount}
           </div>
           <div className="text-xs" style={descStyle}>
             Live courses currently running

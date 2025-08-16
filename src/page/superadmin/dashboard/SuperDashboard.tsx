@@ -19,11 +19,11 @@ export default function SuperAdminDashboard() {
       try {
         setLoading(true);
 
-        // 1️⃣ Fetch all universities
+        // 1️ Fetch all universities
         const uniData = await getUniversities();
         setUniversities(uniData);
 
-        // 2️⃣ Fetch all courses to calculate students per course
+        // 2 Fetch all courses to calculate students per course
         const courseData: CourseResponse[] = await getAllCourses();
         const studentsByCourse: Record<string, number> = {};
         courseData.forEach(course => {
@@ -31,7 +31,7 @@ export default function SuperAdminDashboard() {
         });
         setStudentsPerCourse(studentsByCourse);
 
-        // 3️⃣ Fetch active course count for each university
+        // 3️ Fetch active course count for each university
         const courseCountMap: Record<string, number> = {};
         for (const uni of uniData) {
           const count = await getCourseCountByUniversity(uni.universityId);

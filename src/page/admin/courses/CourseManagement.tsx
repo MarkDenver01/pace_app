@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BookOpen } from "lucide-react";
 import {
   Modal,
@@ -7,30 +7,25 @@ import {
   ModalHeader,
   ModalBody,
 } from "flowbite-react";
+import {
+  getAllCoursesByUniversity,
+  activateCourse,
+  deactivateCourse,
+} from "../../../libs/ApiResponseService";
+import { useAuth } from "../../../context/AuthContext";
 
 interface Course {
-  name: string;
-  description: string;
-  status: "Active" | "Inactive";
+  courseId: number;
+  courseName: string;
+  courseDescription: string;
+  status: string;
 }
-
-const initialCourses: Course[] = [
-  {
-    name: "Graphic Design",
-    description: "Design principles, tools & creative design skills",
-    status: "Active",
-  },
-  {
-    name: "Cyber Security",
-    description: "Understand threats, protection & ethical thinking",
-    status: "Inactive",
-  },
-];
 
 type ActionType = "activate" | "deactivate" | null;
 
 export default function CourseManagement() {
-  const [courses, setCourses] = useState(initialCourses);
+  const { user } = useAuth();
+  const [courses, setCourses] = useState<Course[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
 
@@ -44,26 +39,46 @@ export default function CourseManagement() {
     currentPage * pageSize
   );
 
+  // Fetch courses from API
+  const fetchCourses = async () => {
+    if (!user?.adminResponse?.universityId) return;
+    try {
+      const data = await getAllCoursesByUniversity(
+        Number(user.adminResponse.universityId)
+      );
+      setCourses(data);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
   const openModal = (course: Course, type: ActionType) => {
     setSelectedCourse(course);
     setActionType(type);
     setShowModal(true);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!selectedCourse || !actionType) return;
 
-    const updatedStatus = actionType === "activate" ? "Active" : "Inactive";
-
-    setCourses((prev) =>
-      prev.map((c) =>
-        c.name === selectedCourse.name ? { ...c, status: updatedStatus } : c
-      )
-    );
-
-    setShowModal(false);
-    setSelectedCourse(null);
-    setActionType(null);
+    try {
+      if (actionType === "activate") {
+        await activateCourse(selectedCourse.courseId);
+      } else {
+        await deactivateCourse(selectedCourse.courseId);
+      }
+      await fetchCourses(); // Refresh after update
+    } catch (error) {
+      console.error("Failed to update course status:", error);
+    } finally {
+      setShowModal(false);
+      setSelectedCourse(null);
+      setActionType(null);
+    }
   };
 
   return (
@@ -82,20 +97,20 @@ export default function CourseManagement() {
       {/* Table */}
       <table className="min-w-full text-sm text-left" style={{ color: "var(--text-color)" }}>
         <thead style={{ backgroundColor: "var(--button-color)", color: "#fff" }}>
-        <tr>
-          <th className="p-3 border border-gray-300 font-medium">Course Name</th>
-          <th className="p-3 border border-gray-300 font-medium">Description</th>
-          <th className="p-3 border border-gray-300 font-medium">Status</th>
-          <th className="p-3 border border-gray-300 font-medium">Actions</th>
-        </tr>
+          <tr>
+            <th className="p-3 border border-gray-300 font-medium">Course Name</th>
+            <th className="p-3 border border-gray-300 font-medium">Description</th>
+            <th className="p-3 border border-gray-300 font-medium">Status</th>
+            <th className="p-3 border border-gray-300 font-medium">Actions</th>
+          </tr>
         </thead>
         <tbody>
-        {paginatedData.length > 0 ? (
-          paginatedData.map((course) => (
-            <tr key={course.name} className="transition hover:bg-[var(--divider-color)]">
-              <td className="p-3 border border-gray-300 font-medium">{course.name}</td>
-              <td className="p-3 border border-gray-300">{course.description}</td>
-              <td className="p-3 border border-gray-300">
+          {paginatedData.length > 0 ? (
+            paginatedData.map((course) => (
+              <tr key={course.courseId} className="transition hover:bg-[var(--divider-color)]">
+                <td className="p-3 border border-gray-300 font-medium">{course.courseName}</td>
+                <td className="p-3 border border-gray-300">{course.courseDescription}</td>
+                <td className="p-3 border border-gray-300">
                   <span
                     className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
                       course.status === "Active"
@@ -105,34 +120,34 @@ export default function CourseManagement() {
                   >
                     {course.status}
                   </span>
-              </td>
-              <td className="p-3 border border-gray-300 space-x-2">
-                <button
-                  onClick={() => openModal(course, "activate")}
-                  className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded-md transition"
-                >
-                  Activate
-                </button>
-                <button
-                  onClick={() => openModal(course, "deactivate")}
-                  className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-md transition"
-                >
-                  Deactivate
-                </button>
+                </td>
+                <td className="p-3 border border-gray-300 space-x-2">
+                  <button
+                    onClick={() => openModal(course, "activate")}
+                    className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded-md transition"
+                  >
+                    Activate
+                  </button>
+                  <button
+                    onClick={() => openModal(course, "deactivate")}
+                    className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-md transition"
+                  >
+                    Deactivate
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={4}
+                className="p-4 text-center border border-gray-300"
+                style={{ color: "var(--muted-text-color)" }}
+              >
+                No courses available.
               </td>
             </tr>
-          ))
-        ) : (
-          <tr>
-            <td
-              colSpan={4}
-              className="p-4 text-center border border-gray-300"
-              style={{ color: "var(--muted-text-color)" }}
-            >
-              No courses available.
-            </td>
-          </tr>
-        )}
+          )}
         </tbody>
       </table>
 
@@ -180,7 +195,7 @@ export default function CourseManagement() {
                 {actionType === "activate" ? "activate" : "deactivate"}
               </span>{" "}
               the course:{" "}
-              <span className="font-semibold">{selectedCourse?.name}</span>?
+              <span className="font-semibold">{selectedCourse?.courseName}</span>?
             </h3>
             <div className="flex justify-center gap-4 mt-6">
               <FlowbiteButton color="gray" onClick={() => setShowModal(false)}>
