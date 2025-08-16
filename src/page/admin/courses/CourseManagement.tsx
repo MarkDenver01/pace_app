@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
 import { BookOpen } from "lucide-react";
-import {
-  Modal,
-  Pagination,
-  Button as FlowbiteButton,
-  ModalHeader,
-  ModalBody,
-} from "flowbite-react";
+import { Pagination } from "flowbite-react";
 import {
   getAllCoursesByUniversity,
   activateCourse,
   deactivateCourse,
 } from "../../../libs/ApiResponseService";
 import { useAuth } from "../../../context/AuthContext";
+import Swal from "sweetalert2";
+import { getSwalTheme } from "../../../utils/getSwalTheme";
 
 interface Course {
   courseId: number;
@@ -21,17 +17,13 @@ interface Course {
   status: string;
 }
 
-type ActionType = "activate" | "deactivate" | null;
+type ActionType = "activate" | "deactivate";
 
 export default function CourseManagement() {
   const { user } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
-
-  const [showModal, setShowModal] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [actionType, setActionType] = useState<ActionType>(null);
 
   const totalPages = Math.ceil(courses.length / pageSize);
   const paginatedData = courses.slice(
@@ -56,28 +48,42 @@ export default function CourseManagement() {
     fetchCourses();
   }, []);
 
-  const openModal = (course: Course, type: ActionType) => {
-    setSelectedCourse(course);
-    setActionType(type);
-    setShowModal(true);
-  };
+  const handleAction = async (course: Course, type: ActionType) => {
+    const result = await Swal.fire({
+      title: `Are you sure?`,
+      text: `You are about to ${type} the course: ${course.courseName}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: `Yes, ${type}`,
+      cancelButtonText: "Cancel",
+      confirmButtonColor: type === "activate" ? "#16a34a" : "#dc2626", // green or red
+      ...getSwalTheme(),
+    });
 
-  const handleConfirm = async () => {
-    if (!selectedCourse || !actionType) return;
-
-    try {
-      if (actionType === "activate") {
-        await activateCourse(selectedCourse.courseId);
-      } else {
-        await deactivateCourse(selectedCourse.courseId);
+    if (result.isConfirmed) {
+      try {
+        if (type === "activate") {
+          await activateCourse(course.courseId);
+        } else {
+          await deactivateCourse(course.courseId);
+        }
+        await fetchCourses();
+        Swal.fire({
+          icon: "success",
+          title: `Course ${type}d!`,
+          showConfirmButton: false,
+          timer: 1500,
+          ...getSwalTheme(),
+        });
+      } catch (error) {
+        console.error("Failed to update course status:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong while updating the course status.",
+          ...getSwalTheme(),
+        });
       }
-      await fetchCourses(); // Refresh after update
-    } catch (error) {
-      console.error("Failed to update course status:", error);
-    } finally {
-      setShowModal(false);
-      setSelectedCourse(null);
-      setActionType(null);
     }
   };
 
@@ -123,13 +129,13 @@ export default function CourseManagement() {
                 </td>
                 <td className="p-3 border border-gray-300 space-x-2">
                   <button
-                    onClick={() => openModal(course, "activate")}
+                    onClick={() => handleAction(course, "activate")}
                     className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded-md transition"
                   >
                     Activate
                   </button>
                   <button
-                    onClick={() => openModal(course, "deactivate")}
+                    onClick={() => handleAction(course, "deactivate")}
                     className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-md transition"
                   >
                     Deactivate
@@ -179,38 +185,6 @@ export default function CourseManagement() {
           </div>
         </div>
       )}
-
-      {/* Modal */}
-      <Modal show={showModal} onClose={() => setShowModal(false)} size="md" popup>
-        <ModalHeader />
-        <ModalBody>
-          <div className="text-center">
-            <h3 className="mb-5 text-lg font-normal" style={{ color: "var(--text-color)" }}>
-              Are you sure you want to{" "}
-              <span
-                className={`font-semibold ${
-                  actionType === "activate" ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {actionType === "activate" ? "activate" : "deactivate"}
-              </span>{" "}
-              the course:{" "}
-              <span className="font-semibold">{selectedCourse?.courseName}</span>?
-            </h3>
-            <div className="flex justify-center gap-4 mt-6">
-              <FlowbiteButton color="gray" onClick={() => setShowModal(false)}>
-                Cancel
-              </FlowbiteButton>
-              <FlowbiteButton
-                color={actionType === "activate" ? "success" : "failure"}
-                onClick={handleConfirm}
-              >
-                {actionType === "activate" ? "Yes, Activate" : "Yes, Deactivate"}
-              </FlowbiteButton>
-            </div>
-          </div>
-        </ModalBody>
-      </Modal>
     </div>
   );
 }

@@ -6,7 +6,8 @@ export interface CustomizationResponse {
 }
 
 export interface CustomizationRequest {
-  themeName: string;
-  aboutText: string;
-  logoFile?: File;
+    id?: number; // Make id an optional property
+    themeName: string;
+    aboutText: string;
+    logoFile?: File;
 }
