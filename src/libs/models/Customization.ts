@@ -1,13 +1,15 @@
 export interface CustomizationResponse {
-  id: number;
+  customizationid: number;
   logoUrl: string;
   themeName: string;
   aboutText: string;
+  universityId: number;
 }
 
 export interface CustomizationRequest {
-    id?: number; // Make id an optional property
     themeName: string;
     aboutText: string;
     logoFile?: File;
+    universityId: number;
+
 }

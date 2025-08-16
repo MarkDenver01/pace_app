@@ -2,6 +2,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { LoginResponse } from "../libs/models/Login";
 import { useThemeContext, type Theme } from "./ThemeContext";
+import type { CustomizationResponse } from "../libs/models/Customization";
+import { getTheme } from "../libs/ApiResponseService";
 
 interface AuthContextType {
   user: LoginResponse | null;
@@ -70,6 +72,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem("authorized_role", userData.role);
       localStorage.setItem("authorized_username", userData.username);
       localStorage.setItem("authorized_admin_info", JSON.stringify(userData.adminResponse));
+
+      setUser(userData);
+
+          if (userData.role === "SUPER_ADMIN") {
+            setThemeName("super_admin");
+        } else if (userData.role === "ADMIN" && userData.adminResponse?.universityId) {
+            // This is the key change: The theme logic for ADMIN is moved here.
+            getTheme(Number(userData.adminResponse.universityId))
+                .then((customization: CustomizationResponse) => {
+                    console.log("[AuthContext] Loaded theme from API:", customization.themeName);
+                    setThemeName(
+                        isTheme(customization.themeName) ? customization.themeName : "custom_admin"
+                    );
+                })
+                .catch(err => {
+                    console.warn("[AuthContext] No theme found, falling back to saved/local:", err);
+                    setThemeName(getSavedTheme());
+                });
+        } else {
+            setThemeName(getSavedTheme());
+        }
+
     } else {
       localStorage.removeItem("jwtToken");
       localStorage.removeItem("authorized_role");

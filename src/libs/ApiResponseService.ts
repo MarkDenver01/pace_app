@@ -410,53 +410,50 @@ export async function deactivateCourse(courseId: number) {
   return api.put(`/admin/api/course/${courseId}/deactivate`);
 };
 
-/**
- * Saves or updates a theme.
- * @param request The customization request, including the optional logo file.
- * @returns Promise<CustomizationResponse>
- */
-export async function saveOrUpdateTheme(request: CustomizationRequest): Promise<CustomizationResponse> {
-    try {
-        const formData = new FormData();
-        // Append form fields
-        if (request.id) {
-            formData.append('id', request.id.toString());
-        }
-        formData.append('themeName', request.themeName);
-        formData.append('aboutText', request.aboutText);
+export async function saveOrUpdateTheme(
+  request: CustomizationRequest
+): Promise<CustomizationResponse> {
+  try {
+    const formData = new FormData();
 
-        // Append the file if it exists
-        if (request.logoFile) {
-            formData.append('logoFile', request.logoFile);
-        }
+    formData.append("themeName", request.themeName);
+    formData.append("aboutText", request.aboutText);
 
-        const response = await api.post('/admin/api/customization/save', formData, {
-            headers: {
-                // Axios will automatically set the correct 'multipart/form-data'
-                // header with the correct boundary when a FormData object is passed.
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-        return response.data;
-    } catch (error: any) {
-        console.error('Error saving theme:', error);
-        throw error.response?.data || { message: 'Failed to save theme' };
+    if (request.logoFile) {
+      formData.append("logoFile", request.logoFile);
     }
-};
+
+    // Convert number → string for FormData
+    formData.append("universityId", request.universityId.toString());
+
+    const response = await api.post(
+      "/admin/api/customization/save",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error saving theme:", error);
+    throw error.response?.data || { message: "Failed to save theme" };
+  }
+}
+
 
 /**
  * Fetches a theme by its ID.
  * @param id The ID of the theme to fetch.
  * @returns Promise<CustomizationResponse>
  */
-export async function getTheme(id: number = 1): Promise<CustomizationResponse> {
+export async function getTheme(universityId: number, ): Promise<CustomizationResponse> {
     try {
-        // You'll likely only have one theme to manage, so we can default to ID 1.
-        const response = await api.get(` /admin/api/customization/get/${id}`);
+        const response = await api.get(`/admin/api/customization/${universityId}`); // <-- Corrected spelling
         return response.data;
     } catch (error: any) {
         console.error('Error fetching theme:', error);
-        // If the theme is not found, we can return a default or re-throw.
         throw error.response?.data || { message: 'Failed to fetch theme' };
     }
 };
