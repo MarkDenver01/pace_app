@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting...</title>
+
+  <script>
+    // Kunin ang query params mula sa URL
+    const params = new URLSearchParams(window.location.search);
+    const universityId = params.get('universityId');
+    const token = params.get('token');
+
+    // I-build ang URL para sa Android app
+    const androidAppUrl = `https://lab-household-wedding-approach.trycloudflare.com/universityId=${universityId}&token=${token}`;
+
+    // Gumawa ng meta tag dynamically
+    const meta = document.createElement('meta');
+    meta.setAttribute('property', 'al:android:url');
+    meta.setAttribute('content', androidAppUrl);
+    document.head.appendChild(meta);
+
+    const metaPackage = document.createElement('meta');
+    metaPackage.setAttribute('property', 'al:android:package');
+    metaPackage.setAttribute('content', 'io.dev.pace_app_mobile');
+    document.head.appendChild(metaPackage);
+
+    const metaAppName = document.createElement('meta');
+    metaAppName.setAttribute('property', 'al:android:app_name');
+    metaAppName.setAttribute('content', 'Pace App Mobile');
+    document.head.appendChild(metaAppName);
+
+    // Fallback: redirect to web frontend if app not installed
+    window.location.href = androidAppUrl;
+  </script>
+</head>
+<body>
+Redirecting...
+</body>
+</html>

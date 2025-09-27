@@ -10,27 +10,38 @@ import UpdatePasswordPage from './page/login/UpdatePassword';
 
 function App() {
   const location = useLocation();
+
+  // check kung nasa login/update-password/university page ka
   const isLoginPage = location.pathname === "/";
-  const isUpdatePasswordPage = location.pathname === "/login/update-password"
+  const isUpdatePasswordPage = location.pathname === "/login/update-password";
+  const isUniversityPage = location.pathname.startsWith("/university/");
+
+  const isAuthPage = isLoginPage || isUpdatePasswordPage || isUniversityPage;
 
   return (
     <AuthProvider>
       <div
         className={
-          (isLoginPage || isUpdatePasswordPage)
+          isAuthPage
             ? 'relative min-h-screen w-full bg-cover bg-no-repeat bg-center flex items-center justify-center'
             : 'min-h-screen w-full bg-white'
         }
         style={
-        (isLoginPage || isUpdatePasswordPage)
+          isAuthPage
             ? { backgroundImage: `url(${appBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }
             : {}
         }
       >
-        <div className={(isLoginPage || isUpdatePasswordPage) ? 'z-10 w-full max-w-md mx-auto' : 'w-full'}>
+        <div className={isAuthPage ? 'z-10 w-full max-w-md mx-auto' : 'w-full'}>
           <Routes>
+            {/* Login */}
             <Route path="/" element={<Login />} />
+
+            {/* Manual Update Password (from profile/settings) */}
             <Route path="/login/update-password" element={<UpdatePasswordPage />} />
+
+            {/* Dynamic University Activation Page */}
+            <Route path="/university/:universityId" element={<UpdatePasswordPage />} />
 
             {/* Admin routes */}
             <Route
@@ -52,6 +63,7 @@ function App() {
               }
             />
 
+            {/* Catch-all redirect */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

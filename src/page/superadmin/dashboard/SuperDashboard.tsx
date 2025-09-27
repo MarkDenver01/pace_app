@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { GraduationCap, Users, BookOpenCheck } from "lucide-react";
 import {
   getUniversities,
-  getCourseCountByUniversity,
-  getAllCourses
+  getAllCourses,
+  getActiveCourseCountByUniversity,
 } from "../../../libs/ApiResponseService";
 import type { UniversityResponse } from "../../../libs/models/University";
 import type { CourseResponse } from "../../../libs/models/Course";
@@ -27,14 +27,15 @@ export default function SuperAdminDashboard() {
         const courseData: CourseResponse[] = await getAllCourses();
         const studentsByCourse: Record<string, number> = {};
         courseData.forEach(course => {
-          studentsByCourse[course.courseName] = (studentsByCourse[course.courseName] || 0) + (course.assessed || 0);
+          studentsByCourse[course.courseName] =
+            (studentsByCourse[course.courseName] || 0) + (course.assessed || 0);
         });
         setStudentsPerCourse(studentsByCourse);
 
         // 3️ Fetch active course count for each university
         const courseCountMap: Record<string, number> = {};
         for (const uni of uniData) {
-          const count = await getCourseCountByUniversity(uni.universityId);
+          const count = await getActiveCourseCountByUniversity(uni.universityId);
           courseCountMap[uni.universityName] = count;
         }
         setCoursesPerUniversity(courseCountMap);
@@ -57,10 +58,6 @@ export default function SuperAdminDashboard() {
     color: "var(--button-color)",
   };
 
-  const labelStyle = { color: "var(--button-color)" };
-  const valueStyle = { color: "var(--text-color)" };
-  const descStyle = { color: "var(--muted-text-color, #6b7280)" };
-
   if (loading) return <p className="p-4">Loading dashboard...</p>;
 
   return (
@@ -71,16 +68,10 @@ export default function SuperAdminDashboard() {
           <div className="p-3 rounded-full" style={iconWrapperStyle}>
             <GraduationCap size={28} />
           </div>
-          <span className="text-sm font-semibold" style={labelStyle}>
-            Total Universities
-          </span>
+          <span className="text-sm font-semibold">Total Universities</span>
         </div>
-        <div className="text-4xl font-bold" style={valueStyle}>
-          {universities.length}
-        </div>
-        <div className="text-xs" style={descStyle}>
-          Fetched from backend
-        </div>
+        <div className="text-4xl font-bold">{universities.length}</div>
+        <div className="text-xs text-gray-500">Fetched from backend</div>
       </div>
 
       {/* Students Per Course */}
@@ -89,11 +80,9 @@ export default function SuperAdminDashboard() {
           <div className="p-3 rounded-full" style={iconWrapperStyle}>
             <Users size={28} />
           </div>
-          <span className="text-sm font-semibold" style={labelStyle}>
-            Students per Course
-          </span>
+          <span className="text-sm font-semibold">Students per Course (Assessment-Based)</span>
         </div>
-        <div className="text-sm" style={valueStyle}>
+        <div className="text-sm">
           <ul className="space-y-1 mt-2">
             {Object.entries(studentsPerCourse).map(([course, count]) => (
               <li key={course} className="flex justify-between">
@@ -103,22 +92,18 @@ export default function SuperAdminDashboard() {
             ))}
           </ul>
         </div>
-        <div className="text-xs" style={descStyle}>
-          From course assessment data
-        </div>
+        <div className="text-xs text-gray-500">From course assessment data</div>
       </div>
 
-      {/* Courses Per University */}
+      {/* Active Courses Per University */}
       <div className={cardClass}>
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-full" style={iconWrapperStyle}>
             <BookOpenCheck size={28} />
           </div>
-          <span className="text-sm font-semibold" style={labelStyle}>
-            Active Courses / University
-          </span>
+          <span className="text-sm font-semibold">Active Courses per University</span>
         </div>
-        <div className="text-sm" style={valueStyle}>
+        <div className="text-sm">
           <ul className="space-y-1 mt-2">
             {Object.entries(coursesPerUniversity).map(([univ, count]) => (
               <li key={univ} className="flex justify-between">
@@ -128,9 +113,7 @@ export default function SuperAdminDashboard() {
             ))}
           </ul>
         </div>
-        <div className="text-xs" style={descStyle}>
-          Includes only active programs
-        </div>
+        <div className="text-xs text-gray-500">Assigned by university admin</div>
       </div>
     </div>
   );

@@ -85,25 +85,60 @@ export async function login(request: LoginRequest): Promise<LoginResponse> {
   }
 }
 
+
 /**
- * Updates the password for a user.
- * @param userId The ID of the user whose password is being updated.
+ * Validates the temporary password for a university account.
+ * @param universityId The ID of the university.
+ * @param tempPassword The temporary password to validate.
+ * @returns Promise<boolean> Returns true if valid, false otherwise.
+ */
+export async function validateTempPassword(
+  universityId: number,
+  tempPassword: string
+): Promise<boolean> {
+  try {
+    const response = await api.post(
+      `/user/public/validate-temp-password/${universityId}`,
+      null,
+      { params: { tempPassword } }
+    );
+
+    // Backend should return { valid: true/false }
+    return response?.data?.valid === true;
+  } catch (error: any) {
+    console.error("Error validating temporary password:", error);
+    return false;
+  }
+};
+
+/**
+ * Updates the password for a university account.
+ * @param universityId The ID of the university whose password is being updated.
  * @param newPassword The new password.
  * @returns Promise<boolean> Returns true if update succeeded, false otherwise.
  */
-export async function updatePassword(userId: number, newPassword: string): Promise<boolean> {
+export async function updatePassword(
+  universityId: number,
+  newPassword: string
+): Promise<boolean> {
   try {
-    const response = await api.put(`/user/public/update-password/${userId}`, null, {
-      params: { newPassword },
-    });
+    const response = await api.put(
+      `/user/public/update-password/${universityId}`,
+      null,
+      { params: { newPassword } }
+    );
 
-    // Backend returns "success" on success
-    return response?.data === "success";
+    // Expecting backend to return { success: true } or "success"
+    if (typeof response?.data === "string") {
+      return response.data === "success";
+    }
+    return response?.data?.success === true;
   } catch (error: any) {
     console.error("Error updating password:", error);
-    return false; // Return false on any failure
+    return false;
   }
-}
+};
+
 
 /**
  * 
@@ -203,11 +238,11 @@ export async function saveCourse(course: CourseRequest): Promise<CourseResponse>
  */
 export async function getAllCourses(): Promise<CourseResponse[]> {
   try {
-    const response = await api.get<CourseResponse[]>('/superadmin/api/course/all');
+    const response = await api.get<CourseResponse[]>("/superadmin/api/course/all");
     return response.data;
   } catch (error: any) {
-    console.error('Error fetching courses:', error);
-    throw error.response?.data || { message: 'Failed to fetch courses' };
+    console.error("Error fetching all courses:", error);
+    throw error.response?.data || { message: "Failed to fetch all courses" };
   }
 };
 
@@ -276,17 +311,18 @@ export async function updateCourse(id: number, data: CourseRequest): Promise<Cou
 }
 
 // Save question API
+// Save question API
 export async function saveQuestion(data: {
   courseId: number;
   category: string; // e.g., "GENERAL_INTEREST"
   question: string;
 }) {
   try {
-    const response = await api.post('/superadmin/api/questions/save', data);
+    const response = await api.post("/superadmin/api/questions/save", data);
     return response.data;
   } catch (error: any) {
-    console.error('Error saving question:', error);
-    throw error.response?.data || { message: 'Failed to save question' };
+    console.error("Error saving question:", error);
+    throw error.response?.data || { message: "Failed to save question" };
   }
 }
 
@@ -402,13 +438,35 @@ export async function getAllCoursesByUniversity(universityId: number): Promise<C
   }
 };
 
-export async function activateCourse(courseId: number) {
-  return api.put(`/admin/api/course/${courseId}/activate`);
+/**
+ * Update course status (activate/deactivate) for a specific university.
+ * @param courseId - The course ID
+ * @param universityId - The university ID
+ * @param action - Either "activate" or "deactivate"
+ */
+async function updateCourseStatus(
+  courseId: number,
+  universityId: number,
+  action: "activate" | "deactivate"
+) {
+  return api.put(`/admin/api/course/${courseId}/${action}`, null, {
+    params: { universityId },
+  });
+};
+
+/**
+ * Activate a course for a specific university.
+ */
+export function activateCourse(courseId: number, universityId: number) {
+  return updateCourseStatus(courseId, universityId, "activate");
 }
 
-export async function deactivateCourse(courseId: number) {
-  return api.put(`/admin/api/course/${courseId}/deactivate`);
-};
+/**
+ * Deactivate a course for a specific university.
+ */
+export function deactivateCourse(courseId: number, universityId: number) {
+  return updateCourseStatus(courseId, universityId, "deactivate");
+}
 
 export async function saveOrUpdateTheme(
   request: CustomizationRequest
@@ -457,6 +515,73 @@ export async function getTheme(universityId: number, ): Promise<CustomizationRes
         throw error.response?.data || { message: 'Failed to fetch theme' };
     }
 };
+
+export async function getActiveCourses(): Promise<CourseResponse[]> {
+  try {
+    const response = await api.get<CourseResponse[]>("/admin/api/course/active/all");
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching active courses:", error);
+    throw error.response?.data || { message: "Failed to fetch active courses" };
+  }
+};
+
+/**
+ * Fetches the number of active courses for a given university.
+ * @param universityId number
+ * @returns Promise<number>
+ */
+export async function getActiveCourseCountByUniversity(universityId: number): Promise<number> {
+  try {
+    const response = await api.get<{ count: number }>(
+      `/superadmin/api/course/count/${universityId}`,
+      { params: { status: "Active" } }
+    );
+    return response.data.count; // return number directly
+  } catch (error: any) {
+    console.error("Error fetching active course count:", error);
+    throw error.response?.data || { message: "Failed to fetch active course count" };
+  }
+};
+
+/**
+ * Generates (or retrieves) a dynamic activation link for a university account.
+ * @param universityId The ID of the university.
+ * @returns Promise<{ universityId: string; link: string }>
+ */
+export async function generateActivationLink(
+  universityId: number
+): Promise<{ universityId: string; link: string }> {
+  try {
+    const response = await api.post<{ universityId: string; link: string }>(
+      `/user/public/user/account/${universityId}`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error generating activation link:", error);
+    throw error.response?.data || { message: "Failed to generate activation link" };
+  }
+};
+
+/**
+ * Fetches the generated university activation link by universityId.
+ * @param universityId number
+ * @returns Promise<{ universityId: number; link: string }>
+ */
+export async function getUniversityActivationLink(
+  universityId: number
+): Promise<{ universityId: number; link: string }> {
+  try {
+    const response = await api.get<string>(`/user/public/generated_dynamic_link/${universityId}`);
+    const link = response.data; // response.data ay string galing backend
+
+    // Return object para match sa frontend typing
+    return { universityId, link };
+  } catch (error: any) {
+    console.error("Error fetching university activation link:", error);
+    throw error.response?.data || { message: "Failed to fetch university activation link" };
+  }
+}
 
 
 

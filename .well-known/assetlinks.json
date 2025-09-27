@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.dev.pace_app_mobile",
+      "sha256_cert_fingerprints": [
+        "1F:4F:78:EC:A6:38:C7:48:26:20:A5:A1:96:B7:71:57:D8:42:F5:9B:E6:CF:2E:0C:F6:66:25:40:3F:F7:43:98"
+      ]
+    }
+  }
+]

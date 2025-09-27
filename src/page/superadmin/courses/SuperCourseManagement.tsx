@@ -4,17 +4,11 @@ import {
   Button,
   Label,
   Pagination,
-  Select,
   Textarea,
   TextInput,
   Modal,
 } from "flowbite-react";
-import {
-  getUniversities,
-  saveCourse,
-  getAllCourses,
-} from "../../../libs/ApiResponseService";
-import type { UniversityResponse } from "../../../libs/models/University";
+import { saveCourse, getAllCourses } from "../../../libs/ApiResponseService";
 import type { CourseResponse, CourseRequest } from "../../../libs/models/Course";
 import Swal from "sweetalert2";
 import { getSwalTheme } from "../../../utils/getSwalTheme";
@@ -24,10 +18,6 @@ export default function CourseTableLayout() {
   const [currentPage, setCurrentPage] = useState(1);
   const [courseName, setCourseName] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedUniversity, setSelectedUniversity] = useState<number | "">("");
-  const [universities, setUniversities] = useState<UniversityResponse[]>([]);
-  const [loadingUnis, setLoadingUnis] = useState(false);
-  const [errorUnis, setErrorUnis] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [courses, setCourses] = useState<CourseResponse[]>([]);
   const [loadingCourses, setLoadingCourses] = useState(false);
@@ -38,22 +28,8 @@ export default function CourseTableLayout() {
   const [selectedCourse, setSelectedCourse] = useState<CourseResponse | null>(null);
 
   useEffect(() => {
-    fetchUniversities();
     fetchCourses();
   }, []);
-
-  const fetchUniversities = async () => {
-    setLoadingUnis(true);
-    setErrorUnis(null);
-    try {
-      const data = await getUniversities();
-      setUniversities(data);
-    } catch (error: any) {
-      setErrorUnis(error.message || "Failed to fetch universities");
-    } finally {
-      setLoadingUnis(false);
-    }
-  };
 
   const fetchCourses = async () => {
     setLoadingCourses(true);
@@ -69,7 +45,7 @@ export default function CourseTableLayout() {
   };
 
   const handleSave = async () => {
-    if (!courseName.trim() || !description.trim() || !selectedUniversity) {
+    if (!courseName.trim() || !description.trim()) {
       Swal.fire({
         icon: "warning",
         title: "Fields Empty",
@@ -83,7 +59,6 @@ export default function CourseTableLayout() {
     const newCourseRequest: CourseRequest = {
       courseName: courseName.trim(),
       courseDescription: description.trim(),
-      universityId: selectedUniversity as number,
       status: "Active",
     };
 
@@ -102,7 +77,6 @@ export default function CourseTableLayout() {
       setCurrentPage(1);
       setCourseName("");
       setDescription("");
-      setSelectedUniversity("");
     } catch {
       Swal.fire({
         icon: "error",
@@ -129,8 +103,7 @@ export default function CourseTableLayout() {
   const filteredCourses = courses.filter(
     (course) =>
       course.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.courseDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.universityName.toLowerCase().includes(searchTerm.toLowerCase())
+      course.courseDescription.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const pageSize = 5;
@@ -162,31 +135,6 @@ export default function CourseTableLayout() {
           Add New Course
         </h3>
         <div className="space-y-4">
-          <div>
-            <Label htmlFor="university" className="text-sm" style={valueStyle}>
-              University
-            </Label>
-            {loadingUnis ? (
-              <p>Loading universities...</p>
-            ) : errorUnis ? (
-              <p className="text-red-500 text-sm">{errorUnis}</p>
-            ) : (
-              <Select
-                id="university"
-                value={selectedUniversity}
-                onChange={(e) => setSelectedUniversity(Number(e.target.value))}
-                className="mt-1"
-              >
-                <option value="">Select a university...</option>
-                {universities.map((uni) => (
-                  <option key={uni.universityId} value={uni.universityId}>
-                    {uni.universityName}
-                  </option>
-                ))}
-              </Select>
-            )}
-          </div>
-
           <div>
             <Label htmlFor="courseName" className="text-sm" style={valueStyle}>
               Course Name
@@ -223,7 +171,7 @@ export default function CourseTableLayout() {
                 fontWeight: 600,
                 padding: "0.5rem 2rem",
               }}
-              disabled={!courseName || !selectedUniversity || !description || loading}
+              disabled={!courseName || !description || loading}
             >
               {loading ? "Saving new course..." : "Add New Course"}
             </Button>
@@ -244,7 +192,7 @@ export default function CourseTableLayout() {
 
       <TextInput
         type="text"
-        placeholder="Search university or courses..."
+        placeholder="Search courses..."
         value={searchTerm}
         onChange={(e) => {
           setSearchTerm(e.target.value);
@@ -262,7 +210,6 @@ export default function CourseTableLayout() {
             <thead style={{ backgroundColor: "var(--button-color)", color: "#fff" }}>
               <tr>
                 <th className="p-3 font-medium">ID</th>
-                <th className="p-3 font-medium">University</th>
                 <th className="p-3 font-medium">Course Name</th>
                 <th className="p-3 font-medium">Description</th>
                 <th className="p-3 font-medium">Status</th>
@@ -277,7 +224,6 @@ export default function CourseTableLayout() {
                     className="hover:bg-[#FFEFEA] dark:hover:bg-gray-700 transition"
                   >
                     <td className="p-3">{course.courseId}</td>
-                    <td className="p-3">{course.universityName}</td>
                     <td className="p-3">{course.courseName}</td>
                     <td className="p-3">{course.courseDescription}</td>
                     <td className="p-3">
@@ -305,7 +251,7 @@ export default function CourseTableLayout() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="p-4 text-center text-gray-500">
+                  <td colSpan={5} className="p-4 text-center text-gray-500">
                     No courses found.
                   </td>
                 </tr>

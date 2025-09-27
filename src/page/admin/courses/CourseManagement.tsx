@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 import { BookOpen } from "lucide-react";
 import { Pagination } from "flowbite-react";
 import {
-  getAllCoursesByUniversity,
+  getActiveCourses,
   activateCourse,
   deactivateCourse,
 } from "../../../libs/ApiResponseService";
-import { useAuth } from "../../../context/AuthContext";
 import Swal from "sweetalert2";
 import { getSwalTheme } from "../../../utils/getSwalTheme";
 
@@ -20,10 +19,11 @@ interface Course {
 type ActionType = "activate" | "deactivate";
 
 export default function CourseManagement() {
-  const { user } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
+
+  const universityId = localStorage.getItem("authorized_university_id");
 
   const totalPages = Math.ceil(courses.length / pageSize);
   const paginatedData = courses.slice(
@@ -31,16 +31,13 @@ export default function CourseManagement() {
     currentPage * pageSize
   );
 
-  // Fetch courses from API
+  // Fetch only ACTIVE courses from API
   const fetchCourses = async () => {
-    if (!user?.adminResponse?.universityId) return;
     try {
-      const data = await getAllCoursesByUniversity(
-        Number(user.adminResponse.universityId)
-      );
+      const data = await getActiveCourses();
       setCourses(data);
     } catch (error) {
-      console.error("Error fetching courses:", error);
+      console.error("Error fetching active courses:", error);
     }
   };
 
@@ -56,17 +53,22 @@ export default function CourseManagement() {
       showCancelButton: true,
       confirmButtonText: `Yes, ${type}`,
       cancelButtonText: "Cancel",
-      confirmButtonColor: type === "activate" ? "#16a34a" : "#dc2626", // green or red
+      confirmButtonColor: type === "activate" ? "#16a34a" : "#dc2626",
       ...getSwalTheme(),
     });
 
     if (result.isConfirmed) {
       try {
-        if (type === "activate") {
-          await activateCourse(course.courseId);
-        } else {
-          await deactivateCourse(course.courseId);
+        if (!universityId) {
+          throw new Error("No university ID found for current user.");
         }
+
+        if (type === "activate") {
+          await activateCourse(course.courseId, Number(universityId));
+        } else {
+          await deactivateCourse(course.courseId, Number(universityId));
+        }
+
         await fetchCourses();
         Swal.fire({
           icon: "success",
@@ -95,14 +97,22 @@ export default function CourseManagement() {
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <BookOpen className="w-5 h-5" style={{ color: "var(--button-color)" }} />
-        <h2 className="text-xl font-semibold" style={{ color: "var(--text-color)" }}>
-          Course Management
+        <h2
+          className="text-xl font-semibold"
+          style={{ color: "var(--text-color)" }}
+        >
+          Active Course Management
         </h2>
       </div>
 
       {/* Table */}
-      <table className="min-w-full text-sm text-left" style={{ color: "var(--text-color)" }}>
-        <thead style={{ backgroundColor: "var(--button-color)", color: "#fff" }}>
+      <table
+        className="min-w-full text-sm text-left"
+        style={{ color: "var(--text-color)" }}
+      >
+        <thead
+          style={{ backgroundColor: "var(--button-color)", color: "#fff" }}
+        >
           <tr>
             <th className="p-3 border border-gray-300 font-medium">Course Name</th>
             <th className="p-3 border border-gray-300 font-medium">Description</th>
@@ -113,9 +123,16 @@ export default function CourseManagement() {
         <tbody>
           {paginatedData.length > 0 ? (
             paginatedData.map((course) => (
-              <tr key={course.courseId} className="transition hover:bg-[var(--divider-color)]">
-                <td className="p-3 border border-gray-300 font-medium">{course.courseName}</td>
-                <td className="p-3 border border-gray-300">{course.courseDescription}</td>
+              <tr
+                key={course.courseId}
+                className="transition hover:bg-[var(--divider-color)]"
+              >
+                <td className="p-3 border border-gray-300 font-medium">
+                  {course.courseName}
+                </td>
+                <td className="p-3 border border-gray-300">
+                  {course.courseDescription}
+                </td>
                 <td className="p-3 border border-gray-300">
                   <span
                     className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
@@ -150,7 +167,7 @@ export default function CourseManagement() {
                 className="p-4 text-center border border-gray-300"
                 style={{ color: "var(--muted-text-color)" }}
               >
-                No courses available.
+                No active courses available.
               </td>
             </tr>
           )}
@@ -162,15 +179,24 @@ export default function CourseManagement() {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mt-6 text-sm">
           <span style={{ color: "var(--muted-text-color)" }}>
             Showing{" "}
-            <span className="font-semibold" style={{ color: "var(--text-color)" }}>
+            <span
+              className="font-semibold"
+              style={{ color: "var(--text-color)" }}
+            >
               {(currentPage - 1) * pageSize + 1}
             </span>{" "}
             to{" "}
-            <span className="font-semibold" style={{ color: "var(--text-color)" }}>
+            <span
+              className="font-semibold"
+              style={{ color: "var(--text-color)" }}
+            >
               {Math.min(currentPage * pageSize, courses.length)}
             </span>{" "}
             of{" "}
-            <span className="font-semibold" style={{ color: "var(--text-color)" }}>
+            <span
+              className="font-semibold"
+              style={{ color: "var(--text-color)" }}
+            >
               {courses.length}
             </span>{" "}
             entries

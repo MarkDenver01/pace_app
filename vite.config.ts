@@ -7,6 +7,10 @@ import flowbiteReact from "flowbite-react/plugin/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss(), flowbiteReact()],
   server: {
-    port: 3000
+    host: true, // optional, para ma-access sa LAN
+    port: 3000,
+    allowedHosts: [
+      'lab-household-wedding-approach.trycloudflare.com',
+    ]
   },
 })

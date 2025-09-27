@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { TextInput, Textarea, Select } from "flowbite-react";
-import { updateCourse, getUniversities } from "../../../libs/ApiResponseService";
+import { updateCourse } from "../../../libs/ApiResponseService";
 import type { CourseRequest } from "../../../libs/models/Course";
-import type { UniversityResponse } from "../../../libs/models/University";
 import ThemedButton from "../../../components/ThemedButton";
 import Swal from "sweetalert2";
 import { getSwalTheme } from "../../../utils/getSwalTheme";
@@ -21,23 +20,10 @@ export default function EditCourseForm({
   const [editCourse, setEditCourse] = useState<CourseRequest>({
     courseName: "",
     courseDescription: "",
-    universityId: 0,
     status: "Active",
   });
 
-  const [universities, setUniversities] = useState<{ id: number; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
-
-  // Load universities dropdown
-  useEffect(() => {
-    getUniversities().then((res: UniversityResponse[]) => {
-      const mapped = res.map((u) => ({
-        id: u.universityId,
-        name: u.universityName,
-      }));
-      setUniversities(mapped);
-    });
-  }, []);
 
   // Prefill form when editing
   useEffect(() => {
@@ -46,7 +32,7 @@ export default function EditCourseForm({
     }
   }, [existingCourse]);
 
-  const handleChange = (field: keyof CourseRequest, value: string | number) => {
+  const handleChange = (field: keyof CourseRequest, value: string) => {
     setEditCourse((prev) => ({
       ...prev,
       [field]: value,
@@ -57,24 +43,24 @@ export default function EditCourseForm({
     try {
       setLoading(true);
       await updateCourse(courseId, editCourse);
-       Swal.fire({
-            icon: "success",
-            title: "Course Update",
-            text: "Course updated successfully",
-            confirmButtonText: "CLOSE",
-            ...getSwalTheme(),
-          }).then(() =>{
-               onSuccess?.();
-          });
+      Swal.fire({
+        icon: "success",
+        title: "Course Update",
+        text: "Course updated successfully",
+        confirmButtonText: "CLOSE",
+        ...getSwalTheme(),
+      }).then(() => {
+        onSuccess?.();
+      });
     } catch (err) {
       console.error(err);
-       Swal.fire({
-            icon: "error",
-            title: "Course Update Failed",
-            text: "Failed to update the course",
-            confirmButtonText: "CLOSE",
-            ...getSwalTheme(),
-          });
+      Swal.fire({
+        icon: "error",
+        title: "Course Update Failed",
+        text: "Failed to update the course",
+        confirmButtonText: "CLOSE",
+        ...getSwalTheme(),
+      });
     } finally {
       setLoading(false);
     }
@@ -98,21 +84,6 @@ export default function EditCourseForm({
         value={editCourse.courseDescription}
         onChange={(e) => handleChange("courseDescription", e.target.value)}
       />
-
-      {/* University */}
-      <Select
-        value={editCourse.universityId}
-        onChange={(e) => handleChange("universityId", Number(e.target.value))}
-      >
-        <option value={0} disabled>
-          Select University
-        </option>
-        {universities.map((u) => (
-          <option key={u.id} value={u.id}>
-            {u.name}
-          </option>
-        ))}
-      </Select>
 
       {/* Status */}
       <Select

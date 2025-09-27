@@ -10,17 +10,34 @@ import { type StudentListResponse } from "../../../libs/models/response/StudentL
 import {
   fetchApprovedStudents,
   totalActiveCourseByUniversity,
+  getUniversityActivationLink,
 } from "../../../libs/ApiResponseService";
 import { utils } from "../../../utils/utils.ts";
 import { useAuth } from "../../../context/AuthContext.tsx";
+import Swal from "sweetalert2";
+
+// UI components
+import {
+  Button,
+  Modal,
+  Label,
+  Textarea,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "flowbite-react";
 
 export default function Dashboard() {
-   const { user } = useAuth();
+  const { user } = useAuth();
   const [approvedStudents, setApprovedStudents] =
     useState<StudentListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [activeCourseCount, setActiveCourseCount] = useState<number>(0);
+
+  // For Share Post modal
+  const [openModal, setOpenModal] = useState(false);
+  const [shareMessage, setShareMessage] = useState("");
 
   // Fetch approved students
   const loadApprovedStudents = async () => {
@@ -53,6 +70,76 @@ export default function Dashboard() {
     loadActiveCourses();
   }, [user]);
 
+
+const handleSharePost = async () => {
+  try {
+    const universityId = localStorage.getItem("authorized_university_id");
+    if (!universityId) throw new Error("No university associated.");
+
+    const { link: localLink } = await getUniversityActivationLink(Number(universityId));
+    if (!localLink || typeof localLink !== "string") throw new Error("Invalid link from backend.");
+
+    // --- FIX URL ---
+    // Replace first occurrence of /universityId= with ?universityId=
+    let fixedLink = localLink.replace("/universityId=", "?universityId=");
+
+    // Ensure only one ? in the URL
+    fixedLink = fixedLink.replace(/\?universityId=(\d+)\?/, "?universityId=$1&");
+
+    // Prepend Cloudflare public domain
+    const PUBLIC = "https://lab-household-wedding-approach.trycloudflare.com/dynamic-link.html";
+    const path = fixedLink.replace(/^http:\/\/localhost/i, PUBLIC);
+
+    console.log("Final public link:", path);
+
+    // Show modal to copy link
+    Swal.fire({
+      icon: "info",
+      title: "Generated Share Link",
+      html: `
+        <p>Copy the link below (tap on Android to open the app):</p>
+        <input type="text" readonly value="${path}" style="width:100%;padding:5px;border:1px solid #ccc;border-radius:4px;" />
+      `,
+      showCancelButton: true,
+      confirmButtonText: "Copy Link",
+      cancelButtonText: "Cancel",
+      preConfirm: () => path,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigator.clipboard.writeText(result.value)
+          .then(() => {
+            Swal.fire({
+              icon: "success",
+              title: "Copied!",
+              text: "Link copied to clipboard. Tap on your Android device to open the app.",
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          })
+          .catch((err) => {
+            console.error("Copy failed:", err);
+            Swal.fire({
+              icon: "error",
+              title: "Copy Failed",
+              text: "Could not copy link to clipboard.",
+              confirmButtonColor: "#d33",
+            });
+          });
+      }
+    });
+
+  } catch (error: any) {
+    console.error("Error generating link:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Failed",
+      text: `Could not generate activation link. Reason: ${error.message || error}`,
+      confirmButtonColor: "#d33",
+    });
+  }
+};
+
+
   const cardClass =
     "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border";
 
@@ -75,6 +162,17 @@ export default function Dashboard() {
 
   return (
     <div className="p-4 flex flex-col gap-8">
+      {/* Header Section with Share Post Button */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold" style={{ color: "var(--text-color)" }}>
+          Dashboard Overview
+        </h2>
+        <Button color="blue" onClick={handleSharePost}>
+          Share Post
+        </Button>
+      </div>
+
+    
       {/* Grid Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Card 1: Total Students */}
