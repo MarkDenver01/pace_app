@@ -559,7 +559,7 @@ export async function getTheme(universityId: number, ): Promise<CustomizationRes
 
 export async function getActiveCourses(): Promise<CourseResponse[]> {
   try {
-    const response = await api.get<CourseResponse[]>("/admin/api/course/active/all");
+    const response = await api.get<CourseResponse[]>("/superadmin/api/course/active/all");
     return response.data;
   } catch (error: any) {
     console.error("Error fetching active courses:", error);
