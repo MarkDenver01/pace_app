@@ -2,17 +2,27 @@ import { useEffect, useState } from "react";
 import { Button } from "flowbite-react";
 import { BookOpen, Users } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
-import { getUniversities, getAllCourses } from "../../../libs/ApiResponseService";
+import {
+  getUniversities,
+  getAllActiveCoursesByUniversity,
+  getAssessmentStats,
+} from "../../../libs/ApiResponseService";
 import type { UniversityResponse } from "../../../libs/models/University";
 import type { CourseResponse } from "../../../libs/models/Course";
+
+interface AssessmentStats {
+  assessed: number;
+  total: number;
+}
 
 export default function SuperViewRecords() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [universities, setUniversities] = useState<UniversityResponse[]>([]);
   const [courses, setCourses] = useState<CourseResponse[]>([]);
   const [selectedUniversityId, setSelectedUniversityId] = useState<number | null>(null);
-  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<CourseResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [assessmentStats, setAssessmentStats] = useState<AssessmentStats | null>(null);
 
   // Fetch universities
   useEffect(() => {
@@ -22,10 +32,9 @@ export default function SuperViewRecords() {
         setUniversities(univData);
 
         const queryUnivId = Number(searchParams.get("university"));
-        if (queryUnivId && univData.some(u => u.universityId === queryUnivId)) {
+        if (queryUnivId && univData.some((u) => u.universityId === queryUnivId)) {
           setSelectedUniversityId(queryUnivId);
         } else if (univData.length > 0) {
-          // default to first university if query param invalid/missing
           setSelectedUniversityId(univData[0].universityId);
           setSearchParams({ university: String(univData[0].universityId) });
         }
@@ -36,18 +45,16 @@ export default function SuperViewRecords() {
     fetchUniversities();
   }, [searchParams, setSearchParams]);
 
-  // Fetch courses whenever selectedUniversityId changes
+  // Fetch courses when university changes
   useEffect(() => {
     const fetchCourses = async () => {
       if (!selectedUniversityId) return;
       setLoading(true);
       try {
-        const allCourses = await getAllCourses();
-        const filtered = allCourses.filter(
-          (c: CourseResponse) =>
-            c.status === "Active" && c.universityId === selectedUniversityId
-        );
-        setCourses(filtered);
+        const activeCourses = await getAllActiveCoursesByUniversity(selectedUniversityId);
+        setCourses(activeCourses);
+        setSelectedCourse(null); // reset course selection
+        setAssessmentStats(null); // reset stats
       } catch (err) {
         console.error("Error loading courses:", err);
       } finally {
@@ -57,10 +64,20 @@ export default function SuperViewRecords() {
     fetchCourses();
   }, [selectedUniversityId]);
 
-  // Reset selected course when university changes
+  // Fetch assessment stats when course changes
   useEffect(() => {
-    setSelectedCourse(null);
-  }, [selectedUniversityId]);
+    const fetchStats = async () => {
+      if (!selectedUniversityId || !selectedCourse) return;
+      try {
+        const stats = await getAssessmentStats(selectedUniversityId, selectedCourse.courseId);
+        setAssessmentStats(stats);
+      } catch (err) {
+        console.error("Error fetching assessment stats:", err);
+        setAssessmentStats(null);
+      }
+    };
+    fetchStats();
+  }, [selectedCourse, selectedUniversityId]);
 
   const cardClass =
     "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border border-orange-600";
@@ -123,21 +140,21 @@ export default function SuperViewRecords() {
           <div className="flex-1 overflow-y-auto flex flex-col items-center gap-3 max-h-[460px] mt-2 pr-1">
             {courses.map((course) => (
               <Button
-                key={ course.courseName}
-                onClick={() => setSelectedCourse(course.courseName)}
+                key={course.courseId}
+                onClick={() => setSelectedCourse(course)}
                 style={{
                   width: "100%",
                   height: "42px",
                   backgroundColor:
-                    selectedCourse === course.courseName
+                    selectedCourse?.courseId === course.courseId
                       ? "var(--button-color)"
                       : "var(--card-color)",
                   color:
-                    selectedCourse === course.courseName
+                    selectedCourse?.courseId === course.courseId
                       ? "#ffffff"
                       : "var(--text-color)",
                   border:
-                    selectedCourse === course.courseName
+                    selectedCourse?.courseId === course.courseId
                       ? "none"
                       : "1px solid var(--divider-color)",
                 }}
@@ -168,18 +185,13 @@ export default function SuperViewRecords() {
             {selectedCourse ? (
               <div className="space-y-3">
                 <p className="text-xl font-bold" style={valueStyle}>
-                  {selectedCourse}
+                  {selectedCourse.courseName}
                 </p>
                 <p className="flex items-center gap-2 text-sm" style={valueStyle}>
                   <Users size={16} />
                   Student Assessed:
                   <span className="font-semibold ml-1">
-                    {
-                      courses.find((c) => c.courseName === selectedCourse)
-                        ?.assessed
-                    }
-                    /
-                    {courses.find((c) => c.courseName === selectedCourse)?.max}
+                    {assessmentStats ? `${assessmentStats.assessed}/${assessmentStats.total}` : "Loading..."}
                   </span>
                 </p>
               </div>

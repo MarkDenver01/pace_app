@@ -161,15 +161,10 @@ export async function getUniversities(): Promise<UniversityResponse[]> {
  * Fetches the number of active courses for a given university.
  */
 export async function getCourseCountByUniversity(universityId: number): Promise<number> {
-  try {
-    const response = await api.get<{ count: number }>(
-      `/superadmin/api/course/count?universityId=${universityId}`
-    );
-    return response.data.count;
-  } catch (error: any) {
-    console.error('Error fetching course count:', error);
-    throw error.response?.data || { message: 'Failed to fetch course count' };
-  }
+  const response = await api.get<{ count: number }>(
+    `/superadmin/api/universities/courses/count/${universityId}`
+  );
+  return response.data.count;
 }
 
 
@@ -447,7 +442,7 @@ export async function totalActiveCourseByUniversity(universityId: number): Promi
 export async function getAllActiveCoursesByUniversity(universityId: number): Promise<CourseResponse[]> {
   try {
     const response = await api.get<CourseResponse[]>(
-      `/admin/api/course/all/active?universityId=${universityId}`
+      `/superadmin/api/universities/${universityId}/courses`
     );
     return response.data;
   } catch (error: any) {
@@ -578,15 +573,14 @@ export async function getActiveCourses(): Promise<CourseResponse[]> {
  * @returns Promise<number>
  */
 export async function getActiveCourseCountByUniversity(universityId: number): Promise<number> {
-  try {
+   try {
     const response = await api.get<{ count: number }>(
-      `/superadmin/api/university/courses/count/${universityId}`,
-      { params: { status: "Active" } }
+      `/superadmin/api/universities/courses/count/${universityId}`
     );
-    return response.data.count; // return number directly
+    return response.data.count;
   } catch (error: any) {
-    console.error("Error fetching active course count:", error);
-    throw error.response?.data || { message: "Failed to fetch active course count" };
+    console.error('Error fetching course count:', error);
+    throw error.response?.data || { message: 'Failed to fetch course count' };
   }
 };
 
@@ -626,6 +620,18 @@ export async function getUniversityActivationLink(
   } catch (error: any) {
     console.error("Error fetching university activation link:", error);
     throw error.response?.data || { message: "Failed to fetch university activation link" };
+  }
+};
+
+export async function getAssessmentStats(universityId: number, courseId: number) {
+  try {
+    const response = await api.get<{ assessed: number; total: number }>(
+      `/superadmin/api/assessment/stats?universityId=${universityId}&courseId=${courseId}`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching assessment stats:', error);
+    throw error.response?.data || { message: 'Failed to fetch assessment stats' };
   }
 }
 
