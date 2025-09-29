@@ -168,7 +168,7 @@ const handleSharePost = async () => {
           Dashboard Overview
         </h2>
         <Button color="blue" onClick={handleSharePost}>
-          Share Post
+          Share University Link
         </Button>
       </div>
 

@@ -247,6 +247,41 @@ export async function getAllCourses(): Promise<CourseResponse[]> {
 };
 
 /**
+ * Fetches all courses from the API.
+ * @returns Promise<CourseResponse[]>
+ */
+export async function getAllCoursesForAdmin(): Promise<CourseResponse[]> {
+  try {
+    const response = await api.get<CourseResponse[]>("/admin/api/course/all/active");
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching all courses:", error);
+    throw error.response?.data || { message: "Failed to fetch all courses" };
+  }
+};
+
+/**
+ * Assigns a course to a specific university.
+ * @param universityId The ID of the university
+ * @param courseId The ID of the course
+ * @returns Promise<CourseResponse>
+ */
+export async function assignCourseToUniversity(
+  universityId: number,
+  courseId: number
+): Promise<CourseResponse> {
+  try {
+    const response = await api.post<CourseResponse>(
+      `/admin/api/universities/${universityId}/courses/${courseId}`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error assigning course to university:", error);
+    throw error.response?.data || { message: "Failed to assign course to university" };
+  }
+};
+
+/**
  * Saves an account (ADMIN-only endpoint).
  * @param data AccountRequest
  * @returns Promise<AccountResponse>
@@ -395,7 +430,7 @@ export async function updateQuestion(questionId: number, data: {
 export async function totalActiveCourseByUniversity(universityId: number): Promise<number> {
   try {
     const response = await api.get<{ count: number }>(
-      `/admin/api/course/count/${universityId}`
+      `/admin/api/university/courses/count/${universityId}`
     );
     return response.data.count;
   } catch (error: any) {
@@ -457,16 +492,27 @@ async function updateCourseStatus(
 /**
  * Activate a course for a specific university.
  */
-export function activateCourse(courseId: number, universityId: number) {
-  return updateCourseStatus(courseId, universityId, "activate");
+export async function activateCourse(courseId: number, universityId: number) {
+  const response = await api.put(`/admin/api/courses/${universityId}/activate/${courseId}`);
+  return response.data;
 }
 
 /**
  * Deactivate a course for a specific university.
  */
-export function deactivateCourse(courseId: number, universityId: number) {
-  return updateCourseStatus(courseId, universityId, "deactivate");
+export async function deactivateCourse(courseId: number, universityId: number) {
+  const response = await api.put(`/admin/api/courses/${universityId}/deactivate/${courseId}`);
+  return response.data;
 }
+
+
+/**
+ * Fetch all active courses for a specific university.
+ */
+export async function getUniversityCourses(universityId: number) {
+  const response = await api.get(`/admin/api/course/university/${universityId}`);
+  return response.data;
+};
 
 export async function saveOrUpdateTheme(
   request: CustomizationRequest
@@ -534,7 +580,7 @@ export async function getActiveCourses(): Promise<CourseResponse[]> {
 export async function getActiveCourseCountByUniversity(universityId: number): Promise<number> {
   try {
     const response = await api.get<{ count: number }>(
-      `/superadmin/api/course/count/${universityId}`,
+      `/superadmin/api/university/courses/count/${universityId}`,
       { params: { status: "Active" } }
     );
     return response.data.count; // return number directly

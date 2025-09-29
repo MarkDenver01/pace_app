@@ -26,6 +26,20 @@ function isTheme(value: string): value is Theme {
   return ALL_THEMES.includes(value as Theme);
 }
 
+// Helper to build full logo URL
+function resolveLogoUrl(path: string | null | undefined): string | null {
+  if (!path) return null;
+
+  // If backend already returns absolute URL, just return it
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+
+  // Otherwise prepend backend base URL (adjust to your setup)
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+  return `${baseUrl}${path}`;
+}
+
 export default function Customization() {
   const { user } = useAuth();
   const { themeName, setThemeName } = useThemeContext();
@@ -54,7 +68,7 @@ export default function Customization() {
         setThemeId(data.customizationid);
         setThemeName(safeTheme);
         setAboutText(data.aboutText);
-        setLogoPreview(data.logoUrl || null);
+        setLogoPreview(resolveLogoUrl(data.logoUrl));
       } catch (error) {
         console.error("Failed to load customization", error);
         setThemeId(undefined);
@@ -102,14 +116,12 @@ export default function Customization() {
       const response = await saveOrUpdateTheme(request);
 
       setThemeId(response.customizationid);
-      setLogoPreview(response.logoUrl);
+      setLogoPreview(resolveLogoUrl(response.logoUrl));
       setLogoFile(null);
 
       console.log("[Customization] Saved successfully", response);
-      // toast.success("Customization saved successfully!");
     } catch (err) {
       console.error("Failed to save customization", err);
-      // toast.error("Failed to save customization.");
     } finally {
       setLoading(false);
     }
@@ -234,9 +246,9 @@ export default function Customization() {
             color: "white",
           }}
           onClick={handleSave}
-        
+          disabled={loading}
         >
-          Save Customization
+          {loading ? "Saving..." : "Save Customization"}
         </Button>
       </div>
     </div>

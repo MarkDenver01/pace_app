@@ -11,9 +11,26 @@ import RotateIcon from "../components/sidebar/RotateIcon";
 import SidebarDropdown from "../components/sidebar/SidebarDropdown";
 import { LogOut } from "lucide-react";
 import { useThemeContext } from "../context/ThemeContext";
-import { useAuth } from "../context/AuthContext"; 
+import { useAuth } from "../context/AuthContext";
 import Swal from "sweetalert2";
 import { getSwalTheme } from "../utils/getSwalTheme";
+import { getTheme } from "../libs/ApiResponseService";
+import type { CustomizationResponse } from "../libs/models/Customization";
+
+// helper to resolve backend logo URLs
+function resolveLogoUrl(path: string | null | undefined): string {
+  if (!path) return pace_logo;
+
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+
+  if (path.startsWith("/uploads/")) {
+    return `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"}${path}`;
+  }
+
+  return path;
+}
 
 interface Props {
   collapsed: boolean;
@@ -21,24 +38,45 @@ interface Props {
 }
 
 export default function AppSidebar({ collapsed, setCollapsed }: Props) {
-  const { user, logout} = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const { themeName } = useThemeContext();
+  const [logoUrl, setLogoUrl] = useState<string>(pace_logo);
 
   const sidebarMenu: SidebarMenuSection[] =
-    user?.role === "ADMIN" ? adminSidebarMenu : 
-    user?.role === "SUPER_ADMIN" ? superAdminSidebarMenu :
-    []
+    user?.role === "ADMIN"
+      ? adminSidebarMenu
+      : user?.role === "SUPER_ADMIN"
+      ? superAdminSidebarMenu
+      : [];
+
+  // ✅ Fetch logo from backend (MySQL customization table)
+  useEffect(() => {
+    const fetchCustomization = async () => {
+      if (!user?.adminResponse?.universityId) return;
+
+      try {
+        const data: CustomizationResponse = await getTheme(
+          Number(user.adminResponse.universityId)
+        );
+        setLogoUrl(resolveLogoUrl(data.logoUrl));
+      } catch (error) {
+        console.error("Failed to load sidebar customization", error);
+        setLogoUrl(pace_logo);
+      }
+    };
+
+    fetchCustomization();
+  }, [user?.adminResponse?.universityId]);
 
   const handleLogout = async () => {
-
     const result = await Swal.fire({
       title: "Are you sure you want to logout?",
       icon: "warning",
       showCancelButton: true,
-      cancelButtonColor: "#6b7280", // gray-500
+      cancelButtonColor: "#6b7280",
       confirmButtonText: "Yes, logout",
       cancelButtonText: "Cancel",
       ...getSwalTheme(),
@@ -91,14 +129,12 @@ export default function AppSidebar({ collapsed, setCollapsed }: Props) {
       >
         <div className="flex items-center gap-2">
           <img
-            className="h-8 w-8 rounded bg-white"
-            src={localStorage.getItem("customLogo") || pace_logo}
+            className="h-8 w-8 rounded bg-white object-contain"
+            src={logoUrl}
             alt="Logo"
           />
           {!collapsed && (
-            <span className="text-xl font-semibold">
-              Pace Admin
-            </span>
+            <span className="text-xl font-semibold">Pace Admin</span>
           )}
         </div>
       </div>
@@ -170,7 +206,7 @@ export default function AppSidebar({ collapsed, setCollapsed }: Props) {
         )}
       </div>
 
-      {/*  Logout */}
+      {/* Logout */}
       <div className="border-t p-3">
         <button
           onClick={handleLogout}
