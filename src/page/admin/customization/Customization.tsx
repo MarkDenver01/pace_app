@@ -36,7 +36,7 @@ function resolveLogoUrl(path: string | null | undefined): string | null {
   }
 
   // Otherwise prepend backend base URL (adjust to your setup)
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || "https://pace-app-backend.onrender.com";
   return `${baseUrl}${path}`;
 }
 

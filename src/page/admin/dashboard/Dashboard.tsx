@@ -88,7 +88,7 @@ const handleSharePost = async () => {
 
     // Prepend Cloudflare public domain
     const PUBLIC = "https://lab-household-wedding-approach.trycloudflare.com/dynamic-link.html";
-    const path = fixedLink.replace(/^http:\/\/localhost/i, PUBLIC);
+    const path = fixedLink.replace(/^https:\/\/pace-app-backend.onrender.com/i, PUBLIC);
 
     console.log("Final public link:", path);
 

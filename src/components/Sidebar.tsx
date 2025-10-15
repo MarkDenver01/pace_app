@@ -26,7 +26,7 @@ function resolveLogoUrl(path: string | null | undefined): string {
   }
 
   if (path.startsWith("/uploads/")) {
-    return `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"}${path}`;
+    return `${import.meta.env.VITE_API_BASE_URL || "https://pace-app-backend.onrender.com"}${path}`;
   }
 
   return path;
