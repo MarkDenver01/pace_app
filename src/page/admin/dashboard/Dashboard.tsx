@@ -2,7 +2,6 @@ import {
   GraduationCap,
   BookOpen,
   ClipboardCheck,
-  ServerCog,
 } from "lucide-react";
 import DashboardTable from "./DashboardDataTable.tsx";
 import { useEffect, useState } from "react";
@@ -226,24 +225,6 @@ const handleSharePost = async () => {
           </div>
           <div className="text-xs" style={descStyle}>
             Since last month
-          </div>
-        </div>
-
-        {/* Card 4: System Update */}
-        <div className={cardClass}>
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-full" style={iconWrapperStyle}>
-              <ServerCog size={28} />
-            </div>
-            <span className="text-sm font-semibold" style={labelStyle}>
-              System Update
-            </span>
-          </div>
-          <div className="text-4xl font-bold" style={valueStyle}>
-            99.95%
-          </div>
-          <div className="text-xs" style={descStyle}>
-            Last 28 days
           </div>
         </div>
       </div>
