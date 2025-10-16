@@ -8,6 +8,7 @@ import { AuthProvider } from './context/AuthContext';
 import appBg from './assets/app-bg.jpg';
 import UpdatePasswordPage from './page/login/UpdatePassword';
 import UniversityRedirect from './page/login/UniversityRedirect';
+import ReleaseApk from './page/apk/ReleaseApk';
 
 function App() {
   const location = useLocation();
@@ -43,6 +44,9 @@ function App() {
 
             {/* Dynamic University Activation Page */}
             <Route path="/university/:universityId" element={<UniversityRedirect />} />
+
+            {/* APK Releases Page */}
+            <Route path="/apk-uploads" element={<ReleaseApk />} />
 
             {/* Admin routes */}
             <Route
