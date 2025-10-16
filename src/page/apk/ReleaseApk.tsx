@@ -32,7 +32,7 @@ export default function ReleaseApk() {
 
   return (
     <div className="p-6 flex flex-col gap-6">
-      <h2 className="text-2xl font-bold">📦 GitHub APK Releases</h2>
+      <h2 className="text-2xl font-bold">GitHub APK Releases</h2>
 
       {releases.map((release) => (
         <Card key={release.id} className="shadow-md border rounded-xl">

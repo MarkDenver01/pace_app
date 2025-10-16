@@ -11,6 +11,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, children 
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
 
+  // Allow public routes without requiring authentication
+  const publicRoutes = ["/apk-uploads"];
+  if (publicRoutes.includes(location.pathname)) {
+    return <>{children}</>;
+  }
+
+  //  Protect all other routes
   if (!isAuthenticated || !user?.role) {
     return <Navigate to="/" state={{ from: location }} replace />;
   }
