@@ -7,6 +7,7 @@ import SuperAdminLayout from './layout/superadmin/SuperAdminLayout';
 import { AuthProvider } from './context/AuthContext';
 import appBg from './assets/app-bg.jpg';
 import UpdatePasswordPage from './page/login/UpdatePassword';
+import UniversityRedirect from './page/login/UniversityRedirect';
 
 function App() {
   const location = useLocation();
@@ -41,7 +42,7 @@ function App() {
             <Route path="/login/update-password" element={<UpdatePasswordPage />} />
 
             {/* Dynamic University Activation Page */}
-            <Route path="/university/:universityId" element={<UpdatePasswordPage />} />
+            <Route path="/university/:universityId" element={<UniversityRedirect />} />
 
             {/* Admin routes */}
             <Route

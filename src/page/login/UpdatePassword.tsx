@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { HiLockClosed, HiUser, HiEye, HiEyeOff } from "react-icons/hi";
 import { Button } from "flowbite-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Swal from "sweetalert2";
 import { getSwalTheme } from "../../utils/getSwalTheme";
@@ -9,8 +9,11 @@ import { validateTempPassword, updatePassword, generateActivationLink  } from ".
 
 const UpdatePasswordPage: React.FC = () => {
   const navigate = useNavigate();
-  const { universityId } = useParams<{ universityId: string }>();
+  const { universityId: paramId } = useParams();
+  const [searchParams] = useSearchParams();
+  const queryId = searchParams.get("universityId");
   const { setAuth } = useAuth();
+  const universityId = paramId || queryId;
 
   const [username, setUsername] = useState(`University-${universityId}`); // default label
   const [tempPassword, setTempPassword] = useState("");

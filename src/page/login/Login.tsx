@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { HiLockClosed, HiUser, HiEye, HiEyeOff } from "react-icons/hi";
 import { Button } from "flowbite-react";
 import { login } from "../../libs/ApiResponseService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import type { LoginResponse } from "../../libs/models/Login";
 import Swal from "sweetalert2";
@@ -16,6 +16,8 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+  const universityId = searchParams.get("universityId");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +41,7 @@ const Login: React.FC = () => {
           });
           
           if (result.isConfirmed) {
-            navigate("/login/update-password", { replace: true });
+            navigate(`/login/update-password?universityId=${universityId}`, { replace: true });
           }
         } else if(adminStatus  === "VERIFIED" || adminStatus  === "ACTIVATE") {
           Swal.fire({
