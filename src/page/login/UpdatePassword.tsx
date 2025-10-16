@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { HiLockClosed, HiUser, HiEye, HiEyeOff } from "react-icons/hi";
 import { Button } from "flowbite-react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -12,8 +12,10 @@ const UpdatePasswordPage: React.FC = () => {
   const { universityId: paramId } = useParams();
   const [searchParams] = useSearchParams();
   const queryId = searchParams.get("universityId");
-  const { setAuth } = useAuth();
+  const queryEmail = searchParams.get("email");
+  const { user, setAuth } = useAuth();
   const universityId = paramId || queryId;
+  const email = queryEmail || user?.adminResponse?.email;
 
   const [username, setUsername] = useState(`University-${universityId}`); // default label
   const [tempPassword, setTempPassword] = useState("");
@@ -104,7 +106,7 @@ const UpdatePasswordPage: React.FC = () => {
 
     setLoading(true);
     try {
-      const success = await updatePassword(Number(universityId), password);
+      const success = await updatePassword(email!, Number(universityId), password);
 
       if (success) {
         Swal.fire({

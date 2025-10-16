@@ -118,20 +118,16 @@ export async function validateTempPassword(
  * @returns Promise<boolean> Returns true if update succeeded, false otherwise.
  */
 export async function updatePassword(
+  email: string,
   universityId: number,
   newPassword: string
 ): Promise<boolean> {
   try {
     const response = await api.put(
-      `/user/public/update-password/${universityId}`,
-      null,
-      { params: { newPassword } }
+      "/user/public/update-password",
+      { email, universityId, newPassword }
     );
 
-    // Expecting backend to return { success: true } or "success"
-    if (typeof response?.data === "string") {
-      return response.data === "success";
-    }
     return response?.data?.success === true;
   } catch (error: any) {
     console.error("Error updating password:", error);

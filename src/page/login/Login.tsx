@@ -41,7 +41,7 @@ const Login: React.FC = () => {
           });
           
           if (result.isConfirmed) {
-            navigate(`/login/update-password?universityId=${universityId}`, { replace: true });
+            navigate(`/login/update-password?universityId=${universityId}&email=${encodeURIComponent(email)}`, { replace: true });
           }
         } else if(adminStatus  === "VERIFIED" || adminStatus  === "ACTIVATE") {
           Swal.fire({
