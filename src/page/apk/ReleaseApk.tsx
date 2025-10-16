@@ -16,7 +16,7 @@ export default function ReleaseApk() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://api.github.com/repos/MarkDenver01/pace_app_mobile>/releases")
+    fetch("https://api.github.com/repos/MarkDenver01/pace_app_mobile/releases")
       .then((res) => res.json())
       .then((data) => setReleases(data))
       .catch((err) => console.error(err))
