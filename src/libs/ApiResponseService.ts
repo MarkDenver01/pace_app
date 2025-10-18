@@ -608,11 +608,14 @@ export async function getUniversityActivationLink(
   universityId: number
 ): Promise<{ universityId: number; link: string }> {
   try {
-    const response = await api.get<string>(`/user/public/generated_dynamic_link/${universityId}`);
-    const link = response.data; // response.data ay string galing backend
+    // Use template literal to insert the universityId into the URL
+    const response = await api.post(`/user/public/dynamic_link/generate/${universityId}`);
 
-    // Return object para match sa frontend typing
-    return { universityId, link };
+    // The backend already returns { universityId, link }
+    const { universityId: id, link } = response.data;
+
+    // Ensure type consistency (convert universityId to number)
+    return { universityId: Number(id), link };
   } catch (error: any) {
     console.error("Error fetching university activation link:", error);
     throw error.response?.data || { message: "Failed to fetch university activation link" };
