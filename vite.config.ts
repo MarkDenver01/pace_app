@@ -10,7 +10,7 @@ export default defineConfig({
     host: true, // optional, para ma-access sa LAN
     port: 3000,
     allowedHosts: [
-      'lab-household-wedding-approach.trycloudflare.com',
+      'pace-app-frontend.onrender.com',
     ]
   },
 })
