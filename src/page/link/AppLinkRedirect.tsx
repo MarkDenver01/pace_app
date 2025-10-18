@@ -8,8 +8,8 @@ export default function AppLinkRedirect() {
     const universityId = params.get("universityId");
     const token = params.get("token");
 
-    const appUrl = `https://pace-app-frontend.onrender.com/university?universityId=${universityId}&token=${token}`;
-    const intentUrl = `intent://university?universityId=${universityId}&token=${token}#Intent;scheme=https;package=io.dev.pace_app_mobile;end;`;
+    const appUrl = `https://pace-app-frontend.onrender.com/app-link?universityId=${universityId}&token=${token}`;
+    const intentUrl = `intent://app-link?universityId=${universityId}&token=${token}#Intent;scheme=https;package=io.dev.pace_app_mobile;end;`;
     const fallbackUrl = "https://pace-app-frontend.onrender.com/apk-uploads";
 
     // Inject Android App Link meta tags (like your working version)
