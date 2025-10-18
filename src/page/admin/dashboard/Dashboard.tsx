@@ -75,34 +75,35 @@ const handleSharePost = async () => {
     const universityId = localStorage.getItem("authorized_university_id");
     if (!universityId) throw new Error("No university associated.");
 
-    const { link: localLink } = await getUniversityActivationLink(Number(universityId));
-    if (!localLink || typeof localLink !== "string") throw new Error("Invalid link from backend.");
+    // Fetch link directly from backend
+    const { link: backendLink } = await getUniversityActivationLink(Number(universityId));
+    if (!backendLink || typeof backendLink !== "string") throw new Error("Invalid link from backend.");
 
-    // --- FIX URL ---
-    // Replace first occurrence of /universityId= with ?universityId=
-    let fixedLink = localLink.replace("/universityId=", "?universityId=");
+    // --- Normalize URL ---
+    // Ensure it uses ? instead of / before query params
+    let fixedLink = backendLink;
 
-    // Ensure only one ? in the URL
+    if (fixedLink.includes("/universityId=")) {
+      fixedLink = fixedLink.replace("/universityId=", "?universityId=");
+    }
+
+    // Ensure correct query param formatting (avoid duplicate ?)
     fixedLink = fixedLink.replace(/\?universityId=(\d+)\?/, "?universityId=$1&");
 
-    // Prepend Cloudflare public domain
-    const PUBLIC = "https://lab-household-wedding-approach.trycloudflare.com/dynamic-link.html";
-    const path = fixedLink.replace(/^https:\/\/pace-app-backend.onrender.com/i, PUBLIC);
+    console.log("Final shareable link:", fixedLink);
 
-    console.log("Final public link:", path);
-
-    // Show modal to copy link
-    Swal.fire({
+    // --- Show modal to copy ---
+    await Swal.fire({
       icon: "info",
       title: "Generated Share Link",
       html: `
-        <p>Copy the link below (tap on Android to open the app):</p>
-        <input type="text" readonly value="${path}" style="width:100%;padding:5px;border:1px solid #ccc;border-radius:4px;" />
+        <p>Copy the link below to share or open it on Android:</p>
+        <input type="text" readonly value="${fixedLink}" style="width:100%;padding:5px;border:1px solid #ccc;border-radius:4px;" />
       `,
       showCancelButton: true,
       confirmButtonText: "Copy Link",
       cancelButtonText: "Cancel",
-      preConfirm: () => path,
+      preConfirm: () => fixedLink,
     }).then((result) => {
       if (result.isConfirmed) {
         navigator.clipboard.writeText(result.value)
@@ -110,7 +111,7 @@ const handleSharePost = async () => {
             Swal.fire({
               icon: "success",
               title: "Copied!",
-              text: "Link copied to clipboard. Tap on your Android device to open the app.",
+              text: "Link copied to clipboard.",
               timer: 2000,
               showConfirmButton: false,
             });
@@ -137,7 +138,6 @@ const handleSharePost = async () => {
     });
   }
 };
-
 
   const cardClass =
     "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border";
