@@ -604,21 +604,29 @@ export async function generateActivationLink(
  * @param universityId number
  * @returns Promise<{ universityId: number; link: string }>
  */
-export async function getUniversityActivationLink(
+export async function getOrCreateDynamicLink(
   universityId: number
 ): Promise<{ universityId: number; link: string }> {
   try {
-    // Use template literal to insert the universityId into the URL
     const response = await api.post(`/user/public/dynamic_link/generate/${universityId}`);
-
-    // The backend already returns { universityId, link }
     const { universityId: id, link } = response.data;
-
-    // Ensure type consistency (convert universityId to number)
     return { universityId: Number(id), link };
   } catch (error: any) {
-    console.error("Error fetching university activation link:", error);
-    throw error.response?.data || { message: "Failed to fetch university activation link" };
+    console.error("Error in getOrCreateDynamicLink:", error);
+    throw error.response?.data || { message: "Failed to get or create dynamic link" };
+  }
+};
+
+export async function updateDynamicLinkToken(
+  universityId: number
+): Promise<{ universityId: number; link: string }> {
+  try {
+    const response = await api.put(`/user/public/dynamic_link/update_token/${universityId}`);
+    const { universityId: id, link } = response.data;
+    return { universityId: Number(id), link };
+  } catch (error: any) {
+    console.error("Error in updateDynamicLinkToken:", error);
+    throw error.response?.data || { message: "Failed to update dynamic link token" };
   }
 };
 

@@ -9,7 +9,8 @@ import { type StudentListResponse } from "../../../libs/models/response/StudentL
 import {
   fetchApprovedStudents,
   totalActiveCourseByUniversity,
-  getUniversityActivationLink,
+  getOrCreateDynamicLink,
+  updateDynamicLinkToken,
 } from "../../../libs/ApiResponseService";
 import { utils } from "../../../utils/utils.ts";
 import { useAuth } from "../../../context/AuthContext.tsx";
@@ -75,35 +76,48 @@ const handleSharePost = async () => {
     const universityId = localStorage.getItem("authorized_university_id");
     if (!universityId) throw new Error("No university associated.");
 
-    // Fetch link directly from backend
-    const { link: backendLink } = await getUniversityActivationLink(Number(universityId));
-    if (!backendLink || typeof backendLink !== "string") throw new Error("Invalid link from backend.");
+    // Get existing or create new link
+    let { link: currentLink } = await getOrCreateDynamicLink(Number(universityId));
 
-    // --- Normalize URL ---
-    // Ensure it uses ? instead of / before query params
-    let fixedLink = backendLink;
-
-    if (fixedLink.includes("/universityId=")) {
-      fixedLink = fixedLink.replace("/universityId=", "?universityId=");
+    if (!currentLink || typeof currentLink !== "string") {
+      throw new Error("Invalid link from backend.");
     }
 
-    // Ensure correct query param formatting (avoid duplicate ?)
-    fixedLink = fixedLink.replace(/\?universityId=(\d+)\?/, "?universityId=$1&");
+    // Normalize for display
+    if (currentLink.includes("/universityId=")) {
+      currentLink = currentLink.replace("/universityId=", "?universityId=");
+    }
 
-    console.log("Final shareable link:", fixedLink);
+    // Ask admin to regenerate
+    const decision = await Swal.fire({
+      icon: "question",
+      title: "App Link Already Exists",
+      text: "A dynamic link already exists for this university. Do you want to generate a new one?",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Generate New Link",
+      cancelButtonText: "No, Keep Current Link",
+      reverseButtons: true,
+    });
 
-    // --- Show modal to copy ---
+    // If confirmed, update token
+    if (decision.isConfirmed) {
+      const updated = await updateDynamicLinkToken(Number(universityId));
+      currentLink = updated.link.replace("/universityId=", "?universityId=");
+    }
+
+    // Display final link
     await Swal.fire({
       icon: "info",
-      title: "Generated Share Link",
+      title: "Shareable App Link",
       html: `
-        <p>Copy the link below to share or open it on Android:</p>
-        <input type="text" readonly value="${fixedLink}" style="width:100%;padding:5px;border:1px solid #ccc;border-radius:4px;" />
+        <p>Copy or share this link:</p>
+        <input type="text" readonly value="${currentLink}" 
+          style="width:100%;padding:5px;border:1px solid #ccc;border-radius:4px;" />
       `,
       showCancelButton: true,
       confirmButtonText: "Copy Link",
-      cancelButtonText: "Cancel",
-      preConfirm: () => fixedLink,
+      cancelButtonText: "Close",
+      preConfirm: () => currentLink,
     }).then((result) => {
       if (result.isConfirmed) {
         navigator.clipboard.writeText(result.value)
@@ -116,8 +130,7 @@ const handleSharePost = async () => {
               showConfirmButton: false,
             });
           })
-          .catch((err) => {
-            console.error("Copy failed:", err);
+          .catch(() => {
             Swal.fire({
               icon: "error",
               title: "Copy Failed",
@@ -129,11 +142,11 @@ const handleSharePost = async () => {
     });
 
   } catch (error: any) {
-    console.error("Error generating link:", error);
+    console.error("Error handling dynamic link:", error);
     Swal.fire({
       icon: "error",
       title: "Failed",
-      text: `Could not generate activation link. Reason: ${error.message || error}`,
+      text: `Could not process dynamic link. Reason: ${error.message || error}`,
       confirmButtonColor: "#d33",
     });
   }
