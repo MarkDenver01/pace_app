@@ -9,6 +9,7 @@ import appBg from './assets/app-bg.jpg';
 import UpdatePasswordPage from './page/login/UpdatePassword';
 import UniversityRedirect from './page/login/UniversityRedirect';
 import ReleaseApk from './page/apk/ReleaseApk';
+import AppLinkRedirect from "./page/link/AppLinkRedirect";
 
 function App() {
   const location = useLocation();
@@ -47,6 +48,9 @@ function App() {
 
             {/* APK Releases Page */}
             <Route path="/apk-uploads" element={<ReleaseApk />} />
+
+            {/* App Link Redirect Page */}
+            <Route path="/app-link" element={<AppLinkRedirect />} />
 
             {/* Admin routes */}
             <Route
