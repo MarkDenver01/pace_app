@@ -49,7 +49,8 @@ function App() {
             {/* APK Releases Page */}
             <Route path="/apk-uploads" element={<ReleaseApk />} />
 
-        
+         {/* App Link Redirect Page */}
+            <Route path="/app-link" element={<AppLinkRedirect />} />
 
             {/* Admin routes */}
             <Route
