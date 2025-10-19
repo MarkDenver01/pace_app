@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import { getSwalTheme } from "../../utils/getSwalTheme";
 
 export default function AppLinkRedirect() {
-  const [isFacebookBrowser, setIsFacebookBrowser] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
@@ -18,24 +19,36 @@ export default function AppLinkRedirect() {
     const isInstagram = ua.includes("Instagram");
     const isInAppBrowser = isFacebook || isInstagram;
 
-    setIsFacebookBrowser(isInAppBrowser);
-
+    // Detect if opened from Facebook or Instagram
     if (isInAppBrowser) {
-      // Show an instruction UI instead of hard redirect
+      Swal.fire({
+        icon: "info",
+        title: "Open in Chrome",
+        html: `
+          <p>You’re viewing this link from <b>${isFacebook ? "Facebook" : "Instagram"}</b>.</p>
+          <p>These apps prevent automatic app launching.</p>
+          <p>Please tap the <b>⋯ (three dots)</b> in the top-right corner and select <b>“Open in Chrome”</b> or <b>“Open in Browser”</b>.</p>
+        `,
+        confirmButtonText: "CLOSE",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        ...getSwalTheme(),
+      });
       return;
     }
 
+    // Continue normal redirect flow
     setIsRedirecting(true);
 
-    // Try opening via custom scheme first
+    // Try to open via custom URI scheme
     window.location.href = appScheme;
 
-    // Fallback to intent:// if custom scheme fails
+    // Fallback to intent://
     const timer = setTimeout(() => {
       window.location.href = intentUrl;
     }, 800);
 
-    // Final fallback to web
+    // Final fallback (if not installed)
     const finalTimer = setTimeout(() => {
       window.location.href = fallbackUrl;
     }, 2000);
@@ -46,12 +59,7 @@ export default function AppLinkRedirect() {
     };
   }, []);
 
-  const handleOpenInBrowser = () => {
-    const current = window.location.href;
-    window.open(current, "_blank");
-  };
-
-  const handleTryApp = () => {
+  const handleTryAgain = () => {
     const params = new URLSearchParams(window.location.search);
     const universityId = params.get("universityId");
     const token = params.get("token");
@@ -60,34 +68,16 @@ export default function AppLinkRedirect() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center p-6 bg-gray-50">
-      {isFacebookBrowser ? (
-        <div className="max-w-md bg-white shadow-lg rounded-2xl p-6">
-          <h2 className="text-xl font-semibold mb-2 text-gray-800">
-            Open in Chrome
-          </h2>
-          <p className="text-gray-600 mb-4">
-            It looks like you opened this link from <strong>Facebook</strong> or{" "}
-            <strong>Instagram</strong>, which prevents automatic app opening.
-            Please tap the <strong>three dots ⋯</strong> in the top right and
-            choose <strong>“Open in Chrome”</strong> to continue.
-          </p>
-          <button
-            onClick={handleOpenInBrowser}
-            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
-          >
-            Open in Chrome
-          </button>
-        </div>
-      ) : isRedirecting ? (
+      {isRedirecting ? (
         <div>
           <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin mb-6" />
-          <h2 className="text-xl font-semibold mb-2">Opening the app…</h2>
-          <p className="text-gray-600">
-            If nothing happens, please try again below.
+          <h2 className="text-xl font-semibold mb-2 text-gray-800">Opening the app…</h2>
+          <p className="text-gray-600 mb-4">
+            If nothing happens, please try again manually.
           </p>
           <button
-            onClick={handleTryApp}
-            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
+            onClick={handleTryAgain}
+            className="mt-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
           >
             Try Again
           </button>
