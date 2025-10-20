@@ -7,6 +7,7 @@ export interface UserAccountResponse {
     universityId: number;
     universityName: string;
     userId: number;
+    domainEmail: string;
 }
 
 export interface UserAccountRequest {
