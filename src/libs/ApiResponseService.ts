@@ -120,12 +120,13 @@ export async function validateTempPassword(
 export async function updatePassword(
   email: string,
   universityId: number,
-  newPassword: string
+  newPassword: string,
+  emailDomain: string
 ): Promise<boolean> {
   try {
     const response = await api.put(
       "/user/public/update-password",
-      { email, universityId, newPassword }
+      { email, universityId, newPassword, emailDomain }
     );
 
     return response?.data?.success === true;

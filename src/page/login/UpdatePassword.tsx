@@ -27,7 +27,7 @@ const UpdatePasswordPage: React.FC = () => {
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [emailDomain, setEmailDomain] = useState(""); // ✅ NEW STATE
+  const [emailDomain, setEmailDomain] = useState(""); 
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -120,7 +120,7 @@ const UpdatePasswordPage: React.FC = () => {
 
     setLoading(true);
     try {
-      const success = await updatePassword(email!, Number(universityId), password);
+      const success = await updatePassword(email!, Number(universityId), password, emailDomain);
 
       if (success) {
         Swal.fire({
@@ -250,7 +250,7 @@ const UpdatePasswordPage: React.FC = () => {
               </span>
               <input
                 type="text"
-                placeholder="Set Email Domain (e.g. university.edu)"
+                placeholder="Set Email Domain (e.g. @university.edu)"
                 value={emailDomain}
                 onChange={(e) => setEmailDomain(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border rounded-full bg-[var(--card-color)] text-sm text-[var(--text-color)] border-[var(--button-color)] focus:outline-none focus:ring-2 focus:ring-[var(--button-color)]"
