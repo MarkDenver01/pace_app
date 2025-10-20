@@ -1,11 +1,15 @@
-import React, { use, useState } from "react";
-import { HiLockClosed, HiUser, HiEye, HiEyeOff } from "react-icons/hi";
+import React, { useState } from "react";
+import { HiLockClosed, HiUser, HiEye, HiEyeOff, HiMail } from "react-icons/hi";
 import { Button } from "flowbite-react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Swal from "sweetalert2";
 import { getSwalTheme } from "../../utils/getSwalTheme";
-import { validateTempPassword, updatePassword, generateActivationLink  } from "../../libs/ApiResponseService";
+import {
+  validateTempPassword,
+  updatePassword,
+  generateActivationLink,
+} from "../../libs/ApiResponseService";
 
 const UpdatePasswordPage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,12 +21,14 @@ const UpdatePasswordPage: React.FC = () => {
   const universityId = paramId || queryId;
   const email = queryEmail || user?.adminResponse?.email;
 
-  const [username, setUsername] = useState(`University-${universityId}`); // default label
+  const [username, setUsername] = useState(`University-${universityId}`);
   const [tempPassword, setTempPassword] = useState("");
   const [isTempValid, setIsTempValid] = useState(false);
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [emailDomain, setEmailDomain] = useState(""); // ✅ NEW STATE
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -43,10 +49,7 @@ const UpdatePasswordPage: React.FC = () => {
 
     setLoading(true);
     try {
-      const isValid = await validateTempPassword(
-        Number(universityId),
-        tempPassword
-      );
+      const isValid = await validateTempPassword(Number(universityId), tempPassword);
 
       if (isValid) {
         setIsTempValid(true);
@@ -93,6 +96,17 @@ const UpdatePasswordPage: React.FC = () => {
       return;
     }
 
+    if (!emailDomain.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Email Domain Required",
+        text: "Please enter an email domain before proceeding.",
+        confirmButtonText: "CLOSE",
+        ...getSwalTheme(),
+      });
+      return;
+    }
+
     if (!universityId) {
       Swal.fire({
         icon: "error",
@@ -112,12 +126,15 @@ const UpdatePasswordPage: React.FC = () => {
         Swal.fire({
           icon: "success",
           title: "Password Updated",
-          text: "Your account has been activated successfully.",
+          html: `
+            <p>Your account has been activated successfully.</p>
+            <p><strong>Email Domain Set:</strong> ${emailDomain}</p>
+          `,
           confirmButtonText: "PROCEED",
           ...getSwalTheme(),
         }).then(() => {
           setAuth(null);
-          navigate("/admin", { replace: true }); // or navigate("/") if general user
+          navigate("/admin", { replace: true });
         });
       } else {
         Swal.fire({
@@ -195,7 +212,7 @@ const UpdatePasswordPage: React.FC = () => {
           </div>
         )}
 
-        {/* New + confirm password fields */}
+        {/* New + confirm password + set email domain fields */}
         {isTempValid && (
           <>
             <div className="relative">
@@ -222,6 +239,21 @@ const UpdatePasswordPage: React.FC = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full pl-10 pr-10 py-2 border rounded-full bg-[var(--card-color)] text-sm text-[var(--text-color)] border-[var(--button-color)] focus:outline-none focus:ring-2 focus:ring-[var(--button-color)]"
+                required
+              />
+            </div>
+
+            {/* Set Email Domain Field */}
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-[var(--button-color)]">
+                <HiMail />
+              </span>
+              <input
+                type="text"
+                placeholder="Set Email Domain (e.g. university.edu)"
+                value={emailDomain}
+                onChange={(e) => setEmailDomain(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border rounded-full bg-[var(--card-color)] text-sm text-[var(--text-color)] border-[var(--button-color)] focus:outline-none focus:ring-2 focus:ring-[var(--button-color)]"
                 required
               />
             </div>
