@@ -36,7 +36,7 @@ export default function Dashboard() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [activeCourseCount, setActiveCourseCount] = useState<number>(0);
 
-  // New: University info state
+  // University info state
   const [universityName, setUniversityName] = useState(
     user?.adminResponse?.universityName || "Unknown University"
   );
@@ -78,7 +78,7 @@ export default function Dashboard() {
     loadActiveCourses();
   }, [user]);
 
-  // 🔹 Keep your original handleSharePost
+  // 🔹 Original handleSharePost
   const handleSharePost = async () => {
     try {
       const universityId = localStorage.getItem("authorized_university_id");
@@ -173,7 +173,7 @@ export default function Dashboard() {
   };
 
   const cardClass =
-    "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border";
+    "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border min-h-[180px]";
   const iconWrapperStyle = {
     backgroundColor: "var(--button-color, #D94022)10",
     color: "var(--button-color)",
@@ -200,9 +200,9 @@ export default function Dashboard() {
         </Button>
       </div>
 
-      {/* Grid Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* ✅ New Card: University Info */}
+      {/* Grid Section (2x2 layout) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Row 1 */}
         <div
           className={`${cardClass} cursor-pointer`}
           onClick={() => setIsEditModalOpen(true)}
@@ -216,20 +216,14 @@ export default function Dashboard() {
             </span>
           </div>
           <div>
-            <div
-              className="text-2xl font-extrabold uppercase"
-              style={valueStyle}
-            >
+            <div className="text-2xl font-extrabold uppercase" style={valueStyle}>
               {universityName}
             </div>
             <div className="text-sm text-gray-500">{domainEmail}</div>
           </div>
-          <div className="text-xs italic text-gray-400">
-            Tap to edit details
-          </div>
+          <div className="text-xs italic text-gray-400">Tap to edit details</div>
         </div>
 
-        {/* Card 1: Total Students */}
         <div className={cardClass}>
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-full" style={iconWrapperStyle}>
@@ -247,7 +241,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Card 2: Active Courses */}
+        {/* Row 2 */}
         <div className={cardClass}>
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-full" style={iconWrapperStyle}>
@@ -265,7 +259,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Card 3: Assessments Completed */}
         <div className={cardClass}>
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-full" style={iconWrapperStyle}>
@@ -286,7 +279,7 @@ export default function Dashboard() {
 
       {/* Divider */}
       <div
-        className="border-t my-2"
+        className="border-t my-4"
         style={{ borderColor: "var(--divider-color)" }}
       />
 
@@ -301,29 +294,29 @@ export default function Dashboard() {
         onClose={() => setIsEditModalOpen(false)}
         size="md"
       >
-      <ModalHeader>Edit University Information</ModalHeader>
-<ModalBody>
-  <div className="flex flex-col gap-4">
-    <div>
-      <Label htmlFor="universityName">University Name</Label>
-      <TextInput
-        id="universityName"
-        type="text"
-        value={newUniversityName}
-        onChange={(e) => setNewUniversityName(e.target.value)}
-      />
-    </div>
-    <div>
-      <Label htmlFor="domainEmail">Domain Email</Label>
-      <TextInput
-        id="domainEmail"
-        type="email"
-        value={newDomainEmail}
-        onChange={(e) => setNewDomainEmail(e.target.value)}
-      />
-    </div>
-  </div>
-</ModalBody>
+        <ModalHeader>Edit University Information</ModalHeader>
+        <ModalBody>
+          <div className="flex flex-col gap-4">
+            <div>
+              <Label htmlFor="universityName">University Name</Label>
+              <TextInput
+                id="universityName"
+                type="text"
+                value={newUniversityName}
+                onChange={(e) => setNewUniversityName(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="domainEmail">Domain Email</Label>
+              <TextInput
+                id="domainEmail"
+                type="email"
+                value={newDomainEmail}
+                onChange={(e) => setNewDomainEmail(e.target.value)}
+              />
+            </div>
+          </div>
+        </ModalBody>
 
         <ModalFooter>
           <Button color="success" onClick={handleSaveUniversityInfo}>
