@@ -319,7 +319,7 @@ export default function Dashboard() {
         </ModalBody>
 
         <ModalFooter>
-          <Button color="success" onClick={handleSaveUniversityInfo}>
+          <Button color="blue" onClick={handleSaveUniversityInfo}>
             Save
           </Button>
           <Button color="gray" onClick={() => setIsEditModalOpen(false)}>
