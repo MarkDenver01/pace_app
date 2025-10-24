@@ -8,7 +8,7 @@ import { getSwalTheme } from "../../utils/getSwalTheme";
 import {
   validateTempPassword,
   updatePassword,
-  generateActivationLink,
+  getOrCreateDynamicLink,
   getEmailDomain,
 } from "../../libs/ApiResponseService";
 
@@ -73,19 +73,15 @@ const UpdatePasswordPage: React.FC = () => {
 
       if (isValid) {
         setIsTempValid(true);
-        await fetchEmailDomain(Number(universityId)); // ✅ load email domain after validation
+     
+        const result = await fetchEmailDomain(Number(universityId)); // load email domain after validation
 
-        const result = await generateActivationLink(Number(universityId));
         Swal.fire({
           icon: "success",
           title: "Temporary Password Validated",
           html: `
             <p>Your temporary password is valid.</p>
-            <p>You may now activate your account using the link below:</p>
-            <a href="${result.link}" target="_blank" style="color:#2563eb;text-decoration:underline;word-break:break-all;">
-              ${result.link}
-            </a>
-          `,
+            <p>You may now activate your account using the link below:</p> `,
           confirmButtonText: "OK",
           ...getSwalTheme(),
         });

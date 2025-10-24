@@ -595,24 +595,6 @@ export async function getActiveCourseCountByUniversity(universityId: number): Pr
   }
 };
 
-/**
- * Generates (or retrieves) a dynamic activation link for a university account.
- * @param universityId The ID of the university.
- * @returns Promise<{ universityId: string; link: string }>
- */
-export async function generateActivationLink(
-  universityId: number
-): Promise<{ universityId: string; link: string }> {
-  try {
-    const response = await api.post<{ universityId: string; link: string }>(
-      `/user/public/user/account/${universityId}`
-    );
-    return response.data;
-  } catch (error: any) {
-    console.error("Error generating activation link:", error);
-    throw error.response?.data || { message: "Failed to generate activation link" };
-  }
-};
 
 /**
  * Fetches the generated university activation link by universityId.
