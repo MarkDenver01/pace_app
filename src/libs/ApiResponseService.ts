@@ -113,7 +113,7 @@ export async function validateTempPassword(
 
 export async function getEmailDomain(universityId: number): Promise<string | null> {
   try {
-    const response = await api.get(`/api/dynamic_link/email_domain`, {
+    const response = await api.get(`/admin/api/link/email_domain`, {
       params: { universityId },
     });
 
