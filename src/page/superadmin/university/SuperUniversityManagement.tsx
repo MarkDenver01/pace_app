@@ -71,7 +71,7 @@ export default function UniversityLayout() {
        Swal.fire({
               icon: "error",
               title: "Failed",
-              text: "Failed to save university.",
+              text: "Failed to save university. University already existing.",
               confirmButtonText: "CLOSE",
               ...getSwalTheme(),
             });
