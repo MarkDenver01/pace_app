@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HiLockClosed, HiUser, HiEye, HiEyeOff, HiMail } from "react-icons/hi";
 import { Button } from "flowbite-react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -9,6 +9,7 @@ import {
   validateTempPassword,
   updatePassword,
   generateActivationLink,
+  getEmailDomain,
 } from "../../libs/ApiResponseService";
 
 const UpdatePasswordPage: React.FC = () => {
@@ -27,10 +28,29 @@ const UpdatePasswordPage: React.FC = () => {
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [emailDomain, setEmailDomain] = useState(""); 
+  const [emailDomain, setEmailDomain] = useState<string | null>(null);
+  const [isDomainDisabled, setIsDomainDisabled] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  /** Fetch email domain when temporary password is validated */
+  const fetchEmailDomain = async (id: number) => {
+    try {
+      const domain = await getEmailDomain(id);
+      if (domain) {
+        setEmailDomain(domain);
+        setIsDomainDisabled(true);
+      } else {
+        setEmailDomain("");
+        setIsDomainDisabled(false);
+      }
+    } catch (error) {
+      console.error("Error fetching email domain:", error);
+      setEmailDomain("");
+      setIsDomainDisabled(false);
+    }
+  };
 
   /** Validate temporary password */
   const handleActivate = async (e: React.FormEvent) => {
@@ -53,6 +73,8 @@ const UpdatePasswordPage: React.FC = () => {
 
       if (isValid) {
         setIsTempValid(true);
+        await fetchEmailDomain(Number(universityId)); // ✅ load email domain after validation
+
         const result = await generateActivationLink(Number(universityId));
         Swal.fire({
           icon: "success",
@@ -96,7 +118,7 @@ const UpdatePasswordPage: React.FC = () => {
       return;
     }
 
-    if (!emailDomain.trim()) {
+    if (!emailDomain?.trim()) {
       Swal.fire({
         icon: "warning",
         title: "Email Domain Required",
@@ -212,9 +234,10 @@ const UpdatePasswordPage: React.FC = () => {
           </div>
         )}
 
-        {/* New + confirm password + set email domain fields */}
+        {/* New + confirm password + email domain */}
         {isTempValid && (
           <>
+            {/* New Password */}
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-[var(--button-color)]">
                 <HiLockClosed />
@@ -229,6 +252,7 @@ const UpdatePasswordPage: React.FC = () => {
               />
             </div>
 
+            {/* Confirm Password */}
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-[var(--button-color)]">
                 <HiLockClosed />
@@ -243,7 +267,7 @@ const UpdatePasswordPage: React.FC = () => {
               />
             </div>
 
-            {/* Set Email Domain Field */}
+            {/* Email Domain */}
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-[var(--button-color)]">
                 <HiMail />
@@ -251,9 +275,12 @@ const UpdatePasswordPage: React.FC = () => {
               <input
                 type="text"
                 placeholder="Set Email Domain (e.g. @university.edu)"
-                value={emailDomain}
+                value={emailDomain || ""}
                 onChange={(e) => setEmailDomain(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-full bg-[var(--card-color)] text-sm text-[var(--text-color)] border-[var(--button-color)] focus:outline-none focus:ring-2 focus:ring-[var(--button-color)]"
+                disabled={isDomainDisabled}
+                className={`w-full pl-10 pr-4 py-2 border rounded-full bg-[var(--card-color)] text-sm text-[var(--text-color)] border-[var(--button-color)] focus:outline-none focus:ring-2 focus:ring-[var(--button-color)] ${
+                  isDomainDisabled ? "opacity-70 cursor-not-allowed" : ""
+                }`}
                 required
               />
             </div>

@@ -111,6 +111,20 @@ export async function validateTempPassword(
   }
 };
 
+export async function getEmailDomain(universityId: number): Promise<string | null> {
+  try {
+    const response = await api.get(`/api/dynamic_link/email_domain`, {
+      params: { universityId },
+    });
+
+    // Expecting backend response: { emailDomain: "@school.edu" } or { emailDomain: null }
+    return response?.data?.emailDomain ?? null;
+  } catch (error: any) {
+    console.error("Error fetching email domain:", error);
+    return null;
+  }
+}
+
 /**
  * Updates the password for a university account.
  * @param universityId The ID of the university whose password is being updated.
