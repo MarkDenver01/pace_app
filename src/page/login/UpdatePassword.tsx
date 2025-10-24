@@ -8,7 +8,6 @@ import { getSwalTheme } from "../../utils/getSwalTheme";
 import {
   validateTempPassword,
   updatePassword,
-  getOrCreateDynamicLink,
   getEmailDomain,
 } from "../../libs/ApiResponseService";
 
