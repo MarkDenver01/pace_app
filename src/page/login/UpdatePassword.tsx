@@ -71,19 +71,15 @@ const UpdatePasswordPage: React.FC = () => {
       const isValid = await validateTempPassword(Number(universityId), tempPassword);
 
       if (isValid) {
-        setIsTempValid(true);
-     
-        const result = await fetchEmailDomain(Number(universityId)); // load email domain after validation
-
-        Swal.fire({
-          icon: "success",
-          title: "Temporary Password Validated",
-          html: `
-            <p>Your temporary password is valid.</p>
-            <p>You may now activate your account using the link below:</p> `,
-          confirmButtonText: "OK",
-          ...getSwalTheme(),
-        });
+          await fetchEmailDomain(Number(universityId)); // wait first
+          setIsTempValid(true); // then show new password + domain fields
+          Swal.fire({
+            icon: "success",
+            title: "Temporary Password Validated",
+            text: "Your temporary password is valid.",
+            confirmButtonText: "OK",
+            ...getSwalTheme(),
+          });
       } else {
         Swal.fire({
           icon: "error",
