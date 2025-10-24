@@ -9,6 +9,8 @@ import {
 } from "../../../libs/ApiResponseService";
 import type { UniversityResponse, UniversityRequest } from "../../../libs/models/University";
 import ThemedButton from "../../../components/ThemedButton";
+import Swal from "sweetalert2";
+import { getSwalTheme } from "../../../utils/getSwalTheme";
 
 export default function UniversityLayout() {
   const [universities, setUniversities] = useState<UniversityResponse[]>([]);
@@ -46,7 +48,14 @@ export default function UniversityLayout() {
 
   const handleSave = async () => {
     if (!university.trim()) {
-      setError("Please enter a university name.");
+      //setError("Please enter a university name.");
+      Swal.fire({
+              icon: "warning",
+              title: "Incomplete Data",
+              text: "Please enter the university name before saving.",
+              confirmButtonText: "CLOSE",
+              ...getSwalTheme(),
+            });
       return;
     }
 
@@ -59,7 +68,13 @@ export default function UniversityLayout() {
       setUniversity("");
       setCurrentPage(Math.ceil((universities.length + 1) / pageSize));
     } catch (err: any) {
-      setError(err.message || "Failed to save university");
+       Swal.fire({
+              icon: "error",
+              title: "Failed",
+              text: "Failed to save university.",
+              confirmButtonText: "CLOSE",
+              ...getSwalTheme(),
+            });
     } finally {
       setSaving(false);
     }
@@ -72,7 +87,14 @@ export default function UniversityLayout() {
 
   const handleUpdate = async (id: number) => {
     if (!editName.trim()) {
-      setError("University name cannot be empty.");
+      //setError("University name cannot be empty.");
+            Swal.fire({
+              icon: "warning",
+              title: "Incomplete Data",
+              text: "Please enter the university name before saving.",
+              confirmButtonText: "CLOSE",
+              ...getSwalTheme(),
+            });
       return;
     }
 
@@ -95,7 +117,14 @@ export default function UniversityLayout() {
       await deleteUniversity(id);
       setUniversities((prev) => prev.filter((u) => u.universityId !== id));
     } catch (err: any) {
-      setError(err.message || "Failed to delete university");
+     // setError(err.message || "Failed to delete university");
+      Swal.fire({
+              icon: "error",
+              title: "Failed",
+              text: "Failed to update university.",
+              confirmButtonText: "CLOSE",
+              ...getSwalTheme(),
+            });
     }
   };
 
