@@ -13,6 +13,7 @@ import type { CourseResponse, CourseRequest } from "../../../libs/models/Course"
 import Swal from "sweetalert2";
 import { getSwalTheme } from "../../../utils/getSwalTheme";
 import EditCourseForm from "./SuperUpdateCourse";
+import CareerModal from "./SuperCareerUpdate"; 
 
 export default function CourseTableLayout() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,8 +25,12 @@ export default function CourseTableLayout() {
   const [errorCourses, setErrorCourses] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Modals
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCareerModalOpen, setIsCareerModalOpen] = useState(false);
+
   const [selectedCourse, setSelectedCourse] = useState<CourseResponse | null>(null);
+  const [selectedCareerCourse, setSelectedCareerCourse] = useState<CourseResponse | null>(null);
 
   useEffect(() => {
     fetchCourses();
@@ -93,6 +98,11 @@ export default function CourseTableLayout() {
   const handleEditClick = (course: CourseResponse) => {
     setSelectedCourse(course);
     setIsEditModalOpen(true);
+  };
+
+  const handleCareerClick = (course: CourseResponse) => {
+    setSelectedCareerCourse(course);
+    setIsCareerModalOpen(true);
   };
 
   const handleUpdateSuccess = () => {
@@ -238,12 +248,18 @@ export default function CourseTableLayout() {
                       </span>
                     </td>
                     <td className="p-3">
-                      <div className="flex justify-center">
+                      <div className="flex justify-center gap-2">
                         <button
                           onClick={() => handleEditClick(course)}
-                          className="text-xs font-medium text-white bg-[var(--button-color)] px-6 py-1.5 rounded hover:opacity-90"
+                          className="text-xs font-medium text-white bg-[var(--button-color)] px-4 py-1.5 rounded hover:opacity-90"
                         >
                           Edit
+                        </button>
+                        <button
+                          onClick={() => handleCareerClick(course)}
+                          className="text-xs font-medium text-white bg-green-600 px-4 py-1.5 rounded hover:opacity-90"
+                        >
+                          Add Career
                         </button>
                       </div>
                     </td>
@@ -261,6 +277,7 @@ export default function CourseTableLayout() {
         </div>
       )}
 
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-6 text-sm text-gray-600">
           <span>
@@ -285,7 +302,19 @@ export default function CourseTableLayout() {
         </div>
       )}
 
-      {/* Edit Modal */}
+      {/* Career Modal */}
+      <Modal show={isCareerModalOpen} onClose={() => setIsCareerModalOpen(false)} popup>
+        <div className="p-6">
+          {selectedCareerCourse && (
+            <CareerModal
+              courseId={selectedCareerCourse.courseId}
+              onClose={() => setIsCareerModalOpen(false)}
+            />
+          )}
+        </div>
+      </Modal>
+
+      {/* ✏️ Edit Modal */}
       <Modal show={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} popup>
         <div className="p-6">
           {selectedCourse && (
