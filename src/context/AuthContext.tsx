@@ -26,6 +26,9 @@ function isTheme(value: string): value is Theme {
     "redish",
     "purplelish",
     "brownish",
+    "greenish",
+    "blueish",
+    "maroonish",
     "super_admin",
     "custom_admin",
   ];

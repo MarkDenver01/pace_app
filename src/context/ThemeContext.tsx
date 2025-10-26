@@ -7,6 +7,9 @@ export type Theme =
   | "redish"
   | "purplelish"
   | "brownish"
+  |  "greenish"
+  | "blueish"
+  | "maroonish"
   | "super_admin"
   | "custom_admin";
 
@@ -23,6 +26,9 @@ const ALL_THEMES: Theme[] = [
   "redish",
   "purplelish",
   "brownish",
+  "greenish",
+  "blueish",
+  "maroonish",
   "super_admin",
   "custom_admin",
 ];

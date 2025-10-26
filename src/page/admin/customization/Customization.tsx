@@ -16,6 +16,9 @@ const NORMAL_THEMES: Theme[] = [
   "redish",
   "purplelish",
   "brownish",
+  "greenish",
+  "blueish",
+  "maroonish"
 ];
 
 // Full list for validation including super_admin and custom_admin

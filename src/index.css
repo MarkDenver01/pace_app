@@ -137,6 +137,64 @@ html, body, #root {
     --muted-text-color: #78350f;
 }
 
+[data-theme="greenish"] {
+    --button-color: #00703c9f;           /* La Salle green button with transparency */
+    --bg-color: #f8fff8;                 /* very light green/white background */
+    --text-color: #0b3d2e;               /* dark green text */
+    --card-color: #e6f4ea;               /* soft pale green for cards */
+    --sidebar-bg: #004d2c;               /* deep La Salle green sidebar */
+    --sidebar-border: #0b3d2e;           /* darker green border */
+    --sidebar-header-bg: #005b33;        /* slightly brighter green for headers */
+    --sidebar-hover-bg: #c9e265;         /* La Salle gold accent on hover */
+    --sidebar-text: #f6fff8;             /* almost white text for sidebar */
+    --sidebar-active-bg: rgba(255, 255, 255, 0.1); /* subtle overlay for active state */
+    --sidebar-border-active: #f6fff8;    /* active border color */
+    --sidebar-border-hover: #f6fff899;   /* hover border with transparency */
+    --divider-color: rgba(11, 61, 46, 0.1); /* faint dark-green divider */
+    --muted-text-color: #0b3d2e;          /* muted dark green text */
+}
+
+[data-theme="blueish"] {
+    --button-color: #003DA59F;           /* NU blue button with transparency */
+    --bg-color: #F5F7FF;                 /* very light blue / off-white background */
+    --text-color: #00297A;               /* dark blue text */
+    --card-color: #E3E9FF;               /* soft pale blue for cards */
+
+    --sidebar-bg: #00297A;               /* deep NU blue sidebar */
+    --sidebar-border: #001F5B;           /* darker blue border */
+    --sidebar-header-bg: #0030A0;        /* slightly brighter header blue */
+    --sidebar-hover-bg: #FFD200;         /* gold accent on hover */
+    --sidebar-text: #F5F7FF;             /* almost white text for sidebar */
+
+    --sidebar-active-bg: rgba(255, 255, 255, 0.1); /* subtle overlay for active state */
+    --sidebar-border-active: #F5F7FF;    /* active border color */
+    --sidebar-border-hover: #F5F7FF99;   /* hover border with transparency */
+
+    --divider-color: rgba(0, 41, 122, 0.1); /* faint dark-blue divider */
+    --muted-text-color: #00297A;          /* muted dark blue text */
+}
+
+[data-theme="maroonish"] {
+    --button-color: #D500329F;           /* LPU red button with transparency */
+    --bg-color: #FFF5F5;                 /* very light red/white background */
+    --text-color: #7A001F;               /* dark red text */
+    --card-color: #FFE5E9;               /* soft pale red for cards */
+
+    --sidebar-bg: #7A001F;               /* deep LPU red sidebar */
+    --sidebar-border: #5C0015;           /* darker red border */
+    --sidebar-header-bg: #8C0026;        /* slightly brighter header red */
+    --sidebar-hover-bg: #FFCCDA;         /* light red/pink accent on hover */
+    --sidebar-text: #FFF5F5;             /* almost white text for sidebar */
+
+    --sidebar-active-bg: rgba(255, 255, 255, 0.1); /* subtle overlay for active state */
+    --sidebar-border-active: #FFF5F5;    /* active border color */
+    --sidebar-border-hover: #FFF5F599;   /* hover border with transparency */
+
+    --divider-color: rgba(122, 0, 31, 0.1); /* faint dark-red divider */
+    --muted-text-color: #7A001F;          /* muted dark red text */
+}
+
+
 /* ======================
    Shared Global Styles
 ====================== */
