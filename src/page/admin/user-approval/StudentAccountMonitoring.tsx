@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
 import { Pagination } from "flowbite-react";
 // import { approveStudent } from "../../../libs/ApiResponseService"; // COMMENTED OUT: For future use
-import { fetchPendingStudents } from "../../../libs/ApiResponseService";
+import { fetchStudents } from "../../../libs/ApiResponseService";
 import { type StudentResponse } from "../../../libs/models/response/StudentResponse";
 import { format, toZonedTime } from "date-fns-tz";
 import Swal from "sweetalert2";
@@ -69,7 +69,7 @@ export default function StudentAccountMonitoring() {
   useEffect(() => {
     const loadStudents = async () => {
       try {
-        const response = await fetchPendingStudents();
+        const response = await fetchStudents();
         // COMMENTED OUT: Only pending students filter
         // const pending = response.students.filter(
         //   (student) => student.userAccountStatus === "PENDING"

@@ -12,7 +12,7 @@ import type { CareerResponse } from './models/response/Career';
 * Fetches a list of students from the API.
  * @returns Promise<StudentResponse[]>
  */
-export async function fetchStudents(): Promise<StudentResponse[]> {
+export async function fetchStudents(): Promise<StudentListResponse> {
     try {
         const response = await api.get('/admin/api/get_all_students');
         return response.data;
