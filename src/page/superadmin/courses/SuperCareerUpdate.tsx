@@ -11,7 +11,7 @@ import { getSwalTheme } from "../../../utils/getSwalTheme";
 
 interface Career {
   careerId: number;
-  careerName: string;
+  career: string;
 }
 
 interface CareerModalProps {
@@ -28,16 +28,16 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
   const [editingName, setEditingName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  // ✅ Fetch existing careers
+  // Fetch existing careers
   useEffect(() => {
     const fetchCareers = async () => {
       setLoading(true);
       try {
         const data = await getCareersByCourse(courseId);
 
-        console.log("Fetched careers data:", data);
+        console.log("Fetched careers data:", data.careers);
 
-        // 🧠 Handle different API response shapes safely
+        // Handle different API response shapes safely
         if (Array.isArray(data)) {
           setCareers(data);
         } else if (Array.isArray(data?.careers)) {
@@ -56,7 +56,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
     fetchCareers();
   }, [courseId]);
 
-  // ✅ Add a new career
+  //  Add a new career
   const handleSave = async () => {
     if (!careerName.trim()) return;
     setSaving(true);
@@ -91,7 +91,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
   // ✅ Edit / Update career
   const handleEdit = (career: Career) => {
     setEditingCareerId(career.careerId);
-    setEditingName(career.careerName);
+    setEditingName(career.career);
   };
 
   const handleUpdate = async (careerId: number) => {
@@ -230,7 +230,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
               ) : (
                 <>
                   <span className="text-gray-900 font-medium">
-                    {c.careerName || "(Unnamed Career)"}
+                    {c.career || "(Unnamed Career)"}
                   </span>
                   <div className="flex gap-2">
                     <ThemedButton
