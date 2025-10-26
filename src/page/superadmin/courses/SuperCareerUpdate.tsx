@@ -229,7 +229,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
               ) : (
                 <>
                   <span className="text-gray-900 font-medium">
-                    {c.career || "(Unnamed Career)"}
+                    {c.career}
                   </span>
                   <div className="flex gap-2">
                     <ThemedButton
