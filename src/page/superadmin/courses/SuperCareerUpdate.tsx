@@ -5,6 +5,9 @@ import {
   updateCareer,
   deleteCareer,
 } from "../../../libs/ApiResponseService";
+import ThemedButton from "../../../components/ThemedButton";
+import Swal from "sweetalert2";
+import { getSwalTheme } from "../../../utils/getSwalTheme";
 
 interface Career {
   careerId: number;
@@ -25,7 +28,6 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
   const [editingName, setEditingName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  // Load existing careers
   useEffect(() => {
     const fetchCareers = async () => {
       setLoading(true);
@@ -41,7 +43,6 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
     fetchCareers();
   }, [courseId]);
 
-  // Create a new career
   const handleSave = async () => {
     if (!careerName.trim()) return;
     setSaving(true);
@@ -51,20 +52,31 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
       const newCareer = await saveCareer(courseId, careerName);
       setCareers((prev) => [...prev, newCareer]);
       setCareerName("");
+      Swal.fire({
+        icon: "success",
+        title: "Career Added",
+        text: "Career has been successfully added.",
+        confirmButtonText: "OK",
+        ...getSwalTheme(),
+      });
     } catch {
-      setError("Failed to save career");
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Failed to save career.",
+        confirmButtonText: "OK",
+        ...getSwalTheme(),
+      });
     } finally {
       setSaving(false);
     }
   };
 
-  // Enable edit mode
   const handleEdit = (career: Career) => {
     setEditingCareerId(career.careerId);
     setEditingName(career.careerName);
   };
 
-  // Save edited career
   const handleUpdate = async (careerId: number) => {
     if (!editingName.trim()) return;
     try {
@@ -74,24 +86,61 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
       );
       setEditingCareerId(null);
       setEditingName("");
+
+      Swal.fire({
+        icon: "success",
+        title: "Career Updated",
+        text: "Career updated successfully.",
+        confirmButtonText: "OK",
+        ...getSwalTheme(),
+      });
     } catch {
-      setError("Failed to update career");
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Failed to update career.",
+        confirmButtonText: "OK",
+        ...getSwalTheme(),
+      });
     }
   };
 
-  // Delete career
   const handleDelete = async (careerId: number) => {
-    if (!window.confirm("Are you sure you want to delete this career?")) return;
+    const confirm = await Swal.fire({
+      icon: "warning",
+      title: "Delete Career?",
+      text: "This action cannot be undone.",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it",
+      cancelButtonText: "Cancel",
+      ...getSwalTheme(),
+    });
+
+    if (!confirm.isConfirmed) return;
+
     try {
       await deleteCareer(careerId);
       setCareers((prev) => prev.filter((c) => c.careerId !== careerId));
+      Swal.fire({
+        icon: "success",
+        title: "Deleted",
+        text: "Career deleted successfully.",
+        confirmButtonText: "OK",
+        ...getSwalTheme(),
+      });
     } catch {
-      setError("Failed to delete career");
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Failed to delete career.",
+        confirmButtonText: "OK",
+        ...getSwalTheme(),
+      });
     }
   };
 
   return (
-    <div className="p-6 bg-white rounded-2xl shadow-lg max-w-md mx-auto">
+    <div className="p-6 bg-white text-gray-800 rounded-2xl shadow-lg max-w-md mx-auto">
       <h2 className="text-lg font-semibold mb-4">Manage Careers</h2>
 
       {error && <p className="text-red-500 mb-3">{error}</p>}
@@ -103,66 +152,81 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
           placeholder="Enter new career name"
           value={careerName}
           onChange={(e) => setCareerName(e.target.value)}
-          className="flex-1 border rounded-lg px-3 py-2"
+          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button
+        <ThemedButton
+          bgColor="var(--button-color)"
+          textColor="#fff"
           onClick={handleSave}
+          size="sm"
+          borderRadius="0.5rem"
           disabled={saving || !careerName.trim()}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
         >
           {saving ? "Saving..." : "Add"}
-        </button>
+        </ThemedButton>
       </div>
 
-      <hr className="my-4" />
+      <hr className="my-4 border-gray-300" />
 
       {/* Career List */}
-      <h3 className="font-medium mb-2">Existing Careers</h3>
+      <h3 className="font-medium mb-2 text-gray-700">Existing Careers</h3>
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-gray-600">Loading...</p>
       ) : careers.length > 0 ? (
         <ul className="space-y-2 max-h-64 overflow-y-auto">
           {careers.map((c) => (
             <li
               key={c.careerId}
-              className="border p-2 rounded-md flex justify-between items-center"
+              className="border border-gray-300 p-2 rounded-md flex justify-between items-center bg-gray-50"
             >
               {editingCareerId === c.careerId ? (
                 <div className="flex items-center gap-2 w-full">
                   <input
                     value={editingName}
                     onChange={(e) => setEditingName(e.target.value)}
-                    className="flex-1 border rounded-md px-2 py-1"
+                    className="flex-1 border border-gray-300 rounded-md px-2 py-1 focus:ring-2 focus:ring-blue-500"
                   />
-                  <button
+                  <ThemedButton
+                    bgColor="var(--button-color)"
+                    textColor="#fff"
+                    size="xs"
+                    borderRadius="0.25rem"
                     onClick={() => handleUpdate(c.careerId)}
-                    className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
                   >
                     Save
-                  </button>
-                  <button
+                  </ThemedButton>
+                  <ThemedButton
+                    bgColor="#f3f4f6"
+                    textColor="#111827"
+                    size="xs"
+                    borderRadius="0.25rem"
                     onClick={() => setEditingCareerId(null)}
-                    className="bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500"
                   >
                     Cancel
-                  </button>
+                  </ThemedButton>
                 </div>
               ) : (
                 <>
-                  <span>{c.careerName}</span>
+                  <span className="text-gray-800">{c.careerName}</span>
                   <div className="flex gap-2">
-                    <button
+                    <ThemedButton
+                      bgColor="#fff"
+                      textColor="#2563eb"
+                      size="xs"
+                      borderRadius="0.25rem"
                       onClick={() => handleEdit(c)}
-                      className="text-blue-600 hover:underline"
                     >
                       Edit
-                    </button>
-                    <button
+                    </ThemedButton>
+                    <ThemedButton
+                      bgColor="#fff"
+                      textColor="#dc2626"
+                      size="xs"
+                      borderRadius="0.25rem"
                       onClick={() => handleDelete(c.careerId)}
-                      className="text-red-600 hover:underline"
                     >
                       Delete
-                    </button>
+                    </ThemedButton>
                   </div>
                 </>
               )}
@@ -173,12 +237,17 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
         <p className="text-gray-500">No careers found for this course.</p>
       )}
 
-      <button
-        onClick={onClose}
-        className="mt-4 text-gray-600 hover:text-gray-900 font-medium"
-      >
-        Close
-      </button>
+      <div className="flex justify-end pt-4">
+        <ThemedButton
+          bgColor="#f3f4f6"
+          textColor="#111827"
+          onClick={onClose}
+          size="sm"
+          borderRadius="0.5rem"
+        >
+          Close
+        </ThemedButton>
+      </div>
     </div>
   );
 }
