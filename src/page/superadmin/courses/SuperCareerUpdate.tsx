@@ -12,6 +12,7 @@ import { getSwalTheme } from "../../../utils/getSwalTheme";
 interface Career {
   careerId: number;
   career: string;
+  courseId: number; 
 }
 
 interface CareerModalProps {
@@ -39,12 +40,10 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
 
         // Handle different API response shapes safely
         if (Array.isArray(data)) {
-          setCareers(data);
-        } else if (Array.isArray(data?.careers)) {
-          setCareers(data.careers);
+            setCareers(data);
         } else {
-          console.warn("Unexpected API response:", data);
-          setCareers([]);
+            console.warn("Unexpected API response:", data);
+            setCareers([]);
         }
       } catch (err) {
         console.error("Error fetching careers:", err);
@@ -88,7 +87,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
     }
   };
 
-  // ✅ Edit / Update career
+  // Edit / Update career
   const handleEdit = (career: Career) => {
     setEditingCareerId(career.careerId);
     setEditingName(career.career);
@@ -123,7 +122,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
     }
   };
 
-  // ✅ Delete career
+  // Delete career
   const handleDelete = async (careerId: number) => {
     const confirm = await Swal.fire({
       icon: "warning",
@@ -159,7 +158,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
     }
   };
 
-  // ✅ Render
+  // Render
   return (
     <div className="p-6 bg-white text-gray-900 rounded-2xl shadow-lg max-w-md mx-auto">
       <h2 className="text-lg font-semibold mb-4">Manage Careers</h2>

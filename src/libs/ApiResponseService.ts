@@ -639,19 +639,23 @@ export async function getAssessmentStats(universityId: number, courseId: number)
   }
 }
 
+// Save a new career
 export async function saveCareer(courseId: number, careerName: string) {
   const response = await api.post(`/superadmin/api/careers`, null, {
     params: { courseId, careerName },
   });
+  // Returns a single CareerResponse object
   return response.data;
 }
 
+// Get all careers by course ID
 export async function getCareersByCourse(courseId: number) {
   const response = await api.get(`/superadmin/api/careers/by-course/${courseId}`);
+  // Returns an array of CareerResponse objects
   return response.data;
 }
 
-// Update career
+// Update career name
 export async function updateCareer(careerId: number, careerName: string) {
   const response = await api.put(`/superadmin/api/careers/${careerId}`, null, {
     params: { careerName },
@@ -659,20 +663,8 @@ export async function updateCareer(careerId: number, careerName: string) {
   return response.data;
 }
 
-// Delete career
+// Delete a career
 export async function deleteCareer(careerId: number) {
   const response = await api.delete(`/superadmin/api/careers/${careerId}`);
   return response.data;
 }
-
-
-
-
-
-
-
-
-
-
-
-
