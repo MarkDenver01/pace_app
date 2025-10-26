@@ -4,7 +4,6 @@ import {
   ClipboardCheck,
   University,
 } from "lucide-react";
-import DashboardTable from "./DashboardDataTable.tsx";
 import { useEffect, useState } from "react";
 import { type StudentListResponse } from "../../../libs/models/response/StudentListResponse.ts";
 import {
@@ -47,6 +46,13 @@ export default function Dashboard() {
   const [newUniversityName, setNewUniversityName] = useState(universityName);
   const [newDomainEmail, setNewDomainEmail] = useState(domainEmail);
 
+  // Additional dashboard metrics
+  const [studentsWantEnroll, setStudentsWantEnroll] = useState<number>(0);
+  const [studentsOtherSchool, setStudentsOtherSchool] = useState<number>(0);
+  const [studentsSameSchool, setStudentsSameSchool] = useState<number>(0);
+  const [topCourses, setTopCourses] = useState<string[]>([]);
+  const [topCompetitorSchools, setTopCompetitorSchools] = useState<string[]>([]);
+
   // Load students
   const loadApprovedStudents = async () => {
     try {
@@ -73,12 +79,27 @@ export default function Dashboard() {
     }
   };
 
+  // Load additional metrics
+  const loadAdditionalMetrics = async () => {
+    try {
+      // TODO: Replace with actual API calls
+      setStudentsWantEnroll(120);
+      setStudentsOtherSchool(35);
+      setStudentsSameSchool(85);
+      setTopCourses(["CS", "EE", "Business", "Math", "Psychology"]);
+      setTopCompetitorSchools(["School A", "School B", "School C"]);
+    } catch (error) {
+      console.error("Failed to fetch additional metrics:", error);
+    }
+  };
+
   useEffect(() => {
     loadApprovedStudents();
     loadActiveCourses();
+    loadAdditionalMetrics();
   }, [user]);
 
-  // 🔹 Original handleSharePost
+  // Handle shareable dynamic link
   const handleSharePost = async () => {
     try {
       const universityId = localStorage.getItem("authorized_university_id");
@@ -172,21 +193,77 @@ export default function Dashboard() {
     });
   };
 
+  // Card styling
   const cardClass =
-    "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme border min-h-[180px]";
+    "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme min-h-[180px]";
   const iconWrapperStyle = {
     backgroundColor: "var(--button-color, #D94022)10",
     color: "var(--button-color)",
   };
-  const labelStyle = {
-    color: "var(--button-color)",
-  };
-  const valueStyle = {
-    color: "var(--text-color)",
-  };
-  const descStyle = {
-    color: "var(--muted-text-color, #6b7280)",
-  };
+  const labelStyle = { color: "var(--button-color)" };
+  const valueStyle = { color: "var(--text-color)" };
+  const descStyle = { color: "var(--muted-text-color, #6b7280)" };
+
+  // Dashboard cards array
+  const dashboardCards = [
+    {
+      label: "University Information",
+      icon: <University size={28} />,
+      value: universityName,
+      description: domainEmail,
+      onClick: () => setIsEditModalOpen(true),
+      isUppercase: true,
+      extraDesc: "Tap to edit details",
+    },
+    {
+      label: "Total Students",
+      icon: <GraduationCap size={28} />,
+      value: loading ? "Loading..." : approvedStudents?.total || 0,
+      description: lastUpdated ? utils.getTimeAgo(lastUpdated) : "",
+    },
+    {
+      label: "Active Courses",
+      icon: <BookOpen size={28} />,
+      value: loading ? "Loading..." : activeCourseCount,
+      description: "Live courses currently running",
+    },
+    {
+      label: "Assessments Completed",
+      icon: <ClipboardCheck size={28} />,
+      value: 430,
+      description: "Since last month",
+    },
+    {
+      label: "Students Want to Enroll",
+      icon: <GraduationCap size={28} />,
+      value: studentsWantEnroll,
+      description: "This month",
+    },
+    {
+      label: "Other School",
+      icon: <University size={28} />,
+      value: studentsOtherSchool,
+      description: "Interested in other schools",
+    },
+    {
+      label: "Same School",
+      icon: <ClipboardCheck size={28} />,
+      value: studentsSameSchool,
+      description: "Interested in this university",
+    },
+    {
+      label: "Top 5 Courses",
+      icon: <BookOpen size={28} />,
+      value: topCourses.join(", "),
+      description: "This month",
+    },
+    {
+      label: "Top 3 Competitor Schools",
+      icon: <University size={28} />,
+      value: topCompetitorSchools.join(", "),
+      description: "Competing universities",
+    },
+  ];
 
   return (
     <div className="p-4 flex flex-col gap-8">
@@ -200,81 +277,29 @@ export default function Dashboard() {
         </Button>
       </div>
 
-      {/* Grid Section (2x2 layout) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Row 1 */}
-        <div
-          className={`${cardClass} cursor-pointer`}
-          onClick={() => setIsEditModalOpen(true)}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-full" style={iconWrapperStyle}>
-              <University size={28} />
+      {/* Grid Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {dashboardCards.map((card, index) => (
+          <div
+            key={index}
+            className={`${cardClass} ${card.onClick ? "cursor-pointer" : ""}`}
+            onClick={card.onClick}
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-full" style={iconWrapperStyle}>
+                {card.icon}
+              </div>
+              <span className="text-sm font-semibold" style={labelStyle}>
+                {card.label}
+              </span>
             </div>
-            <span className="text-sm font-semibold" style={labelStyle}>
-              University Information
-            </span>
-          </div>
-          <div>
-            <div className="text-2xl font-extrabold uppercase" style={valueStyle}>
-              {universityName}
+            <div className={`text-4xl font-bold ${card.isUppercase ? "uppercase" : ""}`} style={valueStyle}>
+              {card.value}
             </div>
-            <div className="text-sm text-gray-500">{domainEmail}</div>
+            {card.description && <div className="text-xs" style={descStyle}>{card.description}</div>}
+            {card.extraDesc && <div className="text-xs italic text-gray-400">{card.extraDesc}</div>}
           </div>
-          <div className="text-xs italic text-gray-400">Tap to edit details</div>
-        </div>
-
-        <div className={cardClass}>
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-full" style={iconWrapperStyle}>
-              <GraduationCap size={28} />
-            </div>
-            <span className="text-sm font-semibold" style={labelStyle}>
-              Total Students
-            </span>
-          </div>
-          <div className="text-4xl font-bold" style={valueStyle}>
-            {loading ? "Loading..." : approvedStudents?.total || 0}
-          </div>
-          <div className="text-xs" style={descStyle}>
-            {utils.getTimeAgo(lastUpdated)}
-          </div>
-        </div>
-
-        {/* Row 2 */}
-        <div className={cardClass}>
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-full" style={iconWrapperStyle}>
-              <BookOpen size={28} />
-            </div>
-            <span className="text-sm font-semibold" style={labelStyle}>
-              Active Courses
-            </span>
-          </div>
-          <div className="text-4xl font-bold" style={valueStyle}>
-            {loading ? "Loading..." : activeCourseCount}
-          </div>
-          <div className="text-xs" style={descStyle}>
-            Live courses currently running
-          </div>
-        </div>
-
-        <div className={cardClass}>
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-full" style={iconWrapperStyle}>
-              <ClipboardCheck size={28} />
-            </div>
-            <span className="text-sm font-semibold" style={labelStyle}>
-              Assessments Completed
-            </span>
-          </div>
-          <div className="text-4xl font-bold" style={valueStyle}>
-            430
-          </div>
-          <div className="text-xs" style={descStyle}>
-            Since last month
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Divider */}
@@ -282,11 +307,6 @@ export default function Dashboard() {
         className="border-t my-4"
         style={{ borderColor: "var(--divider-color)" }}
       />
-
-      {/* Table Section */}
-      <div className="p-2">
-        <DashboardTable />
-      </div>
 
       {/* Modal for editing */}
       <Modal
