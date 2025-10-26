@@ -14,7 +14,7 @@ import type { CareerResponse } from './models/response/Career';
  */
 export async function fetchStudents(universityId: number): Promise<StudentResponse[]> {
   try {
-    const response = await api.get("/api/get_all_students", {
+    const response = await api.get("/admin/api/get_all_students", {
       params: { universityId },
     });
     return response.data;
