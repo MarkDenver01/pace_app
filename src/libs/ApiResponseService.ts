@@ -12,9 +12,11 @@ import type { CareerResponse } from './models/response/Career';
 * Fetches a list of students from the API.
  * @returns Promise<StudentResponse[]>
  */
-export async function fetchStudents(): Promise<StudentResponse[]> {
+export async function fetchStudents(universityId: number): Promise<StudentResponse[]> {
   try {
-    const response = await api.get("/admin/api/get_all_students");
+    const response = await api.get("/api/get_all_students", {
+      params: { universityId },
+    });
     return response.data;
   } catch (error: any) {
     console.error("Error fetching students:", error);

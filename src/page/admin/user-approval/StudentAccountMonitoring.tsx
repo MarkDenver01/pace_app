@@ -21,11 +21,13 @@ export default function StudentAccountMonitoring() {
   );
 
   const timezone = "Asia/Manila";
+ const universityId = Number(localStorage.getItem("authorized_university_id") ?? "");
 
   useEffect(() => {
     const loadStudents = async () => {
       try {
-        const response = await fetchStudents();
+        if (!universityId) throw new Error("Invalid university ID");
+        const response = await fetchStudents(universityId);
         setStudents(response); // backend returns a list, not {students: []}
       } catch (error) {
         console.error("Failed to load students:", error);

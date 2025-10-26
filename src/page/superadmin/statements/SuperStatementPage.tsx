@@ -9,7 +9,7 @@ type Statement = {
   content: string;
 };
 
-const categories = ["General Interest", "Career Interest", "Personal Qualities"];
+const categories = ["General Interest", "Career Interest", "Personal Traits"];
 
 export default function StatementsPage() {
   const [statements, setStatements] = useState<Statement[]>([]);
