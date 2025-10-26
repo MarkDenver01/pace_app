@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
 import { Pagination } from "flowbite-react";
-// import { approveStudent } from "../../../libs/ApiResponseService"; // COMMENTED OUT: For future use
 import { fetchStudents } from "../../../libs/ApiResponseService";
 import { type StudentResponse } from "../../../libs/models/response/StudentResponse";
 import { format, toZonedTime } from "date-fns-tz";
@@ -21,63 +20,21 @@ export default function StudentAccountMonitoring() {
     currentPage * pageSize
   );
 
-  const timezone = "Asia/Manila"; // GMT+8
-
-  // COMMENTED OUT: Action handlers (Approve/Reject)
-  /*
-  const handleAction = async (student: StudentResponse, type: "approve" | "reject") => {
-    const result = await Swal.fire({
-      title: `Are you sure you want to ${type} ${student.userName}'s account?`,
-      icon: "warning",
-      showCancelButton: true,
-      cancelButtonColor: "#6b7280",
-      confirmButtonText: type === "approve" ? "Yes, Approve" : "Yes, Reject",
-      cancelButtonText: "Cancel",
-      ...getSwalTheme(),
-    });
-
-    if (result.isConfirmed) {
-      try {
-        const newStatus = type === "approve" ? "APPROVED" : "REJECTED";
-        await approveStudent(student.email, newStatus);
-
-        setStudents((prev) =>
-          prev.filter((s) => s.studentId !== student.studentId)
-        );
-
-        await Swal.fire({
-          title: `${type === "approve" ? "Approved" : "Rejected"}!`,
-          text: `Student ${student.userName}'s account has been ${type}d.`,
-          icon: "success",
-          timer: 1800,
-          showConfirmButton: false,
-        });
-      } catch (error) {
-        console.error("Error updating student status:", error);
-        await Swal.fire({
-          title: "Error",
-          text: "There was a problem updating the student status.",
-          icon: "error",
-          ...getSwalTheme(),
-        });
-      }
-    }
-  };
-  */
-  // END COMMENTED
+  const timezone = "Asia/Manila";
 
   useEffect(() => {
     const loadStudents = async () => {
       try {
         const response = await fetchStudents();
-        // COMMENTED OUT: Only pending students filter
-        // const pending = response.students.filter(
-        //   (student) => student.userAccountStatus === "PENDING"
-        // );
-        // setStudents(pending);
-        setStudents(response.students); // Display ALL statuses instead
+        setStudents(response); // backend returns a list, not {students: []}
       } catch (error) {
         console.error("Failed to load students:", error);
+        Swal.fire({
+          title: "Error",
+          text: "Failed to fetch students. Please try again later.",
+          icon: "error",
+          ...getSwalTheme(),
+        });
       } finally {
         setLoading(false);
       }
@@ -115,9 +72,9 @@ export default function StudentAccountMonitoring() {
           <tr>
             <th className="p-3 border border-gray-300 font-medium">Student Name</th>
             <th className="p-3 border border-gray-300 font-medium">Email</th>
+            <th className="p-3 border border-gray-300 font-medium">University</th>
             <th className="p-3 border border-gray-300 font-medium">Requested Date</th>
             <th className="p-3 border border-gray-300 font-medium">Status</th>
-            {/* <th className="p-3 border border-gray-300 font-medium">Actions</th> */} {/* COMMENTED OUT */}
           </tr>
         </thead>
         <tbody>
@@ -137,6 +94,9 @@ export default function StudentAccountMonitoring() {
                   {student.userName}
                 </td>
                 <td className="p-3 border border-gray-300">{student.email}</td>
+                <td className="p-3 border border-gray-300">
+                  {student.universityName ?? "N/A"}
+                </td>
                 <td className="p-3 border border-gray-300">
                   {student.requestedDate
                     ? format(
@@ -158,25 +118,6 @@ export default function StudentAccountMonitoring() {
                     {student.userAccountStatus}
                   </span>
                 </td>
-
-                {/* COMMENTED OUT: Action Buttons */}
-                {/*
-                <td className="p-3 border border-gray-300 space-x-2">
-                  <button
-                    onClick={() => handleAction(student, "approve")}
-                    className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded-md transition"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => handleAction(student, "reject")}
-                    className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-md transition"
-                  >
-                    Reject
-                  </button>
-                </td>
-                */}
-                {/* END COMMENTED */}
               </tr>
             ))
           ) : (

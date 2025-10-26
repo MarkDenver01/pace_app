@@ -4,4 +4,5 @@ export interface StudentResponse {
     email: string; 
     requestedDate: string;
     userAccountStatus: string;
+    universityName: string;
 }
