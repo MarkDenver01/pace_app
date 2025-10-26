@@ -28,13 +28,26 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
   const [editingName, setEditingName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  // ✅ Fetch existing careers
   useEffect(() => {
     const fetchCareers = async () => {
       setLoading(true);
       try {
         const data = await getCareersByCourse(courseId);
-        setCareers(data);
+
+        console.log("Fetched careers data:", data);
+
+        // 🧠 Handle different API response shapes safely
+        if (Array.isArray(data)) {
+          setCareers(data);
+        } else if (Array.isArray(data?.careers)) {
+          setCareers(data.careers);
+        } else {
+          console.warn("Unexpected API response:", data);
+          setCareers([]);
+        }
       } catch (err) {
+        console.error("Error fetching careers:", err);
         setError("Failed to load careers");
       } finally {
         setLoading(false);
@@ -43,6 +56,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
     fetchCareers();
   }, [courseId]);
 
+  // ✅ Add a new career
   const handleSave = async () => {
     if (!careerName.trim()) return;
     setSaving(true);
@@ -52,6 +66,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
       const newCareer = await saveCareer(courseId, careerName);
       setCareers((prev) => [...prev, newCareer]);
       setCareerName("");
+
       Swal.fire({
         icon: "success",
         title: "Career Added",
@@ -59,7 +74,8 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
         confirmButtonText: "OK",
         ...getSwalTheme(),
       });
-    } catch {
+    } catch (err) {
+      console.error("Save failed:", err);
       Swal.fire({
         icon: "error",
         title: "Failed",
@@ -72,6 +88,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
     }
   };
 
+  // ✅ Edit / Update career
   const handleEdit = (career: Career) => {
     setEditingCareerId(career.careerId);
     setEditingName(career.careerName);
@@ -94,7 +111,8 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
         confirmButtonText: "OK",
         ...getSwalTheme(),
       });
-    } catch {
+    } catch (err) {
+      console.error("Update failed:", err);
       Swal.fire({
         icon: "error",
         title: "Failed",
@@ -105,6 +123,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
     }
   };
 
+  // ✅ Delete career
   const handleDelete = async (careerId: number) => {
     const confirm = await Swal.fire({
       icon: "warning",
@@ -128,7 +147,8 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
         confirmButtonText: "OK",
         ...getSwalTheme(),
       });
-    } catch {
+    } catch (err) {
+      console.error("Delete failed:", err);
       Swal.fire({
         icon: "error",
         title: "Failed",
@@ -139,8 +159,9 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
     }
   };
 
+  // ✅ Render
   return (
-    <div className="p-6 bg-white text-gray-800 rounded-2xl shadow-lg max-w-md mx-auto">
+    <div className="p-6 bg-white text-gray-900 rounded-2xl shadow-lg max-w-md mx-auto">
       <h2 className="text-lg font-semibold mb-4">Manage Careers</h2>
 
       {error && <p className="text-red-500 mb-3">{error}</p>}
@@ -168,17 +189,18 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
 
       <hr className="my-4 border-gray-300" />
 
-      {/* Career List */}
+      {/* Existing Careers */}
       <h3 className="font-medium mb-2 text-gray-700">Existing Careers</h3>
+
       {loading ? (
         <p className="text-gray-600">Loading...</p>
       ) : careers.length > 0 ? (
         <ul className="space-y-2 max-h-64 overflow-y-auto">
           {careers.map((c) => (
-           <li
-           key={c.careerId}
-           className="border border-gray-300 p-2 rounded-md flex justify-between items-center bg-gray-50 text-gray-800"
-           >
+            <li
+              key={c.careerId}
+              className="border border-gray-300 p-2 rounded-md flex justify-between items-center bg-gray-50 text-gray-900"
+            >
               {editingCareerId === c.careerId ? (
                 <div className="flex items-center gap-2 w-full">
                   <input
@@ -207,7 +229,9 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
                 </div>
               ) : (
                 <>
-                  <span className="text-gray-800">{c.careerName}</span>
+                  <span className="text-gray-900 font-medium">
+                    {c.careerName || "(Unnamed Career)"}
+                  </span>
                   <div className="flex gap-2">
                     <ThemedButton
                       bgColor="#fff"
