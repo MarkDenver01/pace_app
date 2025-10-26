@@ -175,10 +175,10 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
       ) : careers.length > 0 ? (
         <ul className="space-y-2 max-h-64 overflow-y-auto">
           {careers.map((c) => (
-            <li
-              key={c.careerId}
-              className="border border-gray-300 p-2 rounded-md flex justify-between items-center bg-gray-50"
-            >
+           <li
+           key={c.careerId}
+           className="border border-gray-300 p-2 rounded-md flex justify-between items-center bg-gray-50 text-gray-800"
+           >
               {editingCareerId === c.careerId ? (
                 <div className="flex items-center gap-2 w-full">
                   <input
