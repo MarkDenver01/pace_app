@@ -8,12 +8,7 @@ import {
 import ThemedButton from "../../../components/ThemedButton";
 import Swal from "sweetalert2";
 import { getSwalTheme } from "../../../utils/getSwalTheme";
-
-interface Career {
-  careerId: number;
-  career: string;
-  courseId: number; 
-}
+import type { CareerResponse } from "../../../libs/models/response/Career";
 
 interface CareerModalProps {
   courseId: number;
@@ -22,7 +17,7 @@ interface CareerModalProps {
 
 export default function CareerModal({ courseId, onClose }: CareerModalProps) {
   const [careerName, setCareerName] = useState("");
-  const [careers, setCareers] = useState<Career[]>([]);
+  const [careers, setCareers] = useState<CareerResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editingCareerId, setEditingCareerId] = useState<number | null>(null);
@@ -35,19 +30,17 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
       setLoading(true);
       try {
         const data = await getCareersByCourse(courseId);
+        console.log("Fetched careers data:", data);
 
-        console.log("Fetched careers data:", data.careers);
+        // Handle possible shapes of API response
+        const list: CareerResponse[] = Array.isArray(data)
+          ? data
+          : data ?? [];
 
-        // Handle different API response shapes safely
-        if (Array.isArray(data)) {
-            setCareers(data);
-        } else {
-            console.warn("Unexpected API response:", data);
-            setCareers([]);
-        }
+        setCareers(list);
       } catch (err) {
         console.error("Error fetching careers:", err);
-        setError("Failed to load careers");
+        setError("Failed to load careers.");
       } finally {
         setLoading(false);
       }
@@ -55,7 +48,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
     fetchCareers();
   }, [courseId]);
 
-  //  Add a new career
+  // Add a new career
   const handleSave = async () => {
     if (!careerName.trim()) return;
     setSaving(true);
@@ -87,19 +80,24 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
     }
   };
 
-  // Edit / Update career
-  const handleEdit = (career: Career) => {
+  // Start editing
+  const handleEdit = (career: CareerResponse) => {
     setEditingCareerId(career.careerId);
     setEditingName(career.career);
   };
 
+  // Confirm update
   const handleUpdate = async (careerId: number) => {
     if (!editingName.trim()) return;
+
     try {
-      const updated = await updateCareer(careerId, editingName);
+      const updatedCareer = await updateCareer(careerId, editingName);
       setCareers((prev) =>
-        prev.map((c) => (c.careerId === careerId ? updated : c))
+        prev.map((c) =>
+          c.careerId === careerId ? { ...c, ...updatedCareer } : c
+        )
       );
+
       setEditingCareerId(null);
       setEditingName("");
 
@@ -139,6 +137,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
     try {
       await deleteCareer(careerId);
       setCareers((prev) => prev.filter((c) => c.careerId !== careerId));
+
       Swal.fire({
         icon: "success",
         title: "Deleted",
@@ -158,7 +157,6 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
     }
   };
 
-  // Render
   return (
     <div className="p-6 bg-white text-gray-900 rounded-2xl shadow-lg max-w-md mx-auto">
       <h2 className="text-lg font-semibold mb-4">Manage Careers</h2>

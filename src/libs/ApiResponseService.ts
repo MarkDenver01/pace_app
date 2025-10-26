@@ -6,6 +6,7 @@ import type { CustomizationResponse, CustomizationRequest } from './models/Custo
 import type { UniversityResponse, UniversityRequest } from './models/University';
 import type { CourseResponse, CourseRequest } from './models/Course';
 import type { UserAccountResponse, UserAccountRequest } from './models/UserAccount';
+import type { CareerResponse } from './models/response/Career';
 
 /**
 * Fetches a list of students from the API.
@@ -639,32 +640,51 @@ export async function getAssessmentStats(universityId: number, courseId: number)
   }
 }
 
-// Save a new career
-export async function saveCareer(courseId: number, careerName: string) {
-  const response = await api.post(`/superadmin/api/careers`, null, {
-    params: { courseId, careerName },
-  });
-  // Returns a single CareerResponse object
-  return response.data;
+// ✅ Save a new career
+export async function saveCareer(courseId: number, careerName: string): Promise<CareerResponse> {
+  try {
+    const response = await api.post(`/superadmin/api/careers`, null, {
+      params: { courseId, careerName },
+    });
+    return response.data as CareerResponse;
+  } catch (error: any) {
+    console.error("Error saving career:", error);
+    throw error.response?.data || { message: "Failed to save career" };
+  }
 }
 
-// Get all careers by course ID
-export async function getCareersByCourse(courseId: number) {
-  const response = await api.get(`/superadmin/api/careers/by-course/${courseId}`);
-  // Returns an array of CareerResponse objects
-  return response.data;
+// ✅ Get all careers by course ID
+export async function getCareersByCourse(courseId: number): Promise<CareerResponse[]> {
+  try {
+    const response = await api.get(`/superadmin/api/careers/by-course/${courseId}`);
+    const data = response.data;
+    return Array.isArray(data) ? data : data?.careers ?? [];
+  } catch (error: any) {
+    console.error("Error fetching careers:", error);
+    throw error.response?.data || { message: "Failed to fetch careers" };
+  }
 }
 
-// Update career name
-export async function updateCareer(careerId: number, careerName: string) {
-  const response = await api.put(`/superadmin/api/careers/${careerId}`, null, {
-    params: { careerName },
-  });
-  return response.data;
+// ✅ Update career name
+export async function updateCareer(careerId: number, careerName: string): Promise<CareerResponse> {
+  try {
+    const response = await api.put(`/superadmin/api/careers/${careerId}`, null, {
+      params: { careerName },
+    });
+    return response.data as CareerResponse;
+  } catch (error: any) {
+    console.error("Error updating career:", error);
+    throw error.response?.data || { message: "Failed to update career" };
+  }
 }
 
-// Delete a career
-export async function deleteCareer(careerId: number) {
-  const response = await api.delete(`/superadmin/api/careers/${careerId}`);
-  return response.data;
+// ✅ Delete a career
+export async function deleteCareer(careerId: number): Promise<{ message: string }> {
+  try {
+    const response = await api.delete(`/superadmin/api/careers/${careerId}`);
+    return response.data || { message: "Deleted successfully" };
+  } catch (error: any) {
+    console.error("Error deleting career:", error);
+    throw error.response?.data || { message: "Failed to delete career" };
+  }
 }
