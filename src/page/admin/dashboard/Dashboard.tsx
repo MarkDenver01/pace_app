@@ -29,19 +29,14 @@ import {
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [approvedStudents, setApprovedStudents] =
-    useState<StudentListResponse | null>(null);
+  const [approvedStudents, setApprovedStudents] = useState<StudentListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [activeCourseCount, setActiveCourseCount] = useState<number>(0);
 
   // University info state
-  const [universityName, setUniversityName] = useState(
-    user?.adminResponse?.universityName || "Unknown University"
-  );
-  const [domainEmail, setDomainEmail] = useState(
-    user?.adminResponse?.domainEmail || "university@example.com"
-  );
+  const [universityName, setUniversityName] = useState(user?.adminResponse?.universityName || "Unknown University");
+  const [domainEmail, setDomainEmail] = useState(user?.adminResponse?.domainEmail || "university@example.com");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [newUniversityName, setNewUniversityName] = useState(universityName);
   const [newDomainEmail, setNewDomainEmail] = useState(domainEmail);
@@ -70,9 +65,7 @@ export default function Dashboard() {
   const loadActiveCourses = async () => {
     if (!user?.adminResponse?.universityId) return;
     try {
-      const count = await totalActiveCourseByUniversity(
-        Number(user.adminResponse.universityId)
-      );
+      const count = await totalActiveCourseByUniversity(Number(user.adminResponse.universityId));
       setActiveCourseCount(count);
     } catch (error) {
       console.error("Failed to fetch the active courses: ", error);
@@ -105,9 +98,7 @@ export default function Dashboard() {
       const universityId = localStorage.getItem("authorized_university_id");
       if (!universityId) throw new Error("No university associated.");
 
-      let { link: currentLink } = await getOrCreateDynamicLink(
-        Number(universityId)
-      );
+      let { link: currentLink } = await getOrCreateDynamicLink(Number(universityId));
 
       if (!currentLink || typeof currentLink !== "string") {
         throw new Error("Invalid link from backend.");
@@ -178,16 +169,15 @@ export default function Dashboard() {
 
   // Card styling
   const cardClass =
-    "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition border min-h-[180px]";
+    "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition border min-h-[180px] card-theme";
   const iconWrapperStyle = {
-    backgroundColor: "var(--button-color, #D94022)10",
+    backgroundColor: "var(--button-color)10",
     color: "var(--button-color)",
   };
   const labelStyle = { color: "var(--button-color)", fontSize: "0.875rem" };
   const valueStyle = { color: "var(--text-color)", fontSize: "1.5rem" };
   const descStyle = { color: "var(--muted-text-color, #6b7280)", fontSize: "0.75rem" };
 
-  // Dashboard cards array
   const dashboardCards = [
     {
       label: "University Information",
@@ -265,7 +255,11 @@ export default function Dashboard() {
         {dashboardCards.map((card, index) => (
           <div
             key={index}
-            className={`${cardClass} ${card.onClick ? "cursor-pointer" : ""}`}
+            className={cardClass + (card.onClick ? " cursor-pointer" : "")}
+            style={{
+              borderColor: "var(--divider-color)",
+              backgroundColor: "var(--card-color)",
+            }}
             onClick={card.onClick}
           >
             <div className="flex items-center gap-3">
@@ -274,6 +268,7 @@ export default function Dashboard() {
               </div>
               <span style={labelStyle}>{card.label}</span>
             </div>
+
             <div
               className={`font-bold ${card.isUppercase ? "uppercase" : ""}`}
               style={{
@@ -288,6 +283,7 @@ export default function Dashboard() {
             >
               {card.value}
             </div>
+
             {card.description && <div style={descStyle}>{card.description}</div>}
             {card.extraDesc && (
               <div className="text-xs italic text-gray-400 truncate">{card.extraDesc}</div>
