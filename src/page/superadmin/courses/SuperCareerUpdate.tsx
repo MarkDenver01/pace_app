@@ -83,7 +83,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
   // Start editing
   const handleEdit = (career: CareerResponse) => {
     setEditingCareerId(career.careerId);
-    setEditingName(career.career);
+    setEditingName(career.careerName);
   };
 
   // Confirm update
@@ -227,7 +227,7 @@ export default function CareerModal({ courseId, onClose }: CareerModalProps) {
               ) : (
                 <>
                   <span className="text-gray-900 font-medium">
-                    {c.career}
+                    {c.careerName}
                   </span>
                   <div className="flex gap-2">
                     <ThemedButton

@@ -1,5 +1,5 @@
 export interface CareerResponse {
   careerId: number;
-  career: string;
+  careerName: string;
   courseId: number;
 }
