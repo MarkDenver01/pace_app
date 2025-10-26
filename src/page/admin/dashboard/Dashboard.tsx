@@ -146,25 +146,9 @@ export default function Dashboard() {
         preConfirm: () => currentLink,
       }).then((result) => {
         if (result.isConfirmed) {
-          navigator.clipboard
-            .writeText(result.value)
-            .then(() => {
-              Swal.fire({
-                icon: "success",
-                title: "Copied!",
-                text: "Link copied to clipboard.",
-                timer: 2000,
-                showConfirmButton: false,
-              });
-            })
-            .catch(() => {
-              Swal.fire({
-                icon: "error",
-                title: "Copy Failed",
-                text: "Could not copy link to clipboard.",
-                confirmButtonColor: "#d33",
-              });
-            });
+          navigator.clipboard.writeText(result.value)
+            .then(() => Swal.fire({ icon: "success", title: "Copied!", text: "Link copied to clipboard.", timer: 2000, showConfirmButton: false }))
+            .catch(() => Swal.fire({ icon: "error", title: "Copy Failed", text: "Could not copy link to clipboard.", confirmButtonColor: "#d33" }));
         }
       });
     } catch (error: any) {
@@ -183,7 +167,6 @@ export default function Dashboard() {
     setUniversityName(newUniversityName);
     setDomainEmail(newDomainEmail);
     setIsEditModalOpen(false);
-
     Swal.fire({
       icon: "success",
       title: "Updated Successfully",
@@ -195,14 +178,14 @@ export default function Dashboard() {
 
   // Card styling
   const cardClass =
-    "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition card-theme min-h-[180px]";
+    "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition border min-h-[180px]";
   const iconWrapperStyle = {
     backgroundColor: "var(--button-color, #D94022)10",
     color: "var(--button-color)",
   };
-  const labelStyle = { color: "var(--button-color)" };
-  const valueStyle = { color: "var(--text-color)" };
-  const descStyle = { color: "var(--muted-text-color, #6b7280)" };
+  const labelStyle = { color: "var(--button-color)", fontSize: "0.875rem" };
+  const valueStyle = { color: "var(--text-color)", fontSize: "1.5rem" };
+  const descStyle = { color: "var(--muted-text-color, #6b7280)", fontSize: "0.75rem" };
 
   // Dashboard cards array
   const dashboardCards = [
@@ -267,7 +250,7 @@ export default function Dashboard() {
 
   return (
     <div className="p-4 flex flex-col gap-8">
-      {/* Header Section */}
+      {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold" style={{ color: "var(--text-color)" }}>
           Dashboard Overview
@@ -277,8 +260,8 @@ export default function Dashboard() {
         </Button>
       </div>
 
-      {/* Grid Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* 2x2 Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {dashboardCards.map((card, index) => (
           <div
             key={index}
@@ -289,31 +272,35 @@ export default function Dashboard() {
               <div className="p-3 rounded-full" style={iconWrapperStyle}>
                 {card.icon}
               </div>
-              <span className="text-sm font-semibold" style={labelStyle}>
-                {card.label}
-              </span>
+              <span style={labelStyle}>{card.label}</span>
             </div>
-            <div className={`text-4xl font-bold ${card.isUppercase ? "uppercase" : ""}`} style={valueStyle}>
+            <div
+              className={`font-bold ${card.isUppercase ? "uppercase" : ""}`}
+              style={{
+                color: valueStyle.color,
+                fontSize: valueStyle.fontSize,
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                wordBreak: "break-word",
+              }}
+            >
               {card.value}
             </div>
-            {card.description && <div className="text-xs" style={descStyle}>{card.description}</div>}
-            {card.extraDesc && <div className="text-xs italic text-gray-400">{card.extraDesc}</div>}
+            {card.description && <div style={descStyle}>{card.description}</div>}
+            {card.extraDesc && (
+              <div className="text-xs italic text-gray-400 truncate">{card.extraDesc}</div>
+            )}
           </div>
         ))}
       </div>
 
       {/* Divider */}
-      <div
-        className="border-t my-4"
-        style={{ borderColor: "var(--divider-color)" }}
-      />
+      <div className="border-t my-4" style={{ borderColor: "var(--divider-color)" }} />
 
-      {/* Modal for editing */}
-      <Modal
-        show={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        size="md"
-      >
+      {/* Modal */}
+      <Modal show={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} size="md">
         <ModalHeader>Edit University Information</ModalHeader>
         <ModalBody>
           <div className="flex flex-col gap-4">
@@ -337,7 +324,6 @@ export default function Dashboard() {
             </div>
           </div>
         </ModalBody>
-
         <ModalFooter>
           <Button color="blue" onClick={handleSaveUniversityInfo}>
             Save
