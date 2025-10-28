@@ -720,7 +720,7 @@ export async function getUniversityStats(
 ): Promise<UniversityStatsResponse> {
   try {
     const response = await api.get<UniversityStatsResponse>(
-      `/api/university/${universityId}/stats`
+      `/admin/api/university/${universityId}/stats`
     );
     return response.data;
   } catch (error: any) {
