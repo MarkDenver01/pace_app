@@ -8,6 +8,7 @@ import type { CourseResponse, CourseRequest } from './models/Course';
 import type { UserAccountResponse, UserAccountRequest } from './models/UserAccount';
 import type { CareerResponse } from './models/response/Career';
 import type { StudentAssessmentResponse } from './models/response/StudentAssessmentResponse';
+import type { UniversityStatsResponse } from './models/response/UniversityStats.ts';
 
 /**
 * Fetches a list of students from the API.
@@ -708,5 +709,22 @@ export async function getStudentAssessmentsByUniversity(
   } catch (error: any) {
     console.error("Error fetching student assessments:", error);
     throw error.response?.data || { message: "Failed to fetch student assessments" };
+  }
+}
+
+/**
+ * Fetch university statistics including total assessments and enrollment breakdown.
+ */
+export async function getUniversityStats(
+  universityId: number
+): Promise<UniversityStatsResponse> {
+  try {
+    const response = await api.get<UniversityStatsResponse>(
+      `/api/university/${universityId}/stats`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching university stats:", error);
+    throw error.response?.data || { message: "Failed to fetch university stats" };
   }
 }
