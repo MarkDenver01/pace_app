@@ -313,10 +313,10 @@ Share University Link
           className={`font-bold ${card.isUppercase ? "uppercase" : ""}`}
           style={{
             color: valueStyle.color,
-            fontSize: valueStyle.fontSize,
+            fontSize: card.label === "Top 5 Courses" ? "1rem" : valueStyle.fontSize,
             overflow: "hidden",
             display: "-webkit-box",
-            WebkitLineClamp: 2,
+            WebkitLineClamp: card.label === "Top 5 Courses" ? 3 : 2,
             WebkitBoxOrient: "vertical",
             wordBreak: "break-word",
           }}
