@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileBarChart2, CalendarDays, Search } from "lucide-react";
-import { Pagination, TextInput } from "flowbite-react";
+import { Pagination, TextInput, Spinner } from "flowbite-react";
+import { getStudentAssessmentsByUniversity } from "../../../libs/ApiResponseService";
+import type { StudentAssessmentResponse } from "../../../libs/models/response/StudentAssessmentResponse";
 
 interface ReportData {
   date: string;
@@ -9,23 +11,69 @@ interface ReportData {
   duration: string;
 }
 
-const initialReports: ReportData[] = [
-  {
-    date: "05/14/2025",
-    user: "Joanne Legazpi",
-    activity: "Assessment Completed",
-    duration: "25 mins",
-  },
-];
-
 export default function ReportPage() {
+  const [reports, setReports] = useState<ReportData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [dateFilter, setDateFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
   const pageSize = 5;
+  const universityId = localStorage.getItem("authorized_university_id");
 
-  const filteredData = initialReports.filter((item) => {
+  // ✅ Fetch assessments from backend
+  useEffect(() => {
+    async function fetchReports() {
+      if (!universityId) {
+        setError("University ID not found.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const data: StudentAssessmentResponse[] =
+          await getStudentAssessmentsByUniversity(Number(universityId));
+
+        // Map response to table structure
+        const mapped: ReportData[] = data.map((item) => {
+          const date = item.createdDateTime
+            ? new Date(item.createdDateTime).toLocaleDateString("en-US")
+            : "N/A";
+
+          const user = item.userName || item.email || "Unknown User";
+          const activity =
+            item.assessmentStatus === "COMPLETED"
+              ? "Assessment Completed"
+              : item.assessmentStatus === "IN_PROGRESS"
+              ? "Assessment In Progress"
+              : item.assessmentStatus || "Pending";
+
+          // Optional: estimate duration if you have course data
+          const duration =
+            item.recommendedCourses?.length > 0
+              ? `${item.recommendedCourses.length * 10} mins`
+              : "N/A";
+
+          return { date, user, activity, duration };
+        });
+
+        setReports(mapped);
+      } catch (err: any) {
+        console.error("Error fetching reports:", err);
+        setError(err.message || "Failed to fetch assessment data.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchReports();
+  }, [universityId]);
+
+  // ✅ Filter data
+  const filteredData = reports.filter((item) => {
     const matchesDate = dateFilter ? item.date.includes(dateFilter) : true;
     const matchesSearch =
       item.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -33,6 +81,7 @@ export default function ReportPage() {
     return matchesDate && matchesSearch;
   });
 
+  // ✅ Pagination
   const totalPages = Math.ceil(filteredData.length / pageSize);
   const paginatedData = filteredData.slice(
     (currentPage - 1) * pageSize,
@@ -80,67 +129,78 @@ export default function ReportPage() {
       </div>
 
       {/* Data Table */}
-      <table className="min-w-full text-sm text-left" style={{ color: "var(--text-color)" }}>
-        <thead style={{ backgroundColor: "var(--button-color)", color: "#ffffff" }}>
-        <tr>
-          <th className="p-3 border border-gray-300 font-medium">Date</th>
-          <th className="p-3 border border-gray-300 font-medium">User</th>
-          <th className="p-3 border border-gray-300 font-medium">Activity</th>
-          <th className="p-3 border border-gray-300 font-medium">Duration (mins)</th>
-        </tr>
-        </thead>
-        <tbody>
-        {paginatedData.length > 0 ? (
-          paginatedData.map((report, index) => (
-            <tr key={index} className="transition hover:bg-[var(--divider-color)]">
-              <td className="p-3 border border-gray-300">{report.date}</td>
-              <td className="p-3 border border-gray-300">{report.user}</td>
-              <td className="p-3 border border-gray-300">{report.activity}</td>
-              <td className="p-3 border border-gray-300">{report.duration}</td>
-            </tr>
-          ))
-        ) : (
-          <tr>
-            <td
-              colSpan={4}
-              className="p-4 text-center border border-gray-300"
-              style={{ color: "var(--muted-text-color)" }}
-            >
-              No report data found.
-            </td>
-          </tr>
-        )}
-        </tbody>
-      </table>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mt-6 text-sm">
-          <span style={{ color: "var(--muted-text-color)" }}>
-            Showing{" "}
-            <span className="font-semibold" style={{ color: "var(--text-color)" }}>
-              {(currentPage - 1) * pageSize + 1}
-            </span>{" "}
-            to{" "}
-            <span className="font-semibold" style={{ color: "var(--text-color)" }}>
-              {Math.min(currentPage * pageSize, filteredData.length)}
-            </span>{" "}
-            of{" "}
-            <span className="font-semibold" style={{ color: "var(--text-color)" }}>
-              {filteredData.length}
-            </span>{" "}
-            entries
-          </span>
-
-          <div className="flex overflow-x-auto sm:justify-center">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-              showIcons
-            />
-          </div>
+      {loading ? (
+        <div className="flex justify-center items-center py-10">
+          <Spinner color="info" aria-label="Loading..." />
         </div>
+      ) : error ? (
+        <div className="text-center py-6 text-red-500 font-medium">{error}</div>
+      ) : (
+        <>
+          <table
+            className="min-w-full text-sm text-left"
+            style={{ color: "var(--text-color)" }}
+          >
+            <thead style={{ backgroundColor: "var(--button-color)", color: "#fff" }}>
+              <tr>
+                <th className="p-3 border border-gray-300 font-medium">Date</th>
+                <th className="p-3 border border-gray-300 font-medium">User</th>
+                <th className="p-3 border border-gray-300 font-medium">Activity</th>
+                <th className="p-3 border border-gray-300 font-medium">Duration (mins)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedData.length > 0 ? (
+                paginatedData.map((report, index) => (
+                  <tr key={index} className="transition hover:bg-[var(--divider-color)]">
+                    <td className="p-3 border border-gray-300">{report.date}</td>
+                    <td className="p-3 border border-gray-300">{report.user}</td>
+                    <td className="p-3 border border-gray-300">{report.activity}</td>
+                    <td className="p-3 border border-gray-300">{report.duration}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="p-4 text-center border border-gray-300"
+                    style={{ color: "var(--muted-text-color)" }}
+                  >
+                    No report data found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mt-6 text-sm">
+              <span style={{ color: "var(--muted-text-color)" }}>
+                Showing{" "}
+                <span className="font-semibold" style={{ color: "var(--text-color)" }}>
+                  {(currentPage - 1) * pageSize + 1}
+                </span>{" "}
+                to{" "}
+                <span className="font-semibold" style={{ color: "var(--text-color)" }}>
+                  {Math.min(currentPage * pageSize, filteredData.length)}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold" style={{ color: "var(--text-color)" }}>
+                  {filteredData.length}
+                </span>{" "}
+                entries
+              </span>
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                showIcons
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );

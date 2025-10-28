@@ -7,6 +7,7 @@ import type { UniversityResponse, UniversityRequest } from './models/University'
 import type { CourseResponse, CourseRequest } from './models/Course';
 import type { UserAccountResponse, UserAccountRequest } from './models/UserAccount';
 import type { CareerResponse } from './models/response/Career';
+import type { StudentAssessmentResponse } from './models/response/StudentAssessmentResponse';
 
 /**
 * Fetches a list of students from the API.
@@ -688,5 +689,25 @@ export async function deleteCareer(careerId: number): Promise<{ message: string 
   } catch (error: any) {
     console.error("Error deleting career:", error);
     throw error.response?.data || { message: "Failed to delete career" };
+  }
+}
+
+/**
+ * Fetch all student assessments by university ID.
+ * @param universityId number
+ * @returns Promise<StudentAssessmentResponse[]>
+ */
+export async function getStudentAssessmentsByUniversity(
+  universityId: number
+): Promise<StudentAssessmentResponse[]> {
+  try {
+    const response = await api.get<StudentAssessmentResponse[]>(
+      `/api/student_assessment/get-all`,
+      { params: { universityId } }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching student assessments:", error);
+    throw error.response?.data || { message: "Failed to fetch student assessments" };
   }
 }
