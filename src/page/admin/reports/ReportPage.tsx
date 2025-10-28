@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { FileBarChart2, CalendarDays, Search } from "lucide-react";
-import { Pagination, TextInput, Spinner } from "flowbite-react";
+import { Pagination, TextInput, Spinner, Button } from "flowbite-react";
 import { getStudentAssessmentsByUniversity } from "../../../libs/ApiResponseService";
 import type { StudentAssessmentResponse } from "../../../libs/models/response/StudentAssessmentResponse";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 
 interface ReportData {
   date: string;
@@ -25,7 +27,6 @@ export default function ReportPage() {
   const pageSize = 5;
   const universityId = localStorage.getItem("authorized_university_id");
 
-  // ✅ Fetch assessments from backend
   useEffect(() => {
     async function fetchReports() {
       if (!universityId) {
@@ -39,12 +40,10 @@ export default function ReportPage() {
         const data: StudentAssessmentResponse[] =
           await getStudentAssessmentsByUniversity(Number(universityId));
 
-        // Map response to table structure
         const mapped: ReportData[] = data.map((item) => {
           const date = item.createdDateTime
             ? new Date(item.createdDateTime).toLocaleDateString("en-US")
             : "N/A";
-
           const user = item.userName || item.email || "Unknown User";
           const email = item.email || "N/A";
           const enrollmentStatus = item.enrollmentStatus || "N/A";
@@ -55,7 +54,6 @@ export default function ReportPage() {
               : item.assessmentStatus === "IN_PROGRESS"
               ? "Assessment In Progress"
               : item.assessmentStatus || "Pending";
-
           return { date, user, email, enrollmentStatus, university, activity };
         });
 
@@ -71,7 +69,6 @@ export default function ReportPage() {
     fetchReports();
   }, [universityId]);
 
-  // ✅ Filter data
   const filteredData = reports.filter((item) => {
     const matchesDate = dateFilter ? item.date.includes(dateFilter) : true;
     const matchesSearch =
@@ -80,12 +77,42 @@ export default function ReportPage() {
     return matchesDate && matchesSearch;
   });
 
-  // ✅ Pagination
   const totalPages = Math.ceil(filteredData.length / pageSize);
   const paginatedData = filteredData.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+
+  // ✅ Export to Excel using ExcelJS
+  const exportToExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Reports");
+
+    // Add headers
+    worksheet.columns = [
+      { header: "Date", key: "date", width: 15 },
+      { header: "User", key: "user", width: 25 },
+      { header: "Email", key: "email", width: 30 },
+      { header: "Enrollment Status", key: "enrollmentStatus", width: 20 },
+      { header: "University", key: "university", width: 25 },
+      { header: "Activity", key: "activity", width: 25 },
+    ];
+
+    // Make header bold
+    worksheet.getRow(1).font = { bold: true };
+
+    // Add data rows
+    filteredData.forEach((row) => {
+      worksheet.addRow(row);
+    });
+
+    // Generate buffer
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    // Download file
+    const blob = new Blob([buffer], { type: "application/octet-stream" });
+    saveAs(blob, "engagement_performance_report.xlsx");
+  };
 
   return (
     <div
@@ -94,37 +121,50 @@ export default function ReportPage() {
     >
       {/* Page Header */}
       <div className="flex items-center gap-2 mb-4">
-        <FileBarChart2 className="w-5 h-5" style={{ color: "var(--button-color)" }} />
+        <FileBarChart2
+          className="w-5 h-5"
+          style={{ color: "var(--button-color)" }}
+        />
         <h2 className="text-xl font-semibold" style={{ color: "var(--text-color)" }}>
           Engagement & Performance Report
         </h2>
       </div>
 
-      {/* Filter Bar */}
+      {/* Filter Bar + Export Button */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-        {/* Date Filter */}
-        <div className="flex items-center gap-2 w-full sm:max-w-xs">
-          <CalendarDays className="w-5 h-5" style={{ color: "var(--muted-text-color)" }} />
-          <TextInput
-            type="text"
-            placeholder="Filter by date (mm/dd/yyyy)"
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="w-full"
-          />
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:max-w-lg">
+          <div className="flex items-center gap-2 w-full sm:max-w-xs">
+            <CalendarDays
+              className="w-5 h-5"
+              style={{ color: "var(--muted-text-color)" }}
+            />
+            <TextInput
+              type="text"
+              placeholder="Filter by date (mm/dd/yyyy)"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="w-full"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:max-w-sm">
+            <Search
+              className="w-5 h-5"
+              style={{ color: "var(--muted-text-color)" }}
+            />
+            <TextInput
+              type="text"
+              placeholder="Search user or activity"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full"
+            />
+          </div>
         </div>
 
-        {/* Search Filter */}
-        <div className="flex items-center gap-2 w-full sm:max-w-sm">
-          <Search className="w-5 h-5" style={{ color: "var(--muted-text-color)" }} />
-          <TextInput
-            type="text"
-            placeholder="Search user or activity"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full"
-          />
-        </div>
+        <Button onClick={exportToExcel} color="success">
+          Export to Excel
+        </Button>
       </div>
 
       {/* Data Table */}
@@ -165,7 +205,7 @@ export default function ReportPage() {
               ) : (
                 <tr>
                   <td
-                    colSpan={4}
+                    colSpan={6}
                     className="p-4 text-center border border-gray-300"
                     style={{ color: "var(--muted-text-color)" }}
                   >
