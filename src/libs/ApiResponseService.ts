@@ -9,6 +9,8 @@ import type { UserAccountResponse, UserAccountRequest } from './models/UserAccou
 import type { CareerResponse } from './models/response/Career';
 import type { StudentAssessmentResponse } from './models/response/StudentAssessmentResponse';
 import type { UniversityStatsResponse } from './models/response/UniversityStats.ts';
+import type { TopCourseResponse } from './models/response/TopCourseResponse.ts';
+import type { TopCompetitorResponse } from './models/response/TopCompetitorResponse.ts';
 
 /**
 * Fetches a list of students from the API.
@@ -728,3 +730,40 @@ export async function getUniversityStats(
     throw error.response?.data || { message: "Failed to fetch university stats" };
   }
 }
+
+/**
+ * Fetch top 5 courses for a university (by month)
+ * @param universityId - University ID
+ * @param month - Month number (1-12)
+ * @returns Promise<TopCourseResponse[]>
+ */
+export async function getTopCourses(universityId: number, month: number): Promise<TopCourseResponse[]> {
+  try {
+    const response = await api.get<TopCourseResponse[]>(
+      `/admin/api/${universityId}/top-courses`,
+      { params: { month } }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching top courses:", error);
+    throw error.response?.data || { message: "Failed to fetch top courses" };
+  }
+}
+
+/**
+ * Fetch top 3 competitor universities
+ * @param universityId - University ID
+ * @returns Promise<TopCompetitorResponse[]>
+ */
+export async function getTopCompetitors(universityId: number): Promise<TopCompetitorResponse[]> {
+  try {
+    const response = await api.get<TopCompetitorResponse[]>(
+      `/admin/api/${universityId}/top-competitors`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching top competitors:", error);
+    throw error.response?.data || { message: "Failed to fetch top competitors" };
+  }
+}
+

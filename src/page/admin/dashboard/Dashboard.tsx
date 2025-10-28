@@ -12,8 +12,12 @@ totalActiveCourseByUniversity,
 getOrCreateDynamicLink,
 updateDynamicLinkToken,
 getUniversityStats,
+getTopCourses, 
+getTopCompetitors
 } from "../../../libs/ApiResponseService";
 import { type UniversityStatsResponse } from "../../../libs/models/response/UniversityStats";
+import { type TopCourseResponse } from "../../../libs/models/response/TopCourseResponse";
+import { type TopCompetitorResponse } from "../../../libs/models/response/TopCompetitorResponse"; 
 import { utils } from "../../../utils/utils";
 import { useAuth } from "../../../context/AuthContext";
 import Swal from "sweetalert2";
@@ -50,6 +54,7 @@ const [universityStats, setUniversityStats] = useState<UniversityStatsResponse |
 const [topCourses, setTopCourses] = useState<string[]>([]);
 const [topCompetitorSchools, setTopCompetitorSchools] = useState<string[]>([]);
 
+
 const universityId = Number(localStorage.getItem("authorized_university_id"));
 
 const loadStudents = async () => {
@@ -85,10 +90,33 @@ console.error("Failed to fetch university stats:", error);
 }
 };
 
+const loadTopCourses = async () => {
+  if (!universityId) return;
+  try {
+    const currentMonth = new Date().getMonth() + 1;
+    const courses: TopCourseResponse[] = await getTopCourses(universityId, currentMonth);
+    setTopCourses(courses.map(c => c.courseDescription));
+  } catch (error) {
+    console.error("Failed to fetch top courses:", error);
+  }
+};
+
+const loadTopCompetitors = async () => {
+  if (!universityId) return;
+  try {
+    const competitors: TopCompetitorResponse[] = await getTopCompetitors(universityId);
+    setTopCompetitorSchools(competitors.map(c => c.competitorName));
+  } catch (error) {
+    console.error("Failed to fetch top competitors:", error);
+  }
+};
+
 useEffect(() => {
 loadStudents();
 loadActiveCourses();
 loadUniversityStats();
+loadTopCourses();     
+  loadTopCompetitors(); 
 }, [user]);
 
 const handleSharePost = async () => {
@@ -239,16 +267,16 @@ value: universityStats?.totalNewSchool ?? "—",
 description: "Enrolled in new school",
 },
 {
-label: "Top 5 Courses",
-icon: <BookOpen size={28} />,
-value: topCourses.join(", ") || "—",
-description: "This month",
+  label: "Top 5 Courses",
+  icon: <BookOpen size={28} />,
+  value: topCourses.join(", ") || "—",
+  description: "This month",
 },
 {
-label: "Top 3 Competitor Schools",
-icon: <University size={28} />,
-value: topCompetitorSchools.join(", ") || "—",
-description: "Competing universities",
+  label: "Top 3 Competitor Schools",
+  icon: <University size={28} />,
+  value: topCompetitorSchools.join(", ") || "—",
+  description: "Competing universities",
 },
 ];
 
