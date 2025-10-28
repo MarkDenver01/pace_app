@@ -7,8 +7,10 @@ import type { StudentAssessmentResponse } from "../../../libs/models/response/St
 interface ReportData {
   date: string;
   user: string;
+  email: string;
+  enrollmentStatus: string;
+  university: string;
   activity: string;
-  duration: string;
 }
 
 export default function ReportPage() {
@@ -44,6 +46,9 @@ export default function ReportPage() {
             : "N/A";
 
           const user = item.userName || item.email || "Unknown User";
+          const email = item.email || "N/A";
+          const enrollmentStatus = item.enrollmentStatus || "N/A";
+          const university = item.enrolledUniversity || "N/A";
           const activity =
             item.assessmentStatus === "COMPLETED"
               ? "Assessment Completed"
@@ -51,13 +56,7 @@ export default function ReportPage() {
               ? "Assessment In Progress"
               : item.assessmentStatus || "Pending";
 
-          // Optional: estimate duration if you have course data
-          const duration =
-            item.recommendedCourses?.length > 0
-              ? `${item.recommendedCourses.length * 10} mins`
-              : "N/A";
-
-          return { date, user, activity, duration };
+          return { date, user, email, enrollmentStatus, university, activity };
         });
 
         setReports(mapped);
@@ -145,8 +144,10 @@ export default function ReportPage() {
               <tr>
                 <th className="p-3 border border-gray-300 font-medium">Date</th>
                 <th className="p-3 border border-gray-300 font-medium">User</th>
+                <th className="p-3 border border-gray-300 font-medium">Email</th>
+                <th className="p-3 border border-gray-300 font-medium">Enrollment Status</th>
+                <th className="p-3 border border-gray-300 font-medium">University</th>
                 <th className="p-3 border border-gray-300 font-medium">Activity</th>
-                <th className="p-3 border border-gray-300 font-medium">Duration (mins)</th>
               </tr>
             </thead>
             <tbody>
@@ -155,8 +156,10 @@ export default function ReportPage() {
                   <tr key={index} className="transition hover:bg-[var(--divider-color)]">
                     <td className="p-3 border border-gray-300">{report.date}</td>
                     <td className="p-3 border border-gray-300">{report.user}</td>
+                    <td className="p-3 border border-gray-300">{report.email}</td>
+                    <td className="p-3 border border-gray-300">{report.enrollmentStatus}</td>
+                    <td className="p-3 border border-gray-300">{report.university}</td>
                     <td className="p-3 border border-gray-300">{report.activity}</td>
-                    <td className="p-3 border border-gray-300">{report.duration}</td>
                   </tr>
                 ))
               ) : (
