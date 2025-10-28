@@ -5,9 +5,9 @@ import {
   University,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { type StudentListResponse } from "../../../libs/models/response/StudentListResponse.ts";
+import { type StudentResponse } from "../../../libs/models/response/StudentResponse.ts";
 import {
-  fetchApprovedStudents,
+  fetchStudents,
   totalActiveCourseByUniversity,
   getOrCreateDynamicLink,
   updateDynamicLinkToken,
@@ -15,8 +15,6 @@ import {
 import { utils } from "../../../utils/utils.ts";
 import { useAuth } from "../../../context/AuthContext.tsx";
 import Swal from "sweetalert2";
-
-// UI components
 import {
   Button,
   Modal,
@@ -29,53 +27,57 @@ import {
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [approvedStudents, setApprovedStudents] = useState<StudentListResponse | null>(null);
+  const [students, setStudents] = useState<StudentResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [activeCourseCount, setActiveCourseCount] = useState<number>(0);
 
-  // University info state
-  const [universityName, setUniversityName] = useState(user?.adminResponse?.universityName || "Unknown University");
-  const [domainEmail, setDomainEmail] = useState(user?.adminResponse?.domainEmail || "university@example.com");
+  const [universityName, setUniversityName] = useState(
+    user?.adminResponse?.universityName || "Unknown University"
+  );
+  const [domainEmail, setDomainEmail] = useState(
+    user?.adminResponse?.domainEmail || "university@example.com"
+  );
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [newUniversityName, setNewUniversityName] = useState(universityName);
   const [newDomainEmail, setNewDomainEmail] = useState(domainEmail);
 
-  // Additional dashboard metrics
   const [studentsWantEnroll, setStudentsWantEnroll] = useState<number>(0);
   const [studentsOtherSchool, setStudentsOtherSchool] = useState<number>(0);
   const [studentsSameSchool, setStudentsSameSchool] = useState<number>(0);
   const [topCourses, setTopCourses] = useState<string[]>([]);
   const [topCompetitorSchools, setTopCompetitorSchools] = useState<string[]>([]);
+  const universityId = localStorage.getItem("authorized_university_id");
 
-  // Load students
-  const loadApprovedStudents = async () => {
+  // ✅ Updated: Load all students instead of approved only
+  const loadStudents = async () => {
+    if (!universityId) return;
     try {
-      const studentResponse = await fetchApprovedStudents();
-      setApprovedStudents(studentResponse);
+      const studentResponse = await fetchStudents(Number(universityId));
+      setStudents(studentResponse);
       setLastUpdated(new Date());
     } catch (error) {
-      console.error("Failed to fetch approved students: ", error);
+      console.error("Failed to fetch students: ", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Load active courses
   const loadActiveCourses = async () => {
     if (!user?.adminResponse?.universityId) return;
     try {
-      const count = await totalActiveCourseByUniversity(Number(user.adminResponse.universityId));
+      const count = await totalActiveCourseByUniversity(
+        Number(user.adminResponse.universityId)
+      );
       setActiveCourseCount(count);
     } catch (error) {
       console.error("Failed to fetch the active courses: ", error);
     }
   };
 
-  // Load additional metrics
   const loadAdditionalMetrics = async () => {
     try {
-      // TODO: Replace with actual API calls
+      // Mock metrics
       setStudentsWantEnroll(120);
       setStudentsOtherSchool(35);
       setStudentsSameSchool(85);
@@ -87,15 +89,13 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    loadApprovedStudents();
+    loadStudents();
     loadActiveCourses();
     loadAdditionalMetrics();
   }, [user]);
 
-  // Handle shareable dynamic link
   const handleSharePost = async () => {
     try {
-      const universityId = localStorage.getItem("authorized_university_id");
       if (!universityId) throw new Error("No university associated.");
 
       let { link: currentLink } = await getOrCreateDynamicLink(Number(universityId));
@@ -137,9 +137,25 @@ export default function Dashboard() {
         preConfirm: () => currentLink,
       }).then((result) => {
         if (result.isConfirmed) {
-          navigator.clipboard.writeText(result.value)
-            .then(() => Swal.fire({ icon: "success", title: "Copied!", text: "Link copied to clipboard.", timer: 2000, showConfirmButton: false }))
-            .catch(() => Swal.fire({ icon: "error", title: "Copy Failed", text: "Could not copy link to clipboard.", confirmButtonColor: "#d33" }));
+          navigator.clipboard
+            .writeText(result.value)
+            .then(() =>
+              Swal.fire({
+                icon: "success",
+                title: "Copied!",
+                text: "Link copied to clipboard.",
+                timer: 2000,
+                showConfirmButton: false,
+              })
+            )
+            .catch(() =>
+              Swal.fire({
+                icon: "error",
+                title: "Copy Failed",
+                text: "Could not copy link to clipboard.",
+                confirmButtonColor: "#d33",
+              })
+            );
         }
       });
     } catch (error: any) {
@@ -153,7 +169,6 @@ export default function Dashboard() {
     }
   };
 
-  // Save edited university info
   const handleSaveUniversityInfo = () => {
     setUniversityName(newUniversityName);
     setDomainEmail(newDomainEmail);
@@ -167,7 +182,6 @@ export default function Dashboard() {
     });
   };
 
-  // Card styling
   const cardClass =
     "flex flex-col justify-between gap-2 p-6 rounded-2xl shadow-md hover:shadow-lg transition border min-h-[180px] card-theme";
   const iconWrapperStyle = {
@@ -176,7 +190,10 @@ export default function Dashboard() {
   };
   const labelStyle = { color: "var(--button-color)", fontSize: "0.875rem" };
   const valueStyle = { color: "var(--text-color)", fontSize: "1.5rem" };
-  const descStyle = { color: "var(--muted-text-color, #6b7280)", fontSize: "0.75rem" };
+  const descStyle = {
+    color: "var(--muted-text-color, #6b7280)",
+    fontSize: "0.75rem",
+  };
 
   const dashboardCards = [
     {
@@ -191,7 +208,7 @@ export default function Dashboard() {
     {
       label: "Total Students",
       icon: <GraduationCap size={28} />,
-      value: loading ? "Loading..." : approvedStudents?.total || 0,
+      value: loading ? "Loading..." : students.length,
       description: lastUpdated ? utils.getTimeAgo(lastUpdated) : "",
     },
     {
@@ -240,7 +257,6 @@ export default function Dashboard() {
 
   return (
     <div className="p-4 flex flex-col gap-8">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold" style={{ color: "var(--text-color)" }}>
           Dashboard Overview
@@ -250,7 +266,6 @@ export default function Dashboard() {
         </Button>
       </div>
 
-      {/* 2x2 Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {dashboardCards.map((card, index) => (
           <div
@@ -286,16 +301,19 @@ export default function Dashboard() {
 
             {card.description && <div style={descStyle}>{card.description}</div>}
             {card.extraDesc && (
-              <div className="text-xs italic text-gray-400 truncate">{card.extraDesc}</div>
+              <div className="text-xs italic text-gray-400 truncate">
+                {card.extraDesc}
+              </div>
             )}
           </div>
         ))}
       </div>
 
-      {/* Divider */}
-      <div className="border-t my-4" style={{ borderColor: "var(--divider-color)" }} />
+      <div
+        className="border-t my-4"
+        style={{ borderColor: "var(--divider-color)" }}
+      />
 
-      {/* Modal */}
       <Modal show={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} size="md">
         <ModalHeader>Edit University Information</ModalHeader>
         <ModalBody>
