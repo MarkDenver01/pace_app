@@ -11,6 +11,14 @@ import type { StudentAssessmentResponse } from './models/response/StudentAssessm
 import type { UniversityStatsResponse } from './models/response/UniversityStats.ts';
 import type { TopCourseResponse } from './models/response/TopCourseResponse.ts';
 import type { TopCompetitorResponse } from './models/response/TopCompetitorResponse.ts';
+import type {
+  DailyAssessmentCountResponse,
+  DailySameSchoolCountResponse,
+  DailyOtherSchoolCountResponse,
+  DailyNewSchoolCountResponse,
+  CourseCountResponse,
+  CompetitorUniversityCountResponse,
+} from './models/response/Analytics';
 
 /**
 * Fetches a list of students from the API.
@@ -764,6 +772,98 @@ export async function getTopCompetitors(universityId: number): Promise<TopCompet
   } catch (error: any) {
     console.error("Error fetching top competitors:", error);
     throw error.response?.data || { message: "Failed to fetch top competitors" };
+  }
+}
+
+/**
+ * Fetch daily assessments for a university
+ * @param universityId number
+ * @returns Promise<DailyAssessmentCountResponse[]>
+ */
+export async function getDailyAssessments(universityId: number): Promise<DailyAssessmentCountResponse[]> {
+  try {
+    const response = await api.get<DailyAssessmentCountResponse[]>(
+      `/api/daily-assessments/${universityId}/analytics`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching daily assessments:", error);
+    throw error.response?.data || { message: "Failed to fetch daily assessments" };
+  }
+}
+
+/**
+ * Fetch daily same-school counts
+ */
+export async function getDailySameSchoolCount(universityId: number): Promise<DailySameSchoolCountResponse[]> {
+  try {
+    const response = await api.get<DailySameSchoolCountResponse[]>(
+      `/api/same-school/${universityId}/analytics`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching same-school analytics:", error);
+    throw error.response?.data || { message: "Failed to fetch same-school analytics" };
+  }
+}
+
+/**
+ * Fetch daily other-school counts
+ */
+export async function getDailyOtherSchoolCount(universityId: number): Promise<DailyOtherSchoolCountResponse[]> {
+  try {
+    const response = await api.get<DailyOtherSchoolCountResponse[]>(
+      `/api/other-school/${universityId}/analytics`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching other-school analytics:", error);
+    throw error.response?.data || { message: "Failed to fetch other-school analytics" };
+  }
+}
+
+/**
+ * Fetch daily new-school counts
+ */
+export async function getDailyNewSchoolCount(universityId: number): Promise<DailyNewSchoolCountResponse[]> {
+  try {
+    const response = await api.get<DailyNewSchoolCountResponse[]>(
+      `/api/new-school/${universityId}/analytics`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching new-school analytics:", error);
+    throw error.response?.data || { message: "Failed to fetch new-school analytics" };
+  }
+}
+
+/**
+ * Fetch course counts (Y-axis = total students, X-axis = course description)
+ */
+export async function getCourseCountsByUniversity(universityId: number): Promise<CourseCountResponse[]> {
+  try {
+    const response = await api.get<CourseCountResponse[]>(
+      `/api/courses/${universityId}/analytics`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching course counts:", error);
+    throw error.response?.data || { message: "Failed to fetch course counts" };
+  }
+}
+
+/**
+ * Fetch daily competitor counts (X-axis = university, Y-axis = count per day)
+ */
+export async function getCompetitorCounts(universityId: number): Promise<CompetitorUniversityCountResponse[]> {
+  try {
+    const response = await api.get<CompetitorUniversityCountResponse[]>(
+      `/api/competitors/${universityId}/analytics`
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching competitor counts:", error);
+    throw error.response?.data || { message: "Failed to fetch competitor counts" };
   }
 }
 

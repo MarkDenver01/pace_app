@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { CalendarDays, Search, BarChart3 } from "lucide-react";
 import { TextInput } from "flowbite-react";
 import {
@@ -11,19 +11,12 @@ import {
   CartesianGrid,
   Cell,
 } from "recharts";
+import { getCourseCountsByUniversity } from "../../../libs/ApiResponseService"; // <-- import your API
 
 interface CourseData {
   course: string;
   engagement: number;
 }
-
-const initialData: CourseData[] = [
-  { course: "Web Development", engagement: 120 },
-  { course: "Data Science", engagement: 90 },
-  { course: "Cyber Security", engagement: 100 },
-  { course: "AI", engagement: 80 },
-  { course: "Cloud Computing", engagement: 110 },
-];
 
 function getRandomColor(index: number): string {
   const palette = [
@@ -36,10 +29,36 @@ function getRandomColor(index: number): string {
 export default function AnalyticsPage() {
   const [dateFilter, setDateFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [courseData, setCourseData] = useState<CourseData[]>([]);
 
-  const filteredData = initialData.filter((course) =>
-    course.course.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const universityId = localStorage.getItem("authorized_university_id");
+
+  // Fetch backend data
+  useEffect(() => {
+    if (!universityId) return;
+
+    const fetchCourses = async () => {
+      try {
+        const data = await getCourseCountsByUniversity(Number(universityId));
+        const mappedData: CourseData[] = data.map((item) => ({
+          course: item.courseDescription,
+          engagement: item.total,
+        }));
+        setCourseData(mappedData);
+      } catch (error) {
+        console.error("Failed to fetch course analytics:", error);
+      }
+    };
+
+    fetchCourses();
+  }, [universityId]);
+
+  // Filter by search query
+  const filteredData = useMemo(() => {
+    return courseData.filter((course) =>
+      course.course.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [courseData, searchQuery]);
 
   const courseColors = useMemo(() => {
     const map: Record<string, string> = {};
@@ -66,7 +85,6 @@ export default function AnalyticsPage() {
 
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        {/* Left: Date Filter */}
         <div className="flex items-center gap-2 w-full sm:max-w-xs">
           <CalendarDays className="w-5 h-5" style={{ color: "var(--muted-text-color)" }} />
           <TextInput
@@ -78,7 +96,6 @@ export default function AnalyticsPage() {
           />
         </div>
 
-        {/* Right: Search Filter */}
         <div className="flex items-center gap-2 w-full sm:max-w-sm">
           <Search className="w-5 h-5" style={{ color: "var(--muted-text-color)" }} />
           <TextInput
@@ -108,7 +125,7 @@ export default function AnalyticsPage() {
           >
             <CartesianGrid strokeDasharray="3 3" stroke="var(--divider-color)" />
             <XAxis dataKey="course" stroke="var(--text-color)" />
-            <YAxis stroke="var(--text-color)" domain={[0, 140]} />
+            <YAxis stroke="var(--text-color)" domain={[0, "dataMax + 20"]} />
             <Tooltip
               contentStyle={{
                 backgroundColor: "var(--card-color)",
