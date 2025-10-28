@@ -702,8 +702,7 @@ export async function getStudentAssessmentsByUniversity(
 ): Promise<StudentAssessmentResponse[]> {
   try {
     const response = await api.get<StudentAssessmentResponse[]>(
-      `/admin/api/student_assessment/get-all`,
-      { params: { universityId } }
+      `/admin/api/student_assessment/get-all/${universityId}`
     );
     return response.data;
   } catch (error: any) {
