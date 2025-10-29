@@ -124,30 +124,30 @@ export default function AnalyticsPage() {
 
       {/* Daily Assessments */}
       <ChartCard
-        title="Daily Assessments"
+        title="Daily Assessments (total students taking assessments)"
         filteredData={dailyAssessments}
-        dataKey="count"
+        dataKey="total student per day"
       />
 
       {/* Same-School Counts */}
       <ChartCard
-        title="Daily Same-School Count"
+        title="Daily Same-School (total students from same school)"
         filteredData={sameSchoolCounts}
-        dataKey="count"
+        dataKey="total student per day"
       />
 
       {/* Other-School Counts */}
       <ChartCard
-        title="Daily Other-School Count"
+        title="Daily Other-School Count (total students from other schools)"
         filteredData={otherSchoolCounts}
-        dataKey="count"
+        dataKey="total student per day"
       />
 
       {/* New-School Counts */}
       <ChartCard
-        title="Daily New-School Count"
+        title="Daily New-School Count (total students from new schools)"
         filteredData={newSchoolCounts}
-        dataKey="count"
+        dataKey="total student per day"
       />
     </div>
   );
