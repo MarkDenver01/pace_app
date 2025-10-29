@@ -337,32 +337,39 @@ const handleDeleteAccount = async (adminId: number) => {
                         {user.accountStatus === "PENDING" ? (
                           <span className="text-gray-500 italic">No action</span>
                         ) : (
+                        <div className="flex gap-2"> {/* ✅ Added flex with spacing */}
                         <ThemedButton
                           size="xs"
                           onClick={() => handleToggleStatus(user.adminId)}
                           bgColor={
-                            (user.accountStatus === "ACTIVATE" || user.accountStatus === "VERIFIED") 
-                            ? "#ea2e21ff" : "#1c6a1fff"}
+                            user.accountStatus === "ACTIVATE" || user.accountStatus === "VERIFIED"
+                            ? "#ea2e21ff"
+                            : "#1c6a1fff"
+                          }
                           textColor="#fff"
-                          padding="0.75rem 3rem" 
+                          padding="0.75rem 3rem"
                           borderRadius="1rem"
-                          width="100%">
-                             {(user.accountStatus === "ACTIVATE"
-                             || user.accountStatus == "VERIFIED") ? "DEACTIVATE" : "ACTIVATE"}
-                        </ThemedButton>
-                      )}
-                        <ThemedButton
-                          size="xs"
-                          onClick={() => handleDeleteAccount(user.adminId)}
-                          bgColor="#f00707ff" 
-                          textColor="#fff"
-                          padding="0.75rem 3rem" 
-                          borderRadius="1rem"
-                          width="100%">
-                             DELETE
-                        </ThemedButton>
+                          width="100%"
+                          >
+                            {user.accountStatus === "ACTIVATE" || user.accountStatus === "VERIFIED"
+                            ? "DEACTIVATE"
+                            : "ACTIVATE"}
+                            </ThemedButton>
+                            
+                            <ThemedButton
+                            size="xs"
+                            onClick={() => handleDeleteAccount(user.adminId)}
+                            bgColor="#f00707ff"
+                            textColor="#fff"
+                            padding="0.75rem 3rem"
+                            borderRadius="1rem"
+                            width="100%"
+                            >
+                              DELETE
+                            </ThemedButton>
+                          </div>
+                        )}
                       </td>
-
                     </tr>
                   ))
                 ) : (
