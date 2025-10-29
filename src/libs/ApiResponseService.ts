@@ -783,7 +783,7 @@ export async function getTopCompetitors(universityId: number): Promise<TopCompet
 export async function getDailyAssessments(universityId: number): Promise<DailyAssessmentCountResponse[]> {
   try {
     const response = await api.get<DailyAssessmentCountResponse[]>(
-      `/api/daily-assessments/${universityId}/analytics`
+      `/admin/api/daily-assessments/${universityId}/analytics`
     );
     return response.data;
   } catch (error: any) {
@@ -798,7 +798,7 @@ export async function getDailyAssessments(universityId: number): Promise<DailyAs
 export async function getDailySameSchoolCount(universityId: number): Promise<DailySameSchoolCountResponse[]> {
   try {
     const response = await api.get<DailySameSchoolCountResponse[]>(
-      `/api/same-school/${universityId}/analytics`
+      `/admin/api/same-school/${universityId}/analytics`
     );
     return response.data;
   } catch (error: any) {
@@ -813,7 +813,7 @@ export async function getDailySameSchoolCount(universityId: number): Promise<Dai
 export async function getDailyOtherSchoolCount(universityId: number): Promise<DailyOtherSchoolCountResponse[]> {
   try {
     const response = await api.get<DailyOtherSchoolCountResponse[]>(
-      `/api/other-school/${universityId}/analytics`
+      `/admin/api/other-school/${universityId}/analytics`
     );
     return response.data;
   } catch (error: any) {
@@ -828,7 +828,7 @@ export async function getDailyOtherSchoolCount(universityId: number): Promise<Da
 export async function getDailyNewSchoolCount(universityId: number): Promise<DailyNewSchoolCountResponse[]> {
   try {
     const response = await api.get<DailyNewSchoolCountResponse[]>(
-      `/api/new-school/${universityId}/analytics`
+      `/admin/api/new-school/${universityId}/analytics`
     );
     return response.data;
   } catch (error: any) {
@@ -843,7 +843,7 @@ export async function getDailyNewSchoolCount(universityId: number): Promise<Dail
 export async function getCourseCountsByUniversity(universityId: number): Promise<CourseCountResponse[]> {
   try {
     const response = await api.get<CourseCountResponse[]>(
-      `/api/courses/${universityId}/analytics`
+      `/admin/api/courses/${universityId}/analytics`
     );
     return response.data;
   } catch (error: any) {
@@ -858,7 +858,7 @@ export async function getCourseCountsByUniversity(universityId: number): Promise
 export async function getCompetitorCounts(universityId: number): Promise<CompetitorUniversityCountResponse[]> {
   try {
     const response = await api.get<CompetitorUniversityCountResponse[]>(
-      `/api/competitors/${universityId}/analytics`
+      `/admin/api/competitors/${universityId}/analytics`
     );
     return response.data;
   } catch (error: any) {
