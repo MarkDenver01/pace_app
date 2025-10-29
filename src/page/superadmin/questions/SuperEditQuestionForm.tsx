@@ -15,7 +15,7 @@ interface EditQuestionFormProps {
   onCancel?: () => void;
 }
 
-const categories = ["General Interest", "Career Interest", "Personal Qualities"];
+const categories = ["Interest", "Personal Traits"];
 
 export default function EditQuestionForm({
   questionId,
