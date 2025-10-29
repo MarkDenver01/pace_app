@@ -10,6 +10,9 @@ import {
   ResponsiveContainer,
   CartesianGrid,
   Cell,
+  PieChart,
+  Pie,
+  Legend,
 } from "recharts";
 
 import {
@@ -17,8 +20,11 @@ import {
   getDailyAssessments,
   getDailySameSchoolCount,
   getDailyOtherSchoolCount,
-  getDailyNewSchoolCount
+  getDailyNewSchoolCount,
+  getUniversityStats,
 } from "../../../libs/ApiResponseService";
+
+import { type UniversityStatsResponse } from "../../../libs/models/response/UniversityStats";
 
 interface CourseData {
   course: string;
@@ -52,6 +58,7 @@ export default function AnalyticsPage() {
   const [sameSchoolCounts, setSameSchoolCounts] = useState<DailyData[]>([]);
   const [otherSchoolCounts, setOtherSchoolCounts] = useState<DailyData[]>([]);
   const [newSchoolCounts, setNewSchoolCounts] = useState<DailyData[]>([]);
+  const [universityStats, setUniversityStats] = useState<UniversityStatsResponse | null>(null);
 
   const universityId = localStorage.getItem("authorized_university_id");
 
@@ -66,13 +73,15 @@ export default function AnalyticsPage() {
           assessments,
           sameSchool,
           otherSchool,
-          newSchool
+          newSchool,
+          stats
         ] = await Promise.all([
           getCourseCountsByUniversity(Number(universityId)),
           getDailyAssessments(Number(universityId)),
           getDailySameSchoolCount(Number(universityId)),
           getDailyOtherSchoolCount(Number(universityId)),
           getDailyNewSchoolCount(Number(universityId)),
+          getUniversityStats(Number(universityId)),
         ]);
 
         setCourseData(courses.map(item => ({
@@ -83,6 +92,7 @@ export default function AnalyticsPage() {
         setSameSchoolCounts(sameSchool.map(item => ({ date: item.date, count: item.count })));
         setOtherSchoolCounts(otherSchool.map(item => ({ date: item.date, count: item.count })));
         setNewSchoolCounts(newSchool.map(item => ({ date: item.date, count: item.count })));
+        setUniversityStats(stats);
       } catch (error) {
         console.error("Failed to fetch analytics:", error);
       }
@@ -108,6 +118,18 @@ export default function AnalyticsPage() {
     return map;
   }, [filteredCourseData]);
 
+  // Prepare data for PieChart
+  const pieData = useMemo(() => {
+    if (!universityStats) return [];
+    return [
+      { name: "Same School", value: universityStats.totalSameSchool },
+      { name: "Other School", value: universityStats.totalOtherSchool },
+      { name: "New School", value: universityStats.totalNewSchool },
+    ];
+  }, [universityStats]);
+
+  const pieColors = ["#3B82F6", "#10B981", "#DB2777"];
+
   return (
     <div className="space-y-6">
       {/* Course Engagement Card */}
@@ -122,32 +144,45 @@ export default function AnalyticsPage() {
         setDateFilter={setDateFilter}
       />
 
+      {/* Overall Course Engagement Pie Chart */}
+      <ChartCard
+        title="Overall Course Engagement"
+        filteredData={pieData}
+        dataKey="value"
+        chartType="pie"
+        colorMap={{
+          "Same School": pieColors[0],
+          "Other School": pieColors[1],
+          "New School": pieColors[2],
+        }}
+      />
+
       {/* Daily Assessments */}
       <ChartCard
         title="Daily Assessments (total students taking assessments)"
         filteredData={dailyAssessments}
-        dataKey="total student per day"
+        dataKey="count"
       />
 
       {/* Same-School Counts */}
       <ChartCard
         title="Daily Same-School (total students from same school)"
         filteredData={sameSchoolCounts}
-        dataKey="total student per day"
+        dataKey="count"
       />
 
       {/* Other-School Counts */}
       <ChartCard
         title="Daily Other-School Count (total students from other schools)"
         filteredData={otherSchoolCounts}
-        dataKey="total student per day"
+        dataKey="count"
       />
 
       {/* New-School Counts */}
       <ChartCard
         title="Daily New-School Count (total students from new schools)"
         filteredData={newSchoolCounts}
-        dataKey="total student per day"
+        dataKey="count"
       />
     </div>
   );
@@ -160,6 +195,7 @@ interface ChartCardProps {
   dataKey: string;
   xKey?: string; // optional, defaults to 'date' or 'course'
   colorMap?: Record<string, string>;
+  chartType?: "bar" | "pie"; // optional, defaults to "bar"
   searchQuery?: string;
   setSearchQuery?: (val: string) => void;
   dateFilter?: string;
@@ -172,6 +208,7 @@ function ChartCard({
   dataKey,
   xKey,
   colorMap,
+  chartType = "bar",
   searchQuery,
   setSearchQuery,
   dateFilter,
@@ -190,7 +227,7 @@ function ChartCard({
       </div>
 
       {/* Filters (optional) */}
-      {(setSearchQuery || setDateFilter) && (
+      {(setSearchQuery || setDateFilter) && chartType === "bar" && (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           {setDateFilter && (
             <div className="flex items-center gap-2 w-full sm:max-w-xs">
@@ -222,29 +259,59 @@ function ChartCard({
       {/* Chart */}
       <div className="w-full h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={filteredData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--divider-color)" />
-            <XAxis dataKey={xDataKey} stroke="var(--text-color)" />
-            <YAxis stroke="var(--text-color)" domain={[0, "dataMax + 20"]} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "var(--card-color)",
-                border: "1px solid var(--divider-color)",
-                color: "var(--text-color)",
-              }}
-            />
-            <Bar dataKey={dataKey} radius={[4, 4, 0, 0]}>
-              {filteredData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={colorMap?.[entry[xDataKey]] || getRandomColor(index)}
-                />
-              ))}
-            </Bar>
-          </BarChart>
+          {chartType === "bar" ? (
+            <BarChart
+              data={filteredData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--divider-color)" />
+              <XAxis dataKey={xDataKey} stroke="var(--text-color)" />
+              <YAxis stroke="var(--text-color)" domain={[0, "dataMax + 20"]} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--card-color)",
+                  border: "1px solid var(--divider-color)",
+                  color: "var(--text-color)",
+                }}
+              />
+              <Bar dataKey={dataKey} radius={[4, 4, 0, 0]}>
+                {filteredData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={colorMap?.[entry[xDataKey]] || getRandomColor(index)}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          ) : (
+            <PieChart>
+              <Pie
+                data={filteredData}
+                dataKey={dataKey}
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                fill="#8884d8"
+                label
+              >
+                {filteredData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={colorMap?.[entry.name] || getRandomColor(index)}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--card-color)",
+                  border: "1px solid var(--divider-color)",
+                  color: "var(--text-color)",
+                }}
+              />
+              <Legend verticalAlign="bottom" />
+            </PieChart>
+          )}
         </ResponsiveContainer>
       </div>
     </div>
