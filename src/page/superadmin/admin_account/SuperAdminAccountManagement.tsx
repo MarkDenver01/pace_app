@@ -59,9 +59,9 @@ export default function AdminUserLayout() {
     });
   }
 };
-const handleDeleteAccount = async (adminId: number) => {
+const handleDeleteAccount = async (email: string) => {
   try {
-    await deleteAdminAccount(adminId);
+    await deleteAdminAccount(email);
     Swal.fire({
       icon: "success",
       title: "Delete Account",
@@ -358,7 +358,7 @@ const handleDeleteAccount = async (adminId: number) => {
                             
                             <ThemedButton
                             size="xs"
-                            onClick={() => handleDeleteAccount(user.adminId)}
+                            onClick={() => handleDeleteAccount(user.email)}
                             bgColor="#f00707ff"
                             textColor="#fff"
                             padding="0.75rem 3rem"
