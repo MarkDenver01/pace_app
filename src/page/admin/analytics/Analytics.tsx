@@ -1,6 +1,12 @@
-import { useState, useEffect, useMemo } from "react";
-import { CalendarDays, Search, BarChart3 } from "lucide-react";
-import { TextInput } from "flowbite-react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import {
+  CalendarDays,
+  Search,
+  BarChart3,
+} from "lucide-react";
+import { TextInput, Button } from "flowbite-react";
 import {
   BarChart,
   Bar,
@@ -36,12 +42,6 @@ interface DailyData {
   count: number;
 }
 
-interface CompetitorData {
-  universityName: string;
-  date: string;
-  count: number;
-}
-
 function getRandomColor(index: number): string {
   const palette = [
     "#3B82F6", "#10B981", "#DB2777", "#7F1D1D", "#14B8A6",
@@ -58,7 +58,8 @@ export default function AnalyticsPage() {
   const [sameSchoolCounts, setSameSchoolCounts] = useState<DailyData[]>([]);
   const [otherSchoolCounts, setOtherSchoolCounts] = useState<DailyData[]>([]);
   const [newSchoolCounts, setNewSchoolCounts] = useState<DailyData[]>([]);
-  const [universityStats, setUniversityStats] = useState<UniversityStatsResponse | null>(null);
+  const [universityStats, setUniversityStats] =
+    useState<UniversityStatsResponse | null>(null);
 
   const universityId = localStorage.getItem("authorized_university_id");
 
@@ -74,7 +75,7 @@ export default function AnalyticsPage() {
           sameSchool,
           otherSchool,
           newSchool,
-          stats
+          stats,
         ] = await Promise.all([
           getCourseCountsByUniversity(Number(universityId)),
           getDailyAssessments(Number(universityId)),
@@ -84,14 +85,24 @@ export default function AnalyticsPage() {
           getUniversityStats(Number(universityId)),
         ]);
 
-        setCourseData(courses.map(item => ({
-          course: item.courseDescription,
-          engagement: item.total,
-        })));
-        setDailyAssessments(assessments.map(item => ({ date: item.date, count: item.count })));
-        setSameSchoolCounts(sameSchool.map(item => ({ date: item.date, count: item.count })));
-        setOtherSchoolCounts(otherSchool.map(item => ({ date: item.date, count: item.count })));
-        setNewSchoolCounts(newSchool.map(item => ({ date: item.date, count: item.count })));
+        setCourseData(
+          courses.map((item) => ({
+            course: item.courseDescription,
+            engagement: item.total,
+          }))
+        );
+        setDailyAssessments(
+          assessments.map((item) => ({ date: item.date, count: item.count }))
+        );
+        setSameSchoolCounts(
+          sameSchool.map((item) => ({ date: item.date, count: item.count }))
+        );
+        setOtherSchoolCounts(
+          otherSchool.map((item) => ({ date: item.date, count: item.count }))
+        );
+        setNewSchoolCounts(
+          newSchool.map((item) => ({ date: item.date, count: item.count }))
+        );
         setUniversityStats(stats);
       } catch (error) {
         console.error("Failed to fetch analytics:", error);
@@ -103,7 +114,7 @@ export default function AnalyticsPage() {
 
   // Filter courses by search
   const filteredCourseData = useMemo(() => {
-    return courseData.filter(course =>
+    return courseData.filter((course) =>
       course.course.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [courseData, searchQuery]);
@@ -193,9 +204,9 @@ interface ChartCardProps {
   title: string;
   filteredData: any[];
   dataKey: string;
-  xKey?: string; // optional, defaults to 'date' or 'course'
+  xKey?: string;
   colorMap?: Record<string, string>;
-  chartType?: "bar" | "pie"; // optional, defaults to "bar"
+  chartType?: "bar" | "pie";
   searchQuery?: string;
   setSearchQuery?: (val: string) => void;
   dateFilter?: string;
@@ -215,18 +226,52 @@ function ChartCard({
   setDateFilter,
 }: ChartCardProps) {
   const xDataKey = xKey || (filteredData[0]?.course ? "course" : "date");
+  const chartRef = useRef<HTMLDivElement>(null);
+
+  // 📤 Export chart to PDF
+  const handleExportPDF = async () => {
+    if (!chartRef.current) return;
+
+    const canvas = await html2canvas(chartRef.current, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF({
+      orientation: "landscape",
+      unit: "px",
+      format: [canvas.width, canvas.height],
+    });
+
+    pdf.text(title, 20, 30);
+    pdf.addImage(imgData, "PNG", 10, 40, canvas.width - 20, canvas.height - 60);
+    pdf.save(`${title.replace(/\s+/g, "_")}.pdf`);
+  };
 
   return (
-    <div className="p-6 rounded-xl shadow-md border card-theme" style={{ backgroundColor: "var(--card-color)" }}>
+    <div
+      className="p-6 rounded-xl shadow-md border card-theme"
+      style={{ backgroundColor: "var(--card-color)" }}
+    >
       {/* Header */}
-      <div className="flex items-center gap-2 mb-4">
-        <BarChart3 className="w-5 h-5" style={{ color: "var(--button-color)" }} />
-        <h2 className="text-xl font-semibold" style={{ color: "var(--text-color)" }}>
-          {title}
-        </h2>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="w-5 h-5" style={{ color: "var(--button-color)" }} />
+          <h2 className="text-xl font-semibold" style={{ color: "var(--text-color)" }}>
+            {title}
+          </h2>
+        </div>
+
+        {/* Export Button */}
+        <Button
+          size="sm"
+          color="gray"
+          onClick={handleExportPDF}
+          className="ml-auto flex items-center gap-2"
+        >
+          📄 Export PDF
+        </Button>
       </div>
 
-      {/* Filters (optional) */}
+      {/* Filters */}
       {(setSearchQuery || setDateFilter) && chartType === "bar" && (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           {setDateFilter && (
@@ -257,13 +302,10 @@ function ChartCard({
       )}
 
       {/* Chart */}
-      <div className="w-full h-[300px]">
+      <div ref={chartRef} className="w-full h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           {chartType === "bar" ? (
-            <BarChart
-              data={filteredData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
-            >
+            <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--divider-color)" />
               <XAxis dataKey={xDataKey} stroke="var(--text-color)" />
               <YAxis stroke="var(--text-color)" domain={[0, "dataMax + 20"]} />
