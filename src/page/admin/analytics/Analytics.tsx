@@ -185,16 +185,13 @@ function ChartCard({
   dataKey,
   xKey,
   colorMap,
-  searchQuery,
-  setSearchQuery,
-  dateFilter,
-  setDateFilter,
 }: ChartCardProps) {
+  if (!filteredData || filteredData.length === 0) return null;
+
   const xDataKey = xKey || (filteredData[0]?.course ? "course" : "date");
 
   return (
     <div className="p-6 rounded-xl shadow-md border card-theme" style={{ backgroundColor: "var(--card-color)" }}>
-      {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <BarChart3 className="w-5 h-5" style={{ color: "var(--button-color)" }} />
         <h2 className="text-xl font-semibold" style={{ color: "var(--text-color)" }}>
@@ -202,46 +199,12 @@ function ChartCard({
         </h2>
       </div>
 
-      {/* Filters (optional) */}
-      {(setSearchQuery || setDateFilter) && (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          {setDateFilter && (
-            <div className="flex items-center gap-2 w-full sm:max-w-xs">
-              <CalendarDays className="w-5 h-5" style={{ color: "var(--muted-text-color)" }} />
-              <TextInput
-                type="text"
-                placeholder="Filter by date (mm/dd/yyyy)"
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-                className="w-full"
-              />
-            </div>
-          )}
-          {setSearchQuery && (
-            <div className="flex items-center gap-2 w-full sm:max-w-sm">
-              <Search className="w-5 h-5" style={{ color: "var(--muted-text-color)" }} />
-              <TextInput
-                type="text"
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full"
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Chart */}
-      <div className="w-full h-[300px]">
+      <div style={{ width: "100%", height: 300 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={filteredData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
-          >
+          <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--divider-color)" />
             <XAxis dataKey={xDataKey} stroke="var(--text-color)" />
-            <YAxis stroke="var(--text-color)" domain={[0, "dataMax + 20"]} />
+            <YAxis stroke="var(--text-color)" domain={[0, (dataMax: number) => dataMax + 20]} />
             <Tooltip
               contentStyle={{
                 backgroundColor: "var(--card-color)",
@@ -251,10 +214,7 @@ function ChartCard({
             />
             <Bar dataKey={dataKey} radius={[4, 4, 0, 0]}>
               {filteredData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={colorMap?.[entry[xDataKey]] || getRandomColor(index)}
-                />
+                <Cell key={index} fill={colorMap?.[entry[xDataKey]] || getRandomColor(index)} />
               ))}
             </Bar>
           </BarChart>
@@ -263,3 +223,4 @@ function ChartCard({
     </div>
   );
 }
+
