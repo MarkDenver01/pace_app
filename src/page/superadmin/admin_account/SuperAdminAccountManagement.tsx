@@ -6,6 +6,7 @@ import {
   saveAccount,
   getAccounts,
   toggleAdminStatus,
+  deleteAdminAccount,
 } from "../../../libs/ApiResponseService";
 import type { UniversityResponse } from "../../../libs/models/University";
 import type {
@@ -50,6 +51,27 @@ export default function AdminUserLayout() {
     await fetchUsers(); // refresh table
   } catch (error: any) {
     Swal.fire({
+      icon: "error",
+      title: "Failed",
+      text: error.message || "Failed to toggle account status.",
+      confirmButtonText: "CLOSE",
+      ...getSwalTheme(),
+    });
+  }
+};
+const handleDeleteAccount = async (adminId: number) => {
+  try {
+    await deleteAdminAccount(adminId);
+    Swal.fire({
+      icon: "success",
+      title: "Delete Account",
+      text: "Admin account has been deleted.",
+      confirmButtonText: "CLOSE",
+      ...getSwalTheme(),
+    });
+     await fetchUsers(); // refresh table
+  } catch (error: any) {
+       Swal.fire({
       icon: "error",
       title: "Failed",
       text: error.message || "Failed to toggle account status.",
@@ -329,6 +351,16 @@ export default function AdminUserLayout() {
                              || user.accountStatus == "VERIFIED") ? "DEACTIVATE" : "ACTIVATE"}
                         </ThemedButton>
                       )}
+                        <ThemedButton
+                          size="xs"
+                          onClick={() => handleDeleteAccount(user.adminId)}
+                          bgColor="#f00707ff" 
+                          textColor="#fff"
+                          padding="0.75rem 3rem" 
+                          borderRadius="1rem"
+                          width="100%">
+                             DELETE
+                        </ThemedButton>
                       </td>
 
                     </tr>

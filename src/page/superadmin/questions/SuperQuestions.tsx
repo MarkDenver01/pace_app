@@ -27,7 +27,7 @@ type QuestionTableEntry = {
   category: string;
 };
 
-const categorized = ["General Interest", "Career Interest", "Personal Qualities"];
+const categorized = ["Interest", "Personal Traits"];
 
 export default function StatementQuestionPage() {
   const [currentPage, setCurrentPage] = useState(1);

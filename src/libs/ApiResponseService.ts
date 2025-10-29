@@ -867,3 +867,17 @@ export async function getCompetitorCounts(universityId: number): Promise<Competi
   }
 }
 
+/**
+ * Deletes an admin account by userId.
+ * @param userId The ID of the admin account to delete.
+ * @returns Promise<void>
+ */
+export async function deleteAdminAccount(userId: number): Promise<void> {
+  try {
+    await api.delete(`/superadmin/api/admin_account/delete/${userId}`);
+  } catch (error: any) {
+    console.error("Error deleting admin account:", error);
+    throw error.response?.data || { message: "Failed to delete admin account" };
+  }
+}
+
