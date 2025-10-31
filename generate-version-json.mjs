@@ -1,4 +1,3 @@
-// generate-version-json.mjs
 import fs from "fs";
 import path from "path";
 
@@ -12,7 +11,8 @@ async function generateVersionFile() {
     const releases = await res.json();
 
     if (!Array.isArray(releases) || releases.length === 0) {
-      throw new Error("No releases found.");
+      console.warn("⚠️ No releases found. Skipping version.json generation.");
+      return; // Skip without failing
     }
 
     // Use the first non-prerelease release, fallback to the latest if none
@@ -36,7 +36,7 @@ async function generateVersionFile() {
     console.log(`✅ version.json created at: ${OUTPUT_FILE}`);
   } catch (error) {
     console.error("❌ Failed to generate version.json:", error);
-    process.exit(1);
+    // Do NOT exit the process, just skip
   }
 }
 
