@@ -1,12 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import {
-  CalendarDays,
-  Search,
-  BarChart3,
-} from "lucide-react";
-import { TextInput, Button } from "flowbite-react";
+import { BarChart3 } from "lucide-react";
+import { Button } from "flowbite-react";
 import {
   BarChart,
   Bar,
@@ -22,7 +18,7 @@ import {
 } from "recharts";
 
 import {
-  getCourseCountsByUniversity,
+  getTopCoursesByDateRange,
   getDailyAssessments,
   getDailySameSchoolCount,
   getDailyOtherSchoolCount,
@@ -31,11 +27,7 @@ import {
 } from "../../../libs/ApiResponseService";
 
 import { type UniversityStatsResponse } from "../../../libs/models/response/UniversityStats";
-
-interface CourseData {
-  course: string;
-  engagement: number;
-}
+import { type TopCourseResponse } from "../../../libs/models/response/TopCourseResponse";
 
 interface DailyData {
   date: string;
@@ -51,9 +43,7 @@ function getRandomColor(index: number): string {
 }
 
 export default function AnalyticsPage() {
-  const [dateFilter, setDateFilter] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [courseData, setCourseData] = useState<CourseData[]>([]);
+  const [topCourses, setTopCourses] = useState<TopCourseResponse[]>([]);
   const [dailyAssessments, setDailyAssessments] = useState<DailyData[]>([]);
   const [sameSchoolCounts, setSameSchoolCounts] = useState<DailyData[]>([]);
   const [otherSchoolCounts, setOtherSchoolCounts] = useState<DailyData[]>([]);
@@ -63,21 +53,30 @@ export default function AnalyticsPage() {
 
   const universityId = localStorage.getItem("authorized_university_id");
 
-  // Fetch all analytics
+  // ✅ Auto-refresh when month changes
+  const currentMonthKey = new Date().getMonth();
   useEffect(() => {
     if (!universityId) return;
 
     const fetchAllAnalytics = async () => {
       try {
+        const now = new Date();
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
+          .toISOString()
+          .split("T")[0];
+        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+          .toISOString()
+          .split("T")[0];
+
         const [
-          courses,
+          topCoursesRes,
           assessments,
           sameSchool,
           otherSchool,
           newSchool,
           stats,
         ] = await Promise.all([
-          getCourseCountsByUniversity(Number(universityId)),
+          getTopCoursesByDateRange(Number(universityId), firstDay, lastDay),
           getDailyAssessments(Number(universityId)),
           getDailySameSchoolCount(Number(universityId)),
           getDailyOtherSchoolCount(Number(universityId)),
@@ -85,12 +84,7 @@ export default function AnalyticsPage() {
           getUniversityStats(Number(universityId)),
         ]);
 
-        setCourseData(
-          courses.map((item) => ({
-            course: item.courseDescription,
-            engagement: item.total,
-          }))
-        );
+        setTopCourses(topCoursesRes);
         setDailyAssessments(
           assessments.map((item) => ({ date: item.date, count: item.count }))
         );
@@ -110,26 +104,18 @@ export default function AnalyticsPage() {
     };
 
     fetchAllAnalytics();
-  }, [universityId]);
+  }, [universityId, currentMonthKey]);
 
-  // Filter courses by search
-  const filteredCourseData = useMemo(() => {
-    return courseData.filter((course) =>
-      course.course.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [courseData, searchQuery]);
-
+  // ✅ Generate color per course
   const courseColors = useMemo(() => {
     const map: Record<string, string> = {};
-    filteredCourseData.forEach((item, index) => {
-      if (!map[item.course]) {
-        map[item.course] = getRandomColor(index);
-      }
+    topCourses.forEach((item, index) => {
+      map[item.courseDescription] = getRandomColor(index);
     });
     return map;
-  }, [filteredCourseData]);
+  }, [topCourses]);
 
-  // Prepare data for PieChart
+  // ✅ Pie Data
   const pieData = useMemo(() => {
     if (!universityStats) return [];
     return [
@@ -143,19 +129,19 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Course Engagement Card */}
+      {/* ✅ Top 5 Courses */}
       <ChartCard
-        title="Course Engagement Analytics"
-        filteredData={filteredCourseData}
-        dataKey="engagement"
+        title="Top 5 Courses"
+        filteredData={topCourses.map((item) => ({
+          course: item.courseDescription,
+          total: item.totalCount,
+        }))}
+        dataKey="total"
+        xKey="course"
         colorMap={courseColors}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        dateFilter={dateFilter}
-        setDateFilter={setDateFilter}
       />
 
-      {/* Overall Course Engagement Pie Chart */}
+      {/* ✅ Overall Course Engagement Pie Chart */}
       <ChartCard
         title="Overall Course Engagement"
         filteredData={pieData}
@@ -168,28 +154,28 @@ export default function AnalyticsPage() {
         }}
       />
 
-      {/* Daily Assessments */}
+      {/* ✅ Daily Assessments */}
       <ChartCard
         title="Daily Assessments (total students taking assessments)"
         filteredData={dailyAssessments}
         dataKey="count"
       />
 
-      {/* Same-School Counts */}
+      {/* ✅ Same-School Counts */}
       <ChartCard
         title="Daily Same-School (total students from same school)"
         filteredData={sameSchoolCounts}
         dataKey="count"
       />
 
-      {/* Other-School Counts */}
+      {/* ✅ Other-School Counts */}
       <ChartCard
         title="Daily Other-School Count (total students from other schools)"
         filteredData={otherSchoolCounts}
         dataKey="count"
       />
 
-      {/* New-School Counts */}
+      {/* ✅ New-School Counts */}
       <ChartCard
         title="Daily New-School Count (total students from new schools)"
         filteredData={newSchoolCounts}
@@ -199,7 +185,7 @@ export default function AnalyticsPage() {
   );
 }
 
-// Reusable Chart Card
+// 📊 Reusable Chart Card
 interface ChartCardProps {
   title: string;
   filteredData: any[];
@@ -207,10 +193,6 @@ interface ChartCardProps {
   xKey?: string;
   colorMap?: Record<string, string>;
   chartType?: "bar" | "pie";
-  searchQuery?: string;
-  setSearchQuery?: (val: string) => void;
-  dateFilter?: string;
-  setDateFilter?: (val: string) => void;
 }
 
 function ChartCard({
@@ -220,27 +202,19 @@ function ChartCard({
   xKey,
   colorMap,
   chartType = "bar",
-  searchQuery,
-  setSearchQuery,
-  dateFilter,
-  setDateFilter,
 }: ChartCardProps) {
   const xDataKey = xKey || (filteredData[0]?.course ? "course" : "date");
   const chartRef = useRef<HTMLDivElement>(null);
 
-  // 📤 Export chart to PDF
   const handleExportPDF = async () => {
     if (!chartRef.current) return;
-
     const canvas = await html2canvas(chartRef.current, { scale: 2 });
     const imgData = canvas.toDataURL("image/png");
-
     const pdf = new jsPDF({
       orientation: "landscape",
       unit: "px",
       format: [canvas.width, canvas.height],
     });
-
     pdf.text(title, 20, 30);
     pdf.addImage(imgData, "PNG", 10, 40, canvas.width - 20, canvas.height - 60);
     pdf.save(`${title.replace(/\s+/g, "_")}.pdf`);
@@ -251,7 +225,6 @@ function ChartCard({
       className="p-6 rounded-xl shadow-md border card-theme"
       style={{ backgroundColor: "var(--card-color)" }}
     >
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <BarChart3 className="w-5 h-5" style={{ color: "var(--button-color)" }} />
@@ -260,7 +233,6 @@ function ChartCard({
           </h2>
         </div>
 
-        {/* Export Button */}
         <Button
           size="sm"
           color="gray"
@@ -271,41 +243,13 @@ function ChartCard({
         </Button>
       </div>
 
-      {/* Filters */}
-      {(setSearchQuery || setDateFilter) && chartType === "bar" && (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          {setDateFilter && (
-            <div className="flex items-center gap-2 w-full sm:max-w-xs">
-              <CalendarDays className="w-5 h-5" style={{ color: "var(--muted-text-color)" }} />
-              <TextInput
-                type="text"
-                placeholder="Filter by date (mm/dd/yyyy)"
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-                className="w-full"
-              />
-            </div>
-          )}
-          {setSearchQuery && (
-            <div className="flex items-center gap-2 w-full sm:max-w-sm">
-              <Search className="w-5 h-5" style={{ color: "var(--muted-text-color)" }} />
-              <TextInput
-                type="text"
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full"
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Chart */}
       <div ref={chartRef} className="w-full h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           {chartType === "bar" ? (
-            <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
+            <BarChart
+              data={filteredData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="var(--divider-color)" />
               <XAxis dataKey={xDataKey} stroke="var(--text-color)" />
               <YAxis stroke="var(--text-color)" domain={[0, "dataMax + 20"]} />

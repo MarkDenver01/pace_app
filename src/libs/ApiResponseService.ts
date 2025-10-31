@@ -881,3 +881,28 @@ export async function deleteAdminAccount(email: string): Promise<void> {
   }
 }
 
+/**
+ * Fetch top 5 courses for a university filtered by date range.
+ * @param universityId University ID
+ * @param dateFrom Start date (YYYY-MM-DD)
+ * @param dateTo End date (YYYY-MM-DD)
+ */
+export async function getTopCoursesByDateRange(
+  universityId: number,
+  dateFrom?: string,
+  dateTo?: string
+): Promise<TopCourseResponse[]> {
+  try {
+    const response = await api.get<TopCourseResponse[]>(
+      `/admin/api/${universityId}/top-courses`,
+      {
+        params: { dateFrom, dateTo },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching top courses:", error);
+    throw error.response?.data || { message: "Failed to fetch top courses" };
+  }
+}
+
