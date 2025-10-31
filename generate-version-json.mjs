@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import fetch from "node-fetch";
 
-const OUTPUT_DIR = path.join(process.cwd(), "public", "apk-uploads");
+const OUTPUT_DIR = path.join(process.cwd(), "public");
 const OUTPUT_FILE = path.join(OUTPUT_DIR, "version.json");
 
 async function generateVersionFile() {
