@@ -243,7 +243,7 @@ function ChartCard({
         </Button>
       </div>
 
-      <div ref={chartRef} className="w-full h-[300px]">
+      <div ref={chartRef} className="w-full h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
           {chartType === "bar" ? (
             <BarChart
