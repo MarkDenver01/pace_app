@@ -251,7 +251,20 @@ function ChartCard({
               margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="var(--divider-color)" />
-              <XAxis dataKey={xDataKey} stroke="var(--text-color)" />
+              <XAxis
+                dataKey={xDataKey}
+                stroke="var(--text-color)"
+                interval={0}
+                tick={{
+                    fontSize: 11, // smaller font for long labels
+                    fill: "var(--text-color)"
+              }}
+              tickLine={false}
+              height={70}
+              angle={-25}
+              textAnchor="end"
+            >
+            </XAxis>
               <YAxis stroke="var(--text-color)" domain={[0, "dataMax + 20"]} />
               <Tooltip
                 contentStyle={{
