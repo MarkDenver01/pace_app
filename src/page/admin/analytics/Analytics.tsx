@@ -261,7 +261,7 @@ function ChartCard({
               }}
               tickLine={false}
               height={90}
-              angle={-25}
+              angle={-30}
               textAnchor="end"
             >
             </XAxis>
