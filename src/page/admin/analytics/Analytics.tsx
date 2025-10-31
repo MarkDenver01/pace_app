@@ -24,10 +24,12 @@ import {
   getDailyOtherSchoolCount,
   getDailyNewSchoolCount,
   getUniversityStats,
+  getTopCompetitors
 } from "../../../libs/ApiResponseService";
 
 import { type UniversityStatsResponse } from "../../../libs/models/response/UniversityStats";
 import { type TopCourseResponse } from "../../../libs/models/response/TopCourseResponse";
+import { type TopCompetitorResponse } from "../../../libs/models/response/TopCompetitorResponse";
 
 interface DailyData {
   date: string;
@@ -44,12 +46,14 @@ function getRandomColor(index: number): string {
 
 export default function AnalyticsPage() {
   const [topCourses, setTopCourses] = useState<TopCourseResponse[]>([]);
+  const [topCompetitors, setTopCompetitors] = useState<TopCompetitorResponse[]>([]);
   const [dailyAssessments, setDailyAssessments] = useState<DailyData[]>([]);
   const [sameSchoolCounts, setSameSchoolCounts] = useState<DailyData[]>([]);
   const [otherSchoolCounts, setOtherSchoolCounts] = useState<DailyData[]>([]);
   const [newSchoolCounts, setNewSchoolCounts] = useState<DailyData[]>([]);
   const [universityStats, setUniversityStats] =
-    useState<UniversityStatsResponse | null>(null);
+  
+  useState<UniversityStatsResponse | null>(null);
 
   const universityId = localStorage.getItem("authorized_university_id");
 
@@ -70,6 +74,7 @@ export default function AnalyticsPage() {
 
         const [
           topCoursesRes,
+          topCompetitorsRes,
           assessments,
           sameSchool,
           otherSchool,
@@ -77,6 +82,7 @@ export default function AnalyticsPage() {
           stats,
         ] = await Promise.all([
           getTopCoursesByDateRange(Number(universityId), firstDay, lastDay),
+          getTopCompetitors(Number(universityId)),
           getDailyAssessments(Number(universityId)),
           getDailySameSchoolCount(Number(universityId)),
           getDailyOtherSchoolCount(Number(universityId)),
@@ -85,6 +91,7 @@ export default function AnalyticsPage() {
         ]);
 
         setTopCourses(topCoursesRes);
+        setTopCompetitors(topCompetitorsRes);
         setDailyAssessments(
           assessments.map((item) => ({ date: item.date, count: item.count }))
         );
@@ -115,6 +122,15 @@ export default function AnalyticsPage() {
     return map;
   }, [topCourses]);
 
+    // ✅ Generate color per competitors
+  const competitorsColors = useMemo(() => {
+    const map: Record<string, string> = {};
+    topCompetitors.forEach((item, index) => {
+      map[item.competitorName] = getRandomColor(index);
+    });
+    return map;
+  }, [topCompetitors]);
+
   // ✅ Pie Data
   const pieData = useMemo(() => {
     if (!universityStats) return [];
@@ -139,6 +155,17 @@ export default function AnalyticsPage() {
         dataKey="total"
         xKey="course"
         colorMap={courseColors}
+      />
+
+            {/* ✅ Top 3 Competitors */}
+      <ChartCard
+        title="Top 3 Competitors"
+        filteredData={topCompetitors.map((item) => ({
+          course: item.competitorName,
+          total: item.totalCount,
+        }))}
+        dataKey="total"
+        colorMap={competitorsColors}
       />
 
       {/* ✅ Overall Course Engagement Pie Chart */}
