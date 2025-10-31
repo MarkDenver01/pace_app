@@ -335,7 +335,17 @@ const handleDeleteAccount = async (email: string) => {
                       <td className="px-4 py-3">{user.accountStatus}</td>
                       <td className="px-4 py-3">
                         {user.accountStatus === "PENDING" ? (
-                          <span className="text-gray-500 italic">No action</span>
+                            <ThemedButton
+                            size="xs"
+                            onClick={() => handleDeleteAccount(user.email)}
+                            bgColor="#f00707ff"
+                            textColor="#fff"
+                            padding="0.75rem 3rem"
+                            borderRadius="1rem"
+                            width="100%"
+                            >
+                              DELETE
+                            </ThemedButton>
                         ) : (
                         <div className="flex gap-2"> {/* ✅ Added flex with spacing */}
                         <ThemedButton
