@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "generate:version": "node ./public/version/generate-version-json.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier . --write",
