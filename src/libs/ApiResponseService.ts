@@ -906,3 +906,24 @@ export async function getTopCoursesByDateRange(
   }
 }
 
+/**
+ * Updates an existing admin account.
+ * @param adminId The ID of the admin account to update.
+ * @param payload Object containing updated fields: username, email, universityId
+ * @returns Promise<UserAccountResponse> The updated admin account.
+ */
+export async function updateAdmin(
+  adminId: number,
+  payload: { username: string; email: string; universityId: number }
+): Promise<UserAccountResponse> {
+  try {
+    const response = await api.put<UserAccountResponse>(
+      `/superadmin/api/admin_account/${adminId}/update`,
+      payload
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error updating admin account:", error);
+    throw error.response?.data || { message: "Failed to update admin account" };
+  }
+}

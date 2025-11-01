@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { ChevronUpSquareIcon } from "lucide-react";
-import { Button, Label, Pagination, Select, TextInput, Spinner } from "flowbite-react";
+import { Button, Label, Pagination, Select, TextInput, Spinner, Modal  } from "flowbite-react";
 import {
   getUniversities,
   saveAccount,
   getAccounts,
   toggleAdminStatus,
   deleteAdminAccount,
+  updateAdmin
 } from "../../../libs/ApiResponseService";
 import type { UniversityResponse } from "../../../libs/models/University";
 import type {
@@ -16,6 +17,7 @@ import type {
 import Swal from "sweetalert2";
 import { getSwalTheme } from "../../../utils/getSwalTheme";
 import ThemedButton from "../../../components/ThemedButton";
+import EditUserForm from "../../superadmin/admin_account/EditUserForm"; // new component for modal form
 
 export default function AdminUserLayout() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,6 +36,9 @@ export default function AdminUserLayout() {
   const [errorUsers, setErrorUsers] = useState<string | null>(null);
 
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [editingUser, setEditingUser] = useState<UserAccountResponse | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const pageSize = 5;
   const accentColor = "var(--button-color, #D94022)";
@@ -172,6 +177,21 @@ const handleDeleteAccount = async (email: string) => {
                     ...getSwalTheme(),
                 }).then(() => setLoading(false));  
     }
+  };
+
+  const openEditModal = (user: UserAccountResponse) => {
+    setEditingUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setEditingUser(null);
+    setIsEditModalOpen(false);
+  };
+
+  const onEditSuccess = async () => {
+    closeEditModal();
+    await fetchUsers();
   };
   
   const filteredUsers = users.filter((user) =>
@@ -334,41 +354,55 @@ const handleDeleteAccount = async (email: string) => {
                       <td className="px-4 py-3">{user.email}</td>
                       <td className="px-4 py-3">{user.accountStatus}</td>
                       <td className="px-4 py-3">
-                        {user.accountStatus === "PENDING" ? (
-                          <span className="text-gray-500 italic">No action</span>
-                        ) : (
-                        <div className="flex gap-2"> {/* ✅ Added flex with spacing */}
-                        <ThemedButton
-                          size="xs"
-                          onClick={() => handleToggleStatus(user.adminId)}
-                          bgColor={
-                            user.accountStatus === "ACTIVATE" || user.accountStatus === "VERIFIED"
-                            ? "#ea2e21ff"
-                            : "#1c6a1fff"
-                          }
-                          textColor="#fff"
-                          padding="0.75rem 3rem"
-                          borderRadius="1rem"
-                          width="100%"
-                          >
-                            {user.accountStatus === "ACTIVATE" || user.accountStatus === "VERIFIED"
-                            ? "DEACTIVATE"
-                            : "ACTIVATE"}
-                            </ThemedButton>
-                            
-                            <ThemedButton
-                            size="xs"
-                            onClick={() => handleDeleteAccount(user.email)}
-                            bgColor="#f00707ff"
-                            textColor="#fff"
-                            padding="0.75rem 3rem"
-                            borderRadius="1rem"
-                            width="100%"
-                            >
-                              DELETE
-                            </ThemedButton>
-                          </div>
-                        )}
+                          <div className="flex flex-col gap-2">
+    {user.accountStatus === "PENDING" ? (
+      <>
+        <ThemedButton
+          size="xs"
+          onClick={() => openEditModal(user)}
+          bgColor="#1c6a1fff"
+          textColor="#fff"
+          padding="0.5rem 1rem"
+          borderRadius="0.5rem"
+        >
+          EDIT
+        </ThemedButton>
+        <ThemedButton
+          size="xs"
+          onClick={() => handleDeleteAccount(user.email)}
+          bgColor="#f00707ff"
+          textColor="#fff"
+          padding="0.5rem 1rem"
+          borderRadius="0.5rem"
+        >
+          DELETE
+        </ThemedButton>
+      </>
+    ) : (
+      <>
+        <ThemedButton
+          size="xs"
+          onClick={() => handleToggleStatus(user.adminId)}
+          bgColor={user.accountStatus === "ACTIVATE" || user.accountStatus === "VERIFIED" ? "#ea2e21ff" : "#1c6a1fff"}
+          textColor="#fff"
+          padding="0.5rem 1rem"
+          borderRadius="0.5rem"
+        >
+          {user.accountStatus === "ACTIVATE" || user.accountStatus === "VERIFIED" ? "DEACTIVATE" : "ACTIVATE"}
+        </ThemedButton>
+        <ThemedButton
+          size="xs"
+          onClick={() => handleDeleteAccount(user.email)}
+          bgColor="#f00707ff"
+          textColor="#fff"
+          padding="0.5rem 1rem"
+          borderRadius="0.5rem"
+        >
+          DELETE
+        </ThemedButton>
+      </>
+    )}
+  </div>
                       </td>
                     </tr>
                   ))
@@ -411,6 +445,15 @@ const handleDeleteAccount = async (email: string) => {
           </div>
         )}
       </div>
+
+     <Modal show={isEditModalOpen} onClose={closeEditModal} popup>
+        {editingUser && (
+          <div className="p-6" style={{ minWidth: "400px" }}>
+            <EditUserForm user={editingUser} universities={universities} onCancel={closeEditModal} onSuccess={onEditSuccess} />
+          </div>
+        )}
+      </Modal>
+
     </div>
   );
 }
