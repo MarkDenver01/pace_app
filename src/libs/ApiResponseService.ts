@@ -253,6 +253,15 @@ export async function saveCourse(course: CourseRequest): Promise<CourseResponse>
   }
 };
 
+export const deleteCourse = async (courseId: number) => {
+  const response = await api.delete(`/superadmin/api/course/delete/${courseId}`);
+  if (!response.status || response.status !== 200) {
+    throw new Error("Failed to delete course");
+  }
+
+  return true;
+};
+
 /**
  * Fetches all courses from the API.
  * @returns Promise<CourseResponse[]>

@@ -8,7 +8,7 @@ import {
   TextInput,
   Modal,
 } from "flowbite-react";
-import { saveCourse, getAllCourses } from "../../../libs/ApiResponseService";
+import { saveCourse, getAllCourses, deleteCourse } from "../../../libs/ApiResponseService";
 import type { CourseResponse, CourseRequest } from "../../../libs/models/Course";
 import Swal from "sweetalert2";
 import { getSwalTheme } from "../../../utils/getSwalTheme";
@@ -48,6 +48,45 @@ export default function CourseTableLayout() {
       setLoadingCourses(false);
     }
   };
+
+// Add this function inside your component
+const handleDeleteCourse = async (courseId: number) => {
+  const result = await Swal.fire({
+    icon: "warning",
+    title: "Are you sure do you want to delete?",
+    text: "This action cannot be undone!",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel",
+    ...getSwalTheme(),
+  });
+
+  if (result.isConfirmed) {
+    try {
+      setLoadingCourses(true);
+      await deleteCourse(courseId); // call your API delete function
+      setCourses((prev) => prev.filter((course) => course.courseId !== courseId));
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "The course has been deleted.",
+        confirmButtonText: "CLOSE",
+        ...getSwalTheme(),
+      });
+    } catch (error: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: error.message || "Failed to delete the course.",
+        confirmButtonText: "CLOSE",
+        ...getSwalTheme(),
+      });
+    } finally {
+      setLoadingCourses(false);
+    }
+  }
+};
+
 
   const handleSave = async () => {
     if (!courseName.trim() || !description.trim()) {
@@ -254,6 +293,11 @@ export default function CourseTableLayout() {
                           className="text-xs font-medium text-white bg-[var(--button-color)] px-4 py-1.5 rounded hover:opacity-90"
                         >
                           Edit
+                        </button>
+                        <button
+                           onClick={() => handleDeleteCourse(course.courseId)}
+                          className="text-xs font-medium text-white bg-red-600 px-4 py-1.5 rounded hover:opacity-90">
+                            Delete
                         </button>
                         <button
                           onClick={() => handleCareerClick(course)}
