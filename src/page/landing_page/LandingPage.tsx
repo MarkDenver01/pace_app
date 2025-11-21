@@ -147,8 +147,6 @@ const PaceLandingPage: FC = () => {
 
         {/* NAVBAR */}
         <header className="relative z-20 mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-3 md:px-6 md:py-4">
-          <img src={PaceLogo} alt="PACE Logo" className="h-12 w-auto md:h-14" />
-
           <nav className="hidden items-center gap-7 text-[11px] font-semibold tracking-wide md:flex">
             <button
               onClick={() => scrollToSection("home")}
