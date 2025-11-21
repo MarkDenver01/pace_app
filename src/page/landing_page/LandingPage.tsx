@@ -9,6 +9,7 @@ import IconUserData from "../../assets/pace/icon_user_data.png";
 import IconAnalytics from "../../assets/pace/icon_analytics.png";
 import IconLinks from "../../assets/pace/icon_links.png";
 import IconEvaluation from "../../assets/pace/icon_evaluation.png";
+import HeroBg from "../../assets/pace/hero_bg.png";
 
 const PaceLandingPage: FC = () => {
   const navigate = useNavigate();
@@ -96,7 +97,13 @@ const PaceLandingPage: FC = () => {
       {/* ================= HERO + NAV ================= */}
       <section
         id="home"
-        className="relative overflow-hidden bg-gradient-to-br from-[#FDB254] via-[#F2711C] to-[#B92E09] text-white"
+        className="relative overflow-hidden text-white"
+style={{
+  backgroundImage: `url(${HeroBg})`,
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+}}
       >
         {/* gradient glow overlay (subtle spotlight) */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.28),transparent_55%)]" />
