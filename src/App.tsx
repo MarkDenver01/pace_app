@@ -10,6 +10,7 @@ import UpdatePasswordPage from './page/login/UpdatePassword';
 import UniversityRedirect from './page/login/UniversityRedirect';
 import ReleaseApk from './page/apk/ReleaseApk';
 import AppLinkRedirect from "./page/link/AppLinkRedirect";
+import PaceLandingPage from "./page/landing_page/LandingPage";
 
 function App() {
   const location = useLocation();
@@ -37,8 +38,11 @@ function App() {
       >
         <div className={isAuthPage ? 'z-10 w-full max-w-md mx-auto' : 'w-full'}>
           <Routes>
-            {/* Login */}
-            <Route path="/" element={<Login />} />
+            {/* Homepage → Landing Page */}
+            <Route path="/" element={<PaceLandingPage />} />
+
+            {/* Login Page (moved to /login) */}
+            <Route path="/login" element={<Login />} />
 
             {/* Manual Update Password (from profile/settings) */}
             <Route path="/login/update-password" element={<UpdatePasswordPage />} />
