@@ -9,7 +9,7 @@ import IconUserData from "../../assets/pace/icon_user_data.png";
 import IconAnalytics from "../../assets/pace/icon_analytics.png";
 import IconLinks from "../../assets/pace/icon_links.png";
 import IconEvaluation from "../../assets/pace/icon_evaluation.png";
-import HeroBg from "../../assets/pace/hero_bg.png";
+import HeroBg from "../../assets/app-bg.jpg";
 
 const PaceLandingPage: FC = () => {
   const navigate = useNavigate();
