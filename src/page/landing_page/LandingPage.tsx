@@ -1,5 +1,5 @@
-import type { FC } from "react";
-import { useEffect } from "react";
+import type { FC, MouseEvent } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import PaceLogo from "../../assets/pace/f_logo.png";
@@ -13,9 +13,28 @@ import IconEvaluation from "../../assets/pace/icon_evaluation.png";
 const PaceLandingPage: FC = () => {
   const navigate = useNavigate();
 
+  const [parallax, setParallax] = useState({ x: 0, y: 0 });
+
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  // Mouse-based parallax (hero only)
+  const handleHeroMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const relX = (e.clientX - (rect.left + rect.width / 2)) / rect.width;
+    const relY = (e.clientY - (rect.top + rect.height / 2)) / rect.height;
+
+    // clamp a bit so hindi masyadong wild
+    const x = Math.max(-0.5, Math.min(0.5, relX));
+    const y = Math.max(-0.4, Math.min(0.4, relY));
+
+    setParallax({ x, y });
+  };
+
+  const handleHeroMouseLeave = () => {
+    setParallax({ x: 0, y: 0 });
   };
 
   // Scroll reveal (once per element)
@@ -61,6 +80,17 @@ const PaceLandingPage: FC = () => {
     },
   ];
 
+  // Parallax styles
+  const heroImageStyle: React.CSSProperties = {
+    transform: `translate3d(${parallax.x * 18}px, ${parallax.y * 12}px, 0)`,
+  };
+
+  const heroGlowStyle: React.CSSProperties = {
+    transform: `translate3d(calc(-50% + ${parallax.x * 14}px), ${
+      0 + parallax.y * 12
+    }px, 0)`,
+  };
+
   return (
     <div className="min-h-screen w-full bg-black font-poppins text-gray-900">
       {/* ================= HERO + NAV ================= */}
@@ -81,7 +111,7 @@ const PaceLandingPage: FC = () => {
             className="hero-shape hero-shape-right
                        bg-gradient-to-tr from-[#F07A1C] to-[#B92E09]"
           />
-          <div className="hero-glow" />
+          <div className="hero-glow" style={heroGlowStyle} />
         </div>
 
         {/* NAVBAR */}
@@ -123,7 +153,11 @@ const PaceLandingPage: FC = () => {
         </header>
 
         {/* HERO CONTENT (strict layout match) */}
-        <div className="relative z-20 mx-auto flex w-full max-w-5xl flex-col items-center gap-8 px-4 pb-16 pt-3 md:flex-row md:items-center md:justify-between md:px-6 md:pb-20">
+        <div
+          className="relative z-20 mx-auto flex w-full max-w-5xl flex-col items-center gap-8 px-4 pb-16 pt-3 md:flex-row md:items-center md:justify-between md:px-6 md:pb-20"
+          onMouseMove={handleHeroMouseMove}
+          onMouseLeave={handleHeroMouseLeave}
+        >
           {/* Left text block */}
           <div
             className="max-w-md space-y-4 md:space-y-5"
@@ -162,6 +196,7 @@ const PaceLandingPage: FC = () => {
               src={HeroStudent}
               alt="Student"
               className="hero-image"
+              style={heroImageStyle}
             />
           </div>
         </div>
