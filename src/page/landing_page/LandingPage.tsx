@@ -139,29 +139,34 @@ const PaceLandingPage: FC = () => {
           <div className="hero-glow" style={heroGlowStyle} />
         </div>
 
-        {/* ============ NAVBAR (Right-Aligned, No Logo) ============ */}
-        <header className="relative z-20 mx-auto flex w-full max-w-5xl items-center justify-end px-4 py-3 md:px-6 md:py-4">
-          <nav className="hidden items-center gap-7 text-[11px] font-semibold tracking-wide md:flex">
-            <button onClick={() => scrollToSection("home")} className="nav-link">
-              Home
-            </button>
-            <button onClick={() => scrollToSection("features")} className="nav-link">
-              Platform Features
-            </button>
-            <button onClick={() => scrollToSection("about")} className="nav-link">
-              About Pace
-            </button>
-            <button onClick={() => scrollToSection("mission")} className="nav-link">
-              Our Mission
-            </button>
-            <button
-              onClick={() => navigate("/login")}
-              className="ml-3 rounded-full border border-white/80 px-4 py-1.5 text-[11px] font-semibold shadow-sm transition hover:bg-white hover:text-[#B92E09]"
-            >
-              Admin Login
-            </button>
-          </nav>
-        </header>
+        {/* NAVBAR – LEFT ALIGNED, NO LOGO */}
+<header className="relative z-20 mx-auto flex w-full max-w-5xl items-center justify-start px-4 py-3 md:px-6 md:py-4">
+  <nav className="flex items-center gap-7 text-[11px] font-semibold tracking-wide">
+    <button onClick={() => scrollToSection("home")} className="nav-link">
+      Home
+    </button>
+
+    <button onClick={() => scrollToSection("features")} className="nav-link">
+      Platform Features
+    </button>
+
+    <button onClick={() => scrollToSection("about")} className="nav-link">
+      About Pace
+    </button>
+
+    <button onClick={() => scrollToSection("mission")} className="nav-link">
+      Our Mission
+    </button>
+
+    <button
+      onClick={() => navigate("/login")}
+      className="ml-3 rounded-full border border-white/80 px-4 py-1.5 text-[11px] font-semibold shadow-sm transition hover:bg-white hover:text-[#B92E09]"
+    >
+      Admin Login
+    </button>
+  </nav>
+</header>
+
 
         {/* HERO CONTENT */}
         <div
