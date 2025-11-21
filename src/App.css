@@ -12,7 +12,7 @@ body,
   box-sizing: border-box;
 }
 
-/* ================= HERO IMAGE FLOAT ================= */
+/* ================= HERO IMAGE FLOAT / PARALLAX ================= */
 .hero-image-wrapper {
   display: flex;
   justify-content: center;
@@ -35,18 +35,6 @@ body,
 @media (min-width: 1024px) {
   .hero-image {
     height: 380px;
-  }
-}
-
-@keyframes hero-float {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0);
   }
 }
 
@@ -204,4 +192,3 @@ body,
 .nav-link:hover::after {
   width: 100%;
 }
-

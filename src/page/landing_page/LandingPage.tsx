@@ -1,4 +1,4 @@
-import type { FC, MouseEvent } from "react";
+import type { FC, MouseEvent, CSSProperties } from "react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -14,20 +14,23 @@ import HeroBg from "../../assets/pace/hero_bg.png";
 const PaceLandingPage: FC = () => {
   const navigate = useNavigate();
 
+  // parallax for hero image / glow
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
+
+  // parallax for background image
+  const [bgParallax, setBgParallax] = useState({ x: 0, y: 0 });
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  // Mouse-based parallax (hero only)
-  const handleHeroMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+  // HERO – mouse-based parallax (student illustration)
+  const handleHeroMouseMove = (e: MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const relX = (e.clientX - (rect.left + rect.width / 2)) / rect.width;
     const relY = (e.clientY - (rect.top + rect.height / 2)) / rect.height;
 
-    // clamp a bit so hindi masyadong wild
     const x = Math.max(-0.5, Math.min(0.5, relX));
     const y = Math.max(-0.4, Math.min(0.4, relY));
 
@@ -36,6 +39,22 @@ const PaceLandingPage: FC = () => {
 
   const handleHeroMouseLeave = () => {
     setParallax({ x: 0, y: 0 });
+  };
+
+  // BACKGROUND – subtle parallax
+  const handleBgMove = (e: MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const relX = (e.clientX - (rect.left + rect.width / 2)) / rect.width;
+    const relY = (e.clientY - (rect.top + rect.height / 2)) / rect.height;
+
+    setBgParallax({
+      x: relX * 10, // medium effect
+      y: relY * 10,
+    });
+  };
+
+  const handleBgLeave = () => {
+    setBgParallax({ x: 0, y: 0 });
   };
 
   // Scroll reveal (once per element)
@@ -81,14 +100,14 @@ const PaceLandingPage: FC = () => {
     },
   ];
 
-  // Parallax styles
-  const heroImageStyle: React.CSSProperties = {
+  // Styles for hero parallax
+  const heroImageStyle: CSSProperties = {
     transform: `translate3d(${parallax.x * 18}px, ${parallax.y * 12}px, 0)`,
   };
 
-  const heroGlowStyle: React.CSSProperties = {
+  const heroGlowStyle: CSSProperties = {
     transform: `translate3d(calc(-50% + ${parallax.x * 14}px), ${
-      0 + parallax.y * 12
+      parallax.y * 12
     }px, 0)`,
   };
 
@@ -98,26 +117,30 @@ const PaceLandingPage: FC = () => {
       <section
         id="home"
         className="relative overflow-hidden text-white"
-style={{
-  backgroundImage: `url(${HeroBg})`,
-  backgroundSize: "cover",
-  backgroundPosition: "center",
-  backgroundRepeat: "no-repeat",
-}}
+        onMouseMove={handleBgMove}
+        onMouseLeave={handleBgLeave}
+        style={{
+          backgroundImage: `url(${HeroBg})`,
+          backgroundSize: "110%",
+          backgroundPosition: `${50 + bgParallax.x}% ${50 + bgParallax.y}%`,
+          backgroundRepeat: "no-repeat",
+          backgroundAttachment: "fixed",
+          transition: "background-position 0.1s linear",
+        }}
       >
-        {/* gradient glow overlay (subtle spotlight) */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.28),transparent_55%)]" />
+        {/* dark overlay for readability */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#00000040] via-[#00000025] to-[#00000010]" />
 
-        {/* Background shapes */}
+        {/* orange bloom light */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,rgba(255,180,50,0.35),transparent_70%)]" />
+
+        {/* extra subtle diagonal highlight */}
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.06)_0%,transparent_18%,transparent_100%)] opacity-20" />
+
+        {/* Background shapes on top of bg image */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div
-            className="hero-shape hero-shape-left
-                       bg-gradient-to-br from-[#F9A63A] to-[#D6451C]"
-          />
-          <div
-            className="hero-shape hero-shape-right
-                       bg-gradient-to-tr from-[#F07A1C] to-[#B92E09]"
-          />
+          <div className="hero-shape hero-shape-left bg-gradient-to-br from-[#F9A63A] to-[#D6451C]" />
+          <div className="hero-shape hero-shape-right bg-gradient-to-tr from-[#F07A1C] to-[#B92E09]" />
           <div className="hero-glow" style={heroGlowStyle} />
         </div>
 
@@ -159,13 +182,13 @@ style={{
           </nav>
         </header>
 
-        {/* HERO CONTENT (strict layout match) */}
+        {/* HERO CONTENT */}
         <div
           className="relative z-20 mx-auto flex w-full max-w-5xl flex-col items-center gap-8 px-4 pb-16 pt-3 md:flex-row md:items-center md:justify-between md:px-6 md:pb-20"
           onMouseMove={handleHeroMouseMove}
           onMouseLeave={handleHeroMouseLeave}
         >
-          {/* Left text block */}
+          {/* Left text */}
           <div
             className="max-w-md space-y-4 md:space-y-5"
             data-animate="fade-right"
@@ -258,10 +281,7 @@ style={{
         id="about"
         className="bg-white px-4 py-14 md:px-6 md:py-16"
       >
-        <div
-          className="mx-auto max-w-4xl"
-          data-animate="fade-up"
-        >
+        <div className="mx-auto max-w-4xl" data-animate="fade-up">
           <h2 className="text-center text-2xl font-extrabold text-gray-900 md:text-3xl">
             About Pace
           </h2>
@@ -281,10 +301,7 @@ style={{
         id="mission"
         className="bg-gradient-to-b from-[#FFE08A] via-[#FFC65A] to-[#F9A63A] px-4 py-14 md:px-6 md:py-16"
       >
-        <div
-          className="mx-auto max-w-4xl text-center"
-          data-animate="fade-up"
-        >
+        <div className="mx-auto max-w-4xl text-center" data-animate="fade-up">
           <h2 className="text-2xl font-extrabold text-gray-900 md:text-3xl">
             Our Mission
           </h2>
