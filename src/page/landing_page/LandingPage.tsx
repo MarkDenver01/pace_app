@@ -10,237 +10,186 @@ import IconEvaluation from "../../assets/pace/icon_evaluation.png";
 
 const PaceLandingPage: FC = () => {
   const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    const element = document.getElementById(id);
+    if (element) element.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <div className="min-h-screen bg-black text-gray-900">
-      {/* HERO + NAV */}
+    <div className="min-h-screen w-full bg-white font-poppins text-gray-900">
+      {/* ------------------------ HERO + NAV ------------------------ */}
       <section
         id="home"
-        className="relative overflow-hidden bg-gradient-to-br from-[#ffb347] via-[#ff9035] to-[#f5572f] text-white"
+        className="relative overflow-hidden bg-gradient-to-br from-[#FFD08A] via-[#FF932E] to-[#F95329] text-white pb-16"
       >
-        {/* subtle diagonal overlay */}
-        <div className="pointer-events-none absolute inset-0 opacity-40 mix-blend-soft-light">
-          <div className="absolute -right-32 -top-32 h-72 w-72 rotate-12 rounded-[60px] bg-[#f54c2f]" />
-          <div className="absolute -left-24 bottom-0 h-72 w-72 -rotate-6 rounded-[60px] bg-[#ffb347]" />
-        </div>
+        {/* ORANGE overlay pattern */}
+        <div className="absolute inset-0 opacity-[0.22] bg-[url('/patterns/orange-pattern.png')] bg-cover bg-center pointer-events-none"></div>
 
-        <div className="relative z-10 mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-16 pt-4 md:px-6 md:pt-6 lg:pb-24">
-          {/* NAVBAR */}
-          <header className="flex items-center justify-between gap-4">
+        {/* NAVBAR */}
+        <header className="relative z-20 mx-auto max-w-6xl flex items-center justify-between px-4 py-4 md:px-6">
+          <img src={PaceLogo} alt="PACE Logo" className="h-12 w-auto" />
+
+          <nav className="hidden md:flex gap-8 text-sm font-semibold tracking-wide">
+            <button
+              onClick={() => scrollToSection("home")}
+              className="hover:text-yellow-100 transition"
+            >
+              Home
+            </button>
+            <button
+              onClick={() => scrollToSection("features")}
+              className="hover:text-yellow-100 transition"
+            >
+              Platform Features
+            </button>
+            <button
+              onClick={() => scrollToSection("about")}
+              className="hover:text-yellow-100 transition"
+            >
+              About Pace
+            </button>
+            <button
+              onClick={() => scrollToSection("mission")}
+              className="hover:text-yellow-100 transition"
+            >
+              Our Mission
+            </button>
+          </nav>
+        </header>
+
+        {/* HERO CONTENT */}
+        <div className="relative z-20 mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between px-4 md:px-6 mt-4 md:mt-10">
+          {/* Text */}
+          <div className="max-w-xl space-y-6">
             <div className="flex items-center gap-3">
-              <img
-                src={PaceLogo}
-                alt="PACE Logo"
-                className="h-10 w-auto md:h-12"
-              />
-            </div>
-
-            <nav className="hidden gap-8 text-sm font-semibold md:flex">
-              <button
-                onClick={() => scrollToSection("home")}
-                className="transition hover:text-yellow-200"
-              >
-                Home
-              </button>
-              <button
-                onClick={() => scrollToSection("features")}
-                className="transition hover:text-yellow-200"
-              >
-                Platform Features
-              </button>
-              <button
-                onClick={() => scrollToSection("about")}
-                className="transition hover:text-yellow-200"
-              >
-                About Pace
-              </button>
-              <button
-                onClick={() => scrollToSection("mission")}
-                className="transition hover:text-yellow-200"
-              >
-                Our Mission
-              </button>
-            </nav>
-          </header>
-
-          {/* HERO CONTENT */}
-          <div className="flex flex-col items-center gap-10 md:flex-row md:items-center md:justify-between">
-            {/* Left text */}
-            <div className="max-w-xl space-y-4 md:space-y-6">
-              <div className="flex items-center gap-3">
-                <img
-                  src={PaceLogo}
-                  alt="PACE Logo"
-                  className="h-12 w-auto md:h-16"
-                />
-                <p className="max-w-xs text-xs md:text-sm">
-                  Personalized Academic and Career Exploration
-                </p>
-              </div>
-
-              <h1 className="text-3xl font-extrabold leading-tight md:text-4xl lg:text-5xl">
-                Smart Management for
-                <br />
-                a Smarter Future
-              </h1>
-
-              <p className="text-sm leading-relaxed md:text-base md:leading-relaxed">
-                Empower your institution with efficient, data-driven tools
-                designed to simplify administration, enhance decision-making,
-                and build a future where management and innovation work hand in
-                hand.
+              <img src={PaceLogo} alt="PACE Logo" className="h-14" />
+              <p className="text-sm opacity-90">
+                Personalized Academic and Career Exploration
               </p>
-
-              <button
-                className="mt-4 rounded-full bg-[#d62828] px-8 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-[#b71f1f]"
-                onClick={() => scrollToSection("features")}
-              >
-                Get Started
-              </button>
             </div>
 
-            {/* Right hero illustration */}
-            <div className="flex justify-center md:justify-end">
-              <img
-                src={HeroStudent}
-                alt="Student using tablet"
-                className="h-64 w-auto drop-shadow-2xl md:h-80 lg:h-[22rem]"
-              />
-            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold leading-tight drop-shadow-lg">
+              Smart Management for
+              <br />
+              a Smarter Future
+            </h1>
+
+            <p className="text-sm md:text-base opacity-95 leading-relaxed">
+              Empower your institution with efficient, data-driven tools
+              designed to simplify administration, enhance decision-making,
+              and build a future where management and innovation work hand in
+              hand.
+            </p>
+
+            <button
+              onClick={() => scrollToSection("features")}
+              className="bg-[#D62828] hover:bg-[#B71F1F] px-8 py-3 rounded-full text-sm font-semibold transition shadow-md"
+            >
+              Get Started
+            </button>
           </div>
+
+          {/* Hero Image */}
+          <img
+            src={HeroStudent}
+            alt="Student Illustration"
+            className="h-[280px] md:h-[360px] lg:h-[400px] drop-shadow-2xl mt-8 md:mt-0"
+          />
         </div>
       </section>
 
-      {/* PLATFORM FEATURES */}
+      {/* ------------------------ FEATURES SECTION ------------------------ */}
       <section
         id="features"
-        className="bg-[#ffb347] bg-gradient-to-b from-[#ffb347] via-[#ff9c2f] to-[#ff7a2f] py-12 md:py-16"
+        className="bg-gradient-to-b from-[#FFB347] via-[#FF9D34] to-[#FF7A2F] py-16 px-4 md:px-6"
       >
-        <div className="mx-auto max-w-5xl px-4 md:px-6">
-          <div className="text-center text-white">
-            <h2 className="text-2xl font-extrabold md:text-3xl">
-              Platform Features
-            </h2>
-            <p className="mt-2 text-sm md:text-base">
-              Discover powerful tools designed to make academic and career
-              guidance easier, faster, and more meaningful for every user.
-            </p>
-          </div>
+        <div className="mx-auto max-w-6xl text-center text-white mb-10">
+          <h2 className="text-3xl font-extrabold">Platform Features</h2>
+          <p className="mt-2 text-sm md:text-base opacity-90">
+            Discover powerful tools designed to make academic and career
+            guidance easier, faster, and more meaningful for every user.
+          </p>
+        </div>
 
-          {/* Feature cards */}
-          <div className="mt-8 grid gap-6 md:mt-10 md:grid-cols-2 lg:grid-cols-4">
-            {/* Card 1 */}
-            <div className="flex flex-col items-center rounded-2xl bg-white px-5 py-7 text-center shadow-lg">
+        {/* Feature Cards */}
+        <div className="mx-auto max-w-6xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* CARD */}
+          {[ 
+            {
+              icon: IconUserData,
+              title: "User & Data Management",
+              desc: "Monitor student participation, manage accounts, and view analytics in one dashboard."
+            },
+            {
+              icon: IconAnalytics,
+              title: "Result Analytics & Reports",
+              desc: "Generate visual summaries and insightful reports of student outcomes."
+            },
+            {
+              icon: IconLinks,
+              title: "Institution Portal Links",
+              desc: "Instant access to partner schools and institutions for admissions."
+            },
+            {
+              icon: IconEvaluation,
+              title: "Customizable Evaluation Tools",
+              desc: "Create assessments based on programs and track insights efficiently."
+            }
+          ].map((card, i) => (
+            <div
+              key={i}
+              className="bg-white text-gray-800 rounded-2xl shadow-xl px-6 py-8 text-center hover:scale-[1.03] transition transform"
+            >
               <img
-                src={IconUserData}
-                alt="User & Data Management"
-                className="mb-4 h-14 w-14 object-contain"
+                src={card.icon}
+                alt={card.title}
+                className="h-16 mx-auto mb-4"
               />
-              <h3 className="text-sm font-bold md:text-base">
-                User &amp; Data Management
-              </h3>
-              <p className="mt-2 text-xs text-gray-600 md:text-sm">
-                Monitor student participation, manage user accounts, and
-                visualize key metrics in one intuitive dashboard.
+              <h3 className="font-bold text-base">{card.title}</h3>
+              <p className="text-sm mt-2 opacity-80 leading-relaxed">
+                {card.desc}
               </p>
             </div>
-
-            {/* Card 2 */}
-            <div className="flex flex-col items-center rounded-2xl bg-white px-5 py-7 text-center shadow-lg">
-              <img
-                src={IconAnalytics}
-                alt="Result Analytics & Reports"
-                className="mb-4 h-14 w-14 object-contain"
-              />
-              <h3 className="text-sm font-bold md:text-base">
-                Result Analytics &amp; Reports
-              </h3>
-              <p className="mt-2 text-xs text-gray-600 md:text-sm">
-                Generate visual summaries and reports that highlight student
-                outcomes, courses, and trends.
-              </p>
-            </div>
-
-            {/* Card 3 */}
-            <div className="flex flex-col items-center rounded-2xl bg-white px-5 py-7 text-center shadow-lg">
-              <img
-                src={IconLinks}
-                alt="Institution Portal Links"
-                className="mb-4 h-14 w-14 object-contain"
-              />
-              <h3 className="text-sm font-bold md:text-base">
-                Institution Portal Links
-              </h3>
-              <p className="mt-2 text-xs text-gray-600 md:text-sm">
-                Provide quick access to partner schools and institutions for
-                admissions and inquiries.
-              </p>
-            </div>
-
-            {/* Card 4 */}
-            <div className="flex flex-col items-center rounded-2xl bg-white px-5 py-7 text-center shadow-lg">
-              <img
-                src={IconEvaluation}
-                alt="Customizable Evaluation Tools"
-                className="mb-4 h-14 w-14 object-contain"
-              />
-              <h3 className="text-sm font-bold md:text-base">
-                Customizable Evaluation Tools
-              </h3>
-              <p className="mt-2 text-xs text-gray-600 md:text-sm">
-                Create assessments based on your programs and track insights
-                easily with flexible evaluation tools.
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* ABOUT PACE */}
-      <section id="about" className="bg-white py-12 md:py-16">
-        <div className="mx-auto max-w-4xl px-4 md:px-6">
-          <h2 className="text-center text-2xl font-extrabold text-gray-900 md:text-3xl">
+      {/* ------------------------ ABOUT SECTION ------------------------ */}
+      <section id="about" className="py-16 px-4 md:px-6 bg-white">
+        <div className="mx-auto max-w-4xl">
+          <h2 className="text-center text-3xl font-extrabold text-gray-900">
             About Pace
           </h2>
-          <p className="mt-4 text-justify text-sm leading-relaxed text-gray-700 md:text-base">
-            PACE (Personal Academic &amp; Career Evaluation) is an innovative
+          <p className="mt-5 text-sm md:text-base text-gray-700 leading-relaxed text-justify">
+            PACE (Personal Academic & Career Evaluation) is an innovative
             platform designed to help students discover their ideal academic
-            paths and future careers — while giving institutions the tools to
-            evaluate, guide, and track learner progress. It combines career
-            assessment, data analytics, and institutional insights to build a
-            bridge between students&apos; potential and academic opportunities.
+            paths and future careers while providing institutions with the tools
+            to guide and track learner development. PACE connects assessments,
+            analytics, and institutional insights to bridge the gap between
+            student potential and academic opportunities.
           </p>
         </div>
       </section>
 
-      {/* OUR MISSION */}
+      {/* ------------------------ MISSION SECTION ------------------------ */}
       <section
         id="mission"
-        className="bg-gradient-to-b from-[#ffe9a3] via-[#ffd66b] to-[#ffb347] py-12 md:py-16"
+        className="py-16 px-4 md:px-6 bg-gradient-to-b from-[#FFE8A3] via-[#FFD46B] to-[#FFB347]"
       >
-        <div className="mx-auto max-w-4xl px-4 md:px-6 text-center">
-          <h2 className="text-2xl font-extrabold text-gray-900 md:text-3xl">
-            Our Mission
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-gray-800 md:text-base">
-            Our mission is to empower every learner to discover their path and
-            every institution to guide them with purpose. PACE aims to make
-            academic and career exploration accessible, meaningful, and
-            data-driven by combining technology, psychology, and education. We
-            strive to bridge the gap between potential and opportunity, helping
-            students make confident choices while providing schools and
-            administrators the tools to support informed, impactful guidance for
-            a smarter future.
+        <div className="mx-auto max-w-4xl text-center">
+          <h2 className="text-3xl font-extrabold text-gray-900">Our Mission</h2>
+          <p className="mt-5 text-sm md:text-base text-gray-800 leading-relaxed">
+            Our mission is to empower learners to discover their path and
+            institutions to guide them with purpose. By combining analytics,
+            psychology, and technology, PACE helps students make confident
+            decisions while equipping schools with tools for impactful,
+            data-driven guidance.
           </p>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="bg-[#f5572f] py-6 text-center text-sm text-white">
-        <p className="font-semibold">PACE - Your Choice, Your Future</p>
+      {/* ------------------------ FOOTER ------------------------ */}
+      <footer className="bg-[#F5572F] py-6 text-center text-white text-sm">
+        <p className="font-semibold">PACE – Your Choice, Your Future</p>
         <p className="mt-1 text-xs opacity-90">
           © 2025 PACE System. All rights reserved.
         </p>
