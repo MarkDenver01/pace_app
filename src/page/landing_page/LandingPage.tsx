@@ -1,12 +1,12 @@
 import type { FC } from "react";
 
-import PaceLogo from "../../assets/pace/f_logo-removebg-preview-1.png";
-import HeroStudent from "../../assets/pace/image-4.png";
+import PaceLogo from "../../assets/pace/f_logo.png";
+import HeroStudent from "../../assets/pace/hero_student.png";
 
-import IconUserData from "../../assets/pace/image-20.png";
-import IconAnalytics from "../../assets/pace/image-17.png";
-import IconLinks from "../../assets/pace/image-18.png";
-import IconEvaluation from "../../assets/pace/image-19.png";
+import IconUserData from "../../assets/pace/icon_user_data.png";
+import IconAnalytics from "../../assets/pace/icon_analytics.png";
+import IconLinks from "../../assets/pace/icon_links.png";
+import IconEvaluation from "../../assets/pace/icon_evaluation.png";
 
 const PaceLandingPage: FC = () => {
   const scrollToSection = (id: string) => {
