@@ -14,7 +14,7 @@ import HeroBg from "../../assets/app-bg.jpg";
 const PaceLandingPage: FC = () => {
   const navigate = useNavigate();
 
-  // parallax for hero image / glow
+  // parallax for hero illustration/glow
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
 
   // parallax for background image
@@ -31,6 +31,7 @@ const PaceLandingPage: FC = () => {
     const relX = (e.clientX - (rect.left + rect.width / 2)) / rect.width;
     const relY = (e.clientY - (rect.top + rect.height / 2)) / rect.height;
 
+    // clamp para hindi OA
     const x = Math.max(-0.5, Math.min(0.5, relX));
     const y = Math.max(-0.4, Math.min(0.4, relY));
 
@@ -41,7 +42,7 @@ const PaceLandingPage: FC = () => {
     setParallax({ x: 0, y: 0 });
   };
 
-  // BACKGROUND – subtle parallax
+  // BACKGROUND – subtle/medium parallax
   const handleBgMove = (e: MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const relX = (e.clientX - (rect.left + rect.width / 2)) / rect.width;
@@ -128,16 +129,16 @@ const PaceLandingPage: FC = () => {
           transition: "background-position 0.1s linear",
         }}
       >
-        {/* dark overlay for readability */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#00000040] via-[#00000025] to-[#00000010]" />
+        {/* Darken bottom a bit for readability */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#00000030]" />
 
-        {/* orange bloom light */}
+        {/* Orange bloom light similar to design */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,rgba(255,180,50,0.35),transparent_70%)]" />
 
-        {/* extra subtle diagonal highlight */}
+        {/* Extra subtle diagonal highlight */}
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.06)_0%,transparent_18%,transparent_100%)] opacity-20" />
 
-        {/* Background shapes on top of bg image */}
+        {/* Background shapes + glow on top of bg */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="hero-shape hero-shape-left bg-gradient-to-br from-[#F9A63A] to-[#D6451C]" />
           <div className="hero-shape hero-shape-right bg-gradient-to-tr from-[#F07A1C] to-[#B92E09]" />
@@ -188,7 +189,7 @@ const PaceLandingPage: FC = () => {
           onMouseMove={handleHeroMouseMove}
           onMouseLeave={handleHeroMouseLeave}
         >
-          {/* Left text */}
+          {/* Left text block */}
           <div
             className="max-w-md space-y-4 md:space-y-5"
             data-animate="fade-right"
@@ -220,7 +221,7 @@ const PaceLandingPage: FC = () => {
             </button>
           </div>
 
-          {/* Right hero image */}
+          {/* Right hero illustration */}
           <div className="hero-image-wrapper" data-animate="fade-left">
             <img
               src={HeroStudent}
@@ -244,10 +245,6 @@ const PaceLandingPage: FC = () => {
           <h2 className="text-2xl font-extrabold md:text-3xl">
             Platform Features
           </h2>
-          <p className="mt-2 text-xs opacity-95 md:text-sm">
-            Discover powerful tools designed to make academic and career
-            guidance easier, faster, and more meaningful for every user.
-          </p>
         </div>
 
         <div className="mx-auto mt-8 grid w-full max-w-5xl grid-cols-1 gap-6 md:mt-10 md:grid-cols-2 lg:grid-cols-4">
