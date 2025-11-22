@@ -52,10 +52,6 @@ const Login: React.FC = () => {
       if (response.role === "ADMIN") {
         const adminStatus = response.adminResponse.accountStatus;
 
-        /** ------------------------------------------
-         * 🔥 CASE 1: Admin is PENDING → Ask to activate
-         ------------------------------------------- */
-        if (adminStatus === "PENDING") {
           // GET UNIVERSITY NAME
           let universityName = "your university";
           try {
@@ -63,6 +59,10 @@ const Login: React.FC = () => {
             universityName = uni.universityName ?? "your university";
           } catch (e) {}
 
+        /** ------------------------------------------
+         * 🔥 CASE 1: Admin is PENDING → Ask to activate
+         ------------------------------------------- */
+        if (adminStatus === "PENDING") {
           const confirmUpdate = await Swal.fire({
             title: `Hi ${response.username}!`,
             html: `
@@ -111,7 +111,7 @@ const Login: React.FC = () => {
         if (adminStatus === "VERIFIED" || adminStatus === "ACTIVE") {
           Swal.fire({
             icon: "success",
-            title: `Welcome ${response.username}!`,
+            title: `Welcome to <strong>"${universityName}"</strong>,  ${response.username}!`,
             confirmButtonText: "PROCEED",
             ...getSwalTheme(),
           }).then(() => navigate("/admin/dashboard"));
