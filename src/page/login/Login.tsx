@@ -5,6 +5,7 @@ import {
   HiEye,
   HiEyeOff,
 } from "react-icons/hi";
+
 import { login } from "../../libs/ApiResponseService";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -14,7 +15,8 @@ import { getSwalTheme } from "../../utils/getSwalTheme";
 
 import PaceLogo from "../../assets/pace/logo_final.png";
 import HeroStudent from "../../assets/pace/hero_student.png";
-import HeroBg from "../../assets/pace/login_half_bg.jpg"; // ⬅ use your new BG here
+import LoginLeftBG from "../../assets/pace/login_half_bg.jpg"; // LEFT SIDE BG
+import LoginFullBG from "../../assets/pace/login_half_bg.jpg"; // MAIN BG (same image)
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -109,60 +111,72 @@ const Login: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: `url(${HeroBg})` }}
+      className="
+        min-h-screen w-full flex items-center justify-center 
+        bg-cover bg-center bg-no-repeat relative
+      "
+      style={{ backgroundImage: `url(${LoginFullBG})` }}
     >
-      {/* No black overlay here → pure orange BG */}
+      {/* SOFT GRADIENT OVERLAY */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/20" />
 
-      {/* MAIN LOGIN CARD */}
-      <div className="w-full max-w-8xl mx-6 md:mx-0 rounded-[32px] overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.45)] flex bg-white/10 backdrop-blur-[2px] border border-white/30">
-    {/* LEFT SIDE — LOGO + STUDENT WITH BACKGROUND IMAGE */}
-<div
-  className="
-    hidden md:flex w-1/2 flex-col items-center justify-center 
-    px-10 py-12 relative overflow-hidden
-  "
-  style={{
-    backgroundImage: `url(${HeroBg})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-  }}
->
+      {/* LOGIN CARD */}
+      <div
+        className="
+          relative z-10 w-full max-w-6xl mx-6 
+          rounded-[32px] overflow-hidden 
+          shadow-[0_28px_70px_rgba(0,0,0,0.45)]
+          flex backdrop-blur-md bg-white/10 border border-white/25
+        "
+      >
 
-  {/* subtle dark overlay for readability */}
-  <div className="absolute inset-0 bg-black/20" />
+        {/* LEFT SIDE */}
+        <div
+          className="
+            hidden md:flex w-1/2 flex-col items-center justify-center 
+            px-10 py-14 relative overflow-hidden
+          "
+          style={{
+            backgroundImage: `url(${LoginLeftBG})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          {/* dark overlay */}
+          <div className="absolute inset-0 bg-black/25" />
 
-  {/* bottom glow */}
-  <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-72 h-40 
-                  bg-[radial-gradient(circle,rgba(0,0,0,0.45),transparent_70%)] opacity-80" />
+          {/* bottom glow */}
+          <div className="
+            absolute bottom-0 left-1/2 -translate-x-1/2 
+            w-72 h-40 bg-[radial-gradient(circle,rgba(0,0,0,0.55),transparent_70%)]
+            opacity-70
+          " />
 
-  <img
-    src={PaceLogo}
-    alt="PACE Logo"
-    className="h-40 md:h-44 drop-shadow-2xl mb-4 relative z-10"
-  />
+          <img
+            src={PaceLogo}
+            className="h-40 md:h-48 drop-shadow-2xl mb-4 relative z-10"
+          />
 
-  <img
-    src={HeroStudent}
-    alt="Student"
-    className="h-80 md:h-[22rem] drop-shadow-2xl animate-float relative z-10"
-  />
+          <img
+            src={HeroStudent}
+            className="h-80 md:h-[24rem] drop-shadow-2xl animate-float relative z-10"
+          />
+        </div>
 
-</div>
+        {/* RIGHT SIDE */}
+        <div className="w-full md:w-1/2 bg-white/95 px-8 md:px-10 py-12 flex flex-col">
 
-
-        {/* RIGHT SIDE — LOGIN FORM */}
-        <div className="w-full md:w-1/2 bg-white/95 px-8 md:px-10 py-10 flex flex-col">
-          <div className="text-center mb-6">
-            <h2 className="text-[24px] md:text-[28px] font-extrabold text-orange-700 leading-tight">
+          <div className="text-center mb-8">
+            <h2 className="text-[26px] md:text-[30px] font-extrabold text-orange-700">
               Smart Management
             </h2>
-            <h1 className="text-[28px] md:text-[32px] font-extrabold text-orange-600 tracking-wide">
-              for a Smarter Future
+            <h1 className="text-[32px] md:text-[36px] font-extrabold text-orange-600 tracking-wide">
+              for a Smarter future
             </h1>
           </div>
 
-          <form className="space-y-5" onSubmit={handleLogin}>
+          <form className="space-y-6" onSubmit={handleLogin}>
+
             {/* EMAIL */}
             <div className="space-y-1">
               <label className="font-semibold text-[14px]">Email</label>
@@ -171,7 +185,11 @@ const Login: React.FC = () => {
                 <input
                   type="email"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-orange-300 bg-orange-50/40 text-sm text-gray-800 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                  className="
+                    w-full pl-10 pr-4 py-3 rounded-2xl
+                    border border-orange-300 bg-orange-50/50 text-sm
+                    focus:ring-2 focus:ring-orange-500 focus:outline-none
+                  "
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -186,7 +204,11 @@ const Login: React.FC = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   required
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-orange-300 bg-orange-50/40 text-sm text-gray-800 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                  className="
+                    w-full pl-10 pr-10 py-3 rounded-2xl 
+                    border border-orange-300 bg-orange-50/50 text-sm
+                    focus:ring-2 focus:ring-orange-500 focus:outline-none
+                  "
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -200,7 +222,7 @@ const Login: React.FC = () => {
             </div>
 
             {/* REMEMBER + FORGOT */}
-            <div className="flex justify-between items-center text-[12px] md:text-[13px] text-gray-600">
+            <div className="flex justify-between items-center text-[13px] text-gray-600">
               <label className="flex items-center gap-2">
                 <input type="checkbox" className="accent-orange-600" />
                 Remember me
@@ -218,14 +240,18 @@ const Login: React.FC = () => {
             {/* SUBMIT */}
             <button
               type="submit"
+              className="
+                w-full bg-orange-600 text-white font-bold 
+                py-3 rounded-full shadow-lg 
+                hover:bg-orange-700 transition disabled:opacity-60
+              "
               disabled={loading}
-              className="w-full bg-orange-600 text-white font-bold py-2.5 rounded-full shadow-lg hover:bg-orange-700 transition disabled:opacity-60"
             >
               {loading ? "Logging in..." : "LOGIN"}
             </button>
           </form>
 
-          <p className="text-center text-[11px] md:text-[12px] mt-6 text-gray-500">
+          <p className="text-center text-[12px] mt-8 text-gray-500">
             © 2025 PACE System. All rights reserved.
           </p>
         </div>
