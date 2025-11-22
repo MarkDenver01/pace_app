@@ -1,6 +1,6 @@
 import type { FC, MouseEvent, CSSProperties } from "react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import PaceLogo from "../../assets/pace/transpa_logo.png";
 import HeroStudent from "../../assets/pace/hero_student.png";
@@ -13,9 +13,18 @@ import HeroBg from "../../assets/app-bg.jpg";
 
 const PaceLandingPage: FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams(); 
 
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
   const [bgParallax, setBgParallax] = useState({ x: 0, y: 0 });
+
+  const handleGetStarted = () => {
+    if (id) {
+      navigate(`/login/university/${id}`);
+    } else {
+      navigate("/login");
+    }
+  };
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -155,7 +164,7 @@ const PaceLandingPage: FC = () => {
             </p>
 
             <button
-              onClick={() => navigate("/login")}
+               onClick={handleGetStarted}
               className="mt-6 inline-flex items-center justify-center rounded-full bg-[#F97316] px-10 py-3 text-[14px] md:text-[15px] font-semibold shadow-xl hover:bg-[#EA580C] hover:-translate-y-[2px] transition"
             >
               Get Started
