@@ -36,7 +36,7 @@ const PaceLandingPage: FC = () => {
     transform: `translate3d(${parallax.x * 18}px, ${parallax.y * 12}px, 0)`,
   };
 
-  // Scroll reveal for [data-animate]
+  // Scroll reveal
   useEffect(() => {
     const animated = document.querySelectorAll<HTMLElement>("[data-animate]");
 
@@ -99,12 +99,12 @@ const PaceLandingPage: FC = () => {
         }}
         onMouseLeave={() => setBgParallax({ x: 0, y: 0 })}
       >
-        {/* Opacity + blur overlay so BG still shows */}
-        <div className="pointer-events-none absolute inset-0 bg-black/15 backdrop-blur-[2px]" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/45" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.24),transparent_60%)] opacity-60" />
+        {/* Overlays: subtle dark + orange glow */}
+        <div className="pointer-events-none absolute inset-0 bg-black/18 backdrop-blur-[2px]" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/40 via-transparent to-black/70" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_15%,rgba(249,115,22,0.5),transparent_60%)] opacity-80" />
 
-        {/* NAVBAR (no logo) */}
+        {/* NAVBAR (no logo, right aligned) */}
         <header className="relative z-20 mx-auto flex w-full max-w-6xl justify-end px-4 py-4 md:px-6 text-[14px] font-semibold">
           <nav className="hidden md:flex gap-10 tracking-wide">
             <button onClick={() => scrollToSection("home")} className="nav-link">
@@ -124,13 +124,13 @@ const PaceLandingPage: FC = () => {
 
         {/* HERO CONTENT */}
         <div
-          className="relative z-20 mx-auto flex w-full max-w-6xl flex-col md:flex-row items-center justify-between px-4 pb-20 pt-8 md:pt-14"
+          className="relative z-20 mx-auto flex w-full max-w-6xl flex-col-reverse md:flex-row items-center gap-10 px-4 pb-20 pt-10 md:pt-16"
           onMouseMove={handleHeroMouseMove}
           onMouseLeave={() => setParallax({ x: 0, y: 0 })}
         >
           {/* LEFT HERO CONTENT */}
           <div
-            className="max-w-xl rounded-3xl bg-black/25 px-5 py-6 md:px-7 md:py-7 shadow-[0_24px_60px_rgba(0,0,0,0.55)] backdrop-blur-md border border-white/10"
+            className="md:flex-1 max-w-xl rounded-3xl bg-black/30 px-5 py-6 md:px-7 md:py-7 shadow-[0_24px_60px_rgba(0,0,0,0.6)] backdrop-blur-md border border-white/10"
             data-animate="fade-right"
           >
             {/* BIG LOGO */}
@@ -138,17 +138,17 @@ const PaceLandingPage: FC = () => {
               <img
                 src={PaceLogo}
                 alt="PACE Logo"
-                className="h-[260px] w-auto md:h-[300px] drop-shadow-2xl"
+                className="h-[230px] w-auto md:h-[260px] drop-shadow-2xl"
               />
             </div>
 
-            <h1 className="text-[40px] md:text-[52px] font-extrabold leading-tight drop-shadow-2xl">
-              Smart Management 
+            <h1 className="text-[38px] md:text-[50px] font-extrabold leading-tight drop-shadow-2xl">
+              Smart Management
               <br />
               for a Smarter Future
             </h1>
 
-            <p className="mt-4 text-[15px] md:text-[17px] leading-relaxed opacity-90">
+            <p className="mt-4 text-[15px] md:text-[17px] leading-relaxed text-white/90">
               Empower your institution with efficient, data-driven tools designed to simplify
               administration, enhance decision-making, and build a future where management and
               innovation work hand in hand.
@@ -156,20 +156,24 @@ const PaceLandingPage: FC = () => {
 
             <button
               onClick={() => navigate("/login")}
-              className="mt-6 rounded-full bg-[#D62828] px-10 py-3 text-[14px] md:text-[15px] font-semibold shadow-xl hover:bg-[#B71F1F] hover:-translate-y-[2px] transition"
+              className="mt-6 inline-flex items-center justify-center rounded-full bg-[#F97316] px-10 py-3 text-[14px] md:text-[15px] font-semibold shadow-xl hover:bg-[#EA580C] hover:-translate-y-[2px] transition"
             >
               Get Started
             </button>
           </div>
 
           {/* RIGHT ILLUSTRATION */}
-          <div className="mt-10 md:mt-0 hero-image-wrapper" data-animate="fade-left">
-            <img
-              src={HeroStudent}
-              alt="Student"
-              className="hero-image"
-              style={heroImageStyle}
-            />
+          <div className="md:flex-1 flex items-center justify-center" data-animate="fade-left">
+            <div className="hero-image-wrapper relative">
+              {/* Soft orange glow behind student */}
+              <div className="pointer-events-none absolute inset-auto bottom-0 w-[260px] h-[260px] md:w-[320px] md:h-[320px] translate-y-8 translate-x-4 rounded-full bg-[radial-gradient(circle,rgba(249,115,22,0.9),transparent_60%)] opacity-70 blur-3xl" />
+              <img
+                src={HeroStudent}
+                alt="Student"
+                className="hero-image relative"
+                style={heroImageStyle}
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -177,13 +181,12 @@ const PaceLandingPage: FC = () => {
       {/* ================= FEATURES ================= */}
       <section
         id="features"
-        className="relative px-4 py-16 md:px-6 md:py-20 bg-gradient-to-br from-[#F9A63A] via-[#F07A1C] to-[#D6451C]"
+        className="relative px-4 py-16 md:px-6 md:py-20 bg-gradient-to-br from-[#F97316] via-[#EA580C] to-[#C2410C]"
       >
-        {/* translucent overlay for elegant feel */}
-        <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
 
         <div className="relative mx-auto max-w-5xl" data-animate="fade-up">
-          <div className="rounded-3xl bg-white/10 px-6 py-8 md:px-10 md:py-10 shadow-[0_24px_60px_rgba(0,0,0,0.45)] border border-white/20">
+          <div className="rounded-3xl bg-black/20 px-6 py-8 md:px-10 md:py-10 shadow-[0_24px_60px_rgba(0,0,0,0.6)] border border-white/15">
             <h2 className="text-center text-3xl md:text-4xl font-extrabold text-white drop-shadow-md">
               Platform Features
             </h2>
@@ -219,21 +222,23 @@ const PaceLandingPage: FC = () => {
       {/* ================= ABOUT ================= */}
       <section
         id="about"
-        className="relative px-4 py-16 md:px-6 md:py-20 bg-gradient-to-b from-white via-[#d6ad66] to-[#d6ad66]"
+        className="relative px-4 py-16 md:px-6 md:py-20 bg-gradient-to-b from-[#020617] via-[#020617] to-[#020617]"
       >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(249,115,22,0.22),transparent_55%)] opacity-80" />
+
         <div
-          className="relative mx-auto max-w-4xl rounded-3xl bg-white/80 px-6 py-8 md:px-10 md:py-10 shadow-[0_18px_40px_rgba(0,0,0,0.2)] border border-orange-100"
+          className="relative mx-auto max-w-4xl rounded-3xl bg-white/5 px-6 py-8 md:px-10 md:py-10 shadow-[0_18px_40px_rgba(0,0,0,0.55)] border border-white/10 text-white"
           data-animate="fade-up"
         >
-          <h2 className="text-center text-3xl md:text-4xl font-extrabold text-gray-900">
+          <h2 className="text-center text-3xl md:text-4xl font-extrabold">
             About PACE
           </h2>
-          <p className="mt-4 text-[14px] md:text-[16px] text-gray-800 leading-relaxed text-justify">
+          <p className="mt-4 text-[14px] md:text-[16px] leading-relaxed text-white/90 text-justify">
             PACE (Personal Academic &amp; Career Evaluation) is an innovative platform designed to
             help students discover their ideal academic paths and future careers, while giving
-            institutions the tools to evaluate, guide, and track learner progress. It combines
-            career assessment, analytics, and institutional insights to build a bridge between each
-            student&apos;s potential and real academic opportunities.
+            institutions powerful tools to evaluate, guide, and track learner progress. It combines
+            career assessment, analytics, and institutional insights to bridge the gap between
+            each student&apos;s potential and real academic opportunities.
           </p>
         </div>
       </section>
@@ -241,12 +246,12 @@ const PaceLandingPage: FC = () => {
       {/* ================= MISSION ================= */}
       <section
         id="mission"
-        className="relative px-4 py-16 md:px-6 md:py-20 bg-gradient-to-b from-white via-[#d6ad66] to-[#d6ad66]"
+        className="relative px-4 py-16 md:px-6 md:py-20 bg-gradient-to-br from-[#F97316] via-[#EA580C] to-[#C2410C]"
       >
-        <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]" />
 
         <div
-          className="relative mx-auto max-w-4xl rounded-3xl bg-white/85 px-6 py-8 md:px-10 md:py-10 shadow-[0_18px_40px_rgba(0,0,0,0.25)] border border-yellow-200"
+          className="relative mx-auto max-w-4xl rounded-3xl bg-white/92 px-6 py-8 md:px-10 md:py-10 shadow-[0_18px_40px_rgba(0,0,0,0.55)] border border-orange-200"
           data-animate="fade-up"
         >
           <h2 className="text-center text-3xl md:text-4xl font-extrabold text-gray-900">
@@ -264,9 +269,9 @@ const PaceLandingPage: FC = () => {
       </section>
 
       {/* ================= FOOTER ================= */}
-      <footer className="bg-[#D6451C] py-6 text-center text-white text-[12px] md:text-[14px]">
+      <footer className="bg-[#111827] border-t border-white/5 py-6 text-center text-white text-[12px] md:text-[14px]">
         <p className="font-semibold">PACE - Your Choice, Your Future</p>
-        <p className="mt-1 opacity-90">© 2025 PACE System. All rights reserved.</p>
+        <p className="mt-1 opacity-80">© 2025 PACE System. All rights reserved.</p>
       </footer>
     </div>
   );
