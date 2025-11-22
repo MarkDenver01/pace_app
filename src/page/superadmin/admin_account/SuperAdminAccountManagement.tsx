@@ -43,6 +43,28 @@ export default function AdminUserLayout() {
   const pageSize = 5;
   const accentColor = "var(--button-color, #D94022)";
 
+  type SortableUserKeys =
+  | "adminId"
+  | "universityName"
+  | "userName"
+  | "email"
+  | "accountStatus";
+
+  const [filterStatus, setFilterStatus] = useState("");
+
+  const [sortColumn, setSortColumn] = useState<SortableUserKeys | "">("");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+const handleSort = (column: SortableUserKeys) => {
+  if (sortColumn === column) {
+    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+  } else {
+    setSortColumn(column);
+    setSortDirection("asc");
+  }
+  setCurrentPage(1);
+};
+
   const handleToggleStatus = async (adminId: number) => {
   try {
     await toggleAdminStatus(adminId);
@@ -194,11 +216,37 @@ const handleDeleteAccount = async (email: string) => {
     await fetchUsers();
   };
   
-  const filteredUsers = users.filter((user) =>
+let filteredUsers = users.filter((user) => {
+  const matchesSearch =
     user.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.universityName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    user.universityName.toLowerCase().includes(searchTerm.toLowerCase());
+
+  const matchesUniversity =
+    selectedUniversity === "" ||
+    user.universityId === Number(selectedUniversity);
+
+  const matchesStatus =
+    filterStatus === "" || user.accountStatus === filterStatus;
+
+  return matchesSearch && matchesUniversity && matchesStatus;
+});
+
+// APPLY SORTING
+if (sortColumn) {
+  filteredUsers = [...filteredUsers].sort((a, b) => {
+    const valA = a[sortColumn];
+    const valB = b[sortColumn];
+
+    let aValue = typeof valA === "string" ? valA.toLowerCase() : valA;
+    let bValue = typeof valB === "string" ? valB.toLowerCase() : valB;
+
+    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
+}
+
   
   const totalPages = Math.ceil(filteredUsers.length / pageSize);
   
@@ -311,34 +359,91 @@ const handleDeleteAccount = async (email: string) => {
           <p className="text-red-500">{errorUsers}</p>
         ) : (
           <>
+          {/* FILTER */}
           <div className="flex justify-between items-center mb-4">
             <TextInput
-            type="text"
-            placeholder="Search by name, email, or university..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="w-64 border border-orange-600 rounded-lg"
+              type="text"
+              placeholder="Search by name, email, or university..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full md:w-64 border border-orange-600 rounded-lg"
             />
+              {/* Filter by University */}
+              <Select
+              value={selectedUniversity}
+              onChange={(e) => {
+                setSelectedUniversity(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="w-full md:w-60 border border-orange-600"
+              >
+                <option value="">All Universities</option>
+                {universities.map((uni) => (
+                  <option key={uni.universityId} value={uni.universityId}>
+                    {uni.universityName}
+                    </option>
+                   ))}
+                </Select>
+
+                  {/* Filter by Status */}
+                    <Select
+      value={filterStatus}
+    onChange={(e) => {
+      setFilterStatus(e.target.value);
+      setCurrentPage(1);
+    }}
+    className="w-full md:w-52 border border-orange-600"
+  >
+    <option value="">All Status</option>
+    <option value="VERIFIED">Verified</option>
+    <option value="ACTIVATE">Activate</option>
+    <option value="DEACTIVATE">Deactivate</option>
+    <option value="PENDING">Pending</option>
+  </Select>
+
           </div>
           
           <div className="overflow-hidden rounded-lg shadow border border-orange-600">
             <table className="min-w-full text-sm">
-              <thead
-                style={{ backgroundColor: accentColor }}
-                className="text-white"
-              >
-                <tr>
-                  <th className="px-4 py-3 text-left font-medium">ID</th>
-                  <th className="px-4 py-3 text-left font-medium">University</th>
-                  <th className="px-4 py-3 text-left font-medium">Username</th>
-                  <th className="px-4 py-3 text-left font-medium">Email</th>
-                  <th className="px-4 py-3 text-left font-medium">Account Status</th>
-                  <th className="px-4 py-3 text-left font-medium">Action</th>
-                </tr>
-              </thead>
+<thead style={{ backgroundColor: accentColor }} className="text-white">
+  <tr>
+    <th
+      className="px-4 py-3 text-left font-medium cursor-pointer"
+      onClick={() => handleSort("adminId")}
+    >
+      ID {sortColumn === "adminId" && (sortDirection === "asc" ? "↑" : "↓")}
+    </th>
+    <th
+      className="px-4 py-3 text-left font-medium cursor-pointer"
+      onClick={() => handleSort("universityName")}
+    >
+      University {sortColumn === "universityName" && (sortDirection === "asc" ? "↑" : "↓")}
+    </th>
+    <th
+      className="px-4 py-3 text-left font-medium cursor-pointer"
+      onClick={() => handleSort("userName")}
+    >
+      Username {sortColumn === "userName" && (sortDirection === "asc" ? "↑" : "↓")}
+    </th>
+    <th
+      className="px-4 py-3 text-left font-medium cursor-pointer"
+      onClick={() => handleSort("email")}
+    >
+      Email {sortColumn === "email" && (sortDirection === "asc" ? "↑" : "↓")}
+    </th>
+    <th
+      className="px-4 py-3 text-left font-medium cursor-pointer"
+      onClick={() => handleSort("accountStatus")}
+    >
+      Account Status {sortColumn === "accountStatus" && (sortDirection === "asc" ? "↑" : "↓")}
+    </th>
+    <th className="px-4 py-3 text-left font-medium">Action</th>
+  </tr>
+</thead>
+
               <tbody className="divide-y divide-gray-100 bg-white">
                 {paginatedUsers.length > 0 ? (
                   paginatedUsers.map((user, idx) => (
