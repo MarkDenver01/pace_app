@@ -7,6 +7,7 @@ import AdminLayout from "./layout/admin/AdminLayout";
 import SuperAdminLayout from "./layout/superadmin/SuperAdminLayout";
 import { AuthProvider } from "./context/AuthContext";
 
+import appBg from "./assets/app-bg.jpg";
 import UpdatePasswordPage from "./page/login/UpdatePassword";
 import UniversityRedirect from "./page/login/UniversityRedirect";
 import ReleaseApk from "./page/apk/ReleaseApk";
@@ -18,7 +19,9 @@ function App() {
   const location = useLocation();
   const path = location.pathname;
 
-  /** AUTH PAGES (EXCLUDE landing "/") */
+  /** AUTH PAGES (need background)
+   * DO NOT include landing page ("/")
+   */
   const isLoginPage = path === "/login";
   const isUpdatePasswordPage = path === "/login/update-password";
   const isUniversityPage = path.startsWith("/university/");
@@ -30,11 +33,19 @@ function App() {
       <div
         className={
           isAuthPage
-            ? "min-h-screen w-full flex items-center justify-center bg-orange-600"
+            ? "relative min-h-screen w-full bg-cover bg-no-repeat bg-center flex items-center justify-center"
             : "min-h-screen w-full bg-white"
         }
+        style={
+          isAuthPage
+            ? {
+                backgroundImage: `url(${appBg})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : {}
+        }
       >
-        {/* inner wrapper kept intact */}
         <div className={isAuthPage ? "z-10 w-full max-w-md mx-auto" : "w-full"}>
           <Routes>
             {/* Homepage → Landing Page */}
