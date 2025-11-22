@@ -60,7 +60,7 @@ const Login: React.FC = () => {
           let universityName = "your university";
           try {
             const uni = await findUniversity(Number(universityId));
-            universityName = uni.universityName;
+            universityName = uni.universityName ?? "your university";
           } catch (e) {}
 
           const confirmUpdate = await Swal.fire({
