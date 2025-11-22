@@ -9,7 +9,6 @@ import { AuthProvider } from "./context/AuthContext";
 
 import appBg from "./assets/app-bg.jpg";
 import UpdatePasswordPage from "./page/login/UpdatePassword";
-import UniversityRedirect from "./page/login/UniversityRedirect";
 import ReleaseApk from "./page/apk/ReleaseApk";
 import AppLinkRedirect from "./page/link/AppLinkRedirect";
 
@@ -24,7 +23,7 @@ function App() {
    */
   const isLoginPage = path === "/login";
   const isUpdatePasswordPage = path === "/login/update-password";
-  const isUniversityPage = path.startsWith("/university/");
+  const isUniversityPage = path.startsWith("/login/university/");
 
   const isAuthPage = isLoginPage || isUpdatePasswordPage || isUniversityPage;
 
@@ -48,22 +47,18 @@ function App() {
       >
         <div className={isAuthPage ? "z-10" : "w-full"}>
           <Routes>
-            {/* Homepage → Landing Page */}
+            {/* Landing Page */}
             <Route path="/" element={<PaceLandingPage />} />
+            <Route path="/university/:universityId" element={<PaceLandingPage />} />
 
             {/* Login Page */}
             <Route path="/login" element={<Login />} />
+            <Route path="/login/university/:universityId" element={<Login />} />
 
             {/* Update Password */}
             <Route
               path="/login/update-password"
               element={<UpdatePasswordPage />}
-            />
-
-            {/* University Dynamic Page */}
-            <Route
-              path="/university/:universityId"
-              element={<UniversityRedirect />}
             />
 
             {/* APK Upload */}

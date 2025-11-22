@@ -13,14 +13,19 @@ import HeroBg from "../../assets/app-bg.jpg";
 
 const PaceLandingPage: FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); 
+  const { universityId } = useParams(); // dynamic from deep link
 
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
   const [bgParallax, setBgParallax] = useState({ x: 0, y: 0 });
 
+  /** --------------------------------------------------
+   *  HANDLE GET STARTED
+   * --------------------------------------------------*/
   const handleGetStarted = () => {
-    if (id) {
-      navigate(`/login/university/${id}`);
+    if (universityId) {
+      // store so login can use it
+      localStorage.setItem("selectedUniversityId", universityId);
+      navigate(`/login/university/${universityId}`);
     } else {
       navigate("/login");
     }
@@ -35,6 +40,7 @@ const PaceLandingPage: FC = () => {
     const rect = e.currentTarget.getBoundingClientRect();
     const relX = (e.clientX - (rect.left + rect.width / 2)) / rect.width;
     const relY = (e.clientY - (rect.top + rect.height / 2)) / rect.height;
+
     setParallax({
       x: Math.max(-0.5, Math.min(0.5, relX)),
       y: Math.max(-0.4, Math.min(0.4, relY)),
@@ -45,7 +51,9 @@ const PaceLandingPage: FC = () => {
     transform: `translate3d(${parallax.x * 18}px, ${parallax.y * 12}px, 0)`,
   };
 
-  // Scroll reveal
+  /** --------------------------------------------------
+   * SCROLL REVEAL ANIMATION
+   * --------------------------------------------------*/
   useEffect(() => {
     const animated = document.querySelectorAll<HTMLElement>("[data-animate]");
 
@@ -65,6 +73,9 @@ const PaceLandingPage: FC = () => {
     return () => observer.disconnect();
   }, []);
 
+  /** --------------------------------------------------
+   * FEATURE CARDS
+   * --------------------------------------------------*/
   const featureCards = [
     {
       icon: IconUserData,
@@ -90,7 +101,7 @@ const PaceLandingPage: FC = () => {
 
   return (
     <div className="min-h-screen w-full bg-black font-poppins text-gray-900">
-      {/* ================= HERO SECTION ================= */}
+      {/* ================= HERO ================= */}
       <section
         id="home"
         className="relative overflow-hidden text-white"
@@ -108,12 +119,12 @@ const PaceLandingPage: FC = () => {
         }}
         onMouseLeave={() => setBgParallax({ x: 0, y: 0 })}
       >
-        {/* Overlays: subtle dark + orange glow */}
+        {/* overlays */}
         <div className="pointer-events-none absolute inset-0 bg-black/18 backdrop-blur-[2px]" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/40 via-transparent to-black/70" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_15%,rgba(249,115,22,0.5),transparent_60%)] opacity-80" />
 
-        {/* NAVBAR (no logo, right aligned) */}
+        {/* NAVBAR */}
         <header className="relative z-20 mx-auto flex w-full max-w-6xl justify-end px-4 py-4 md:px-6 text-[14px] font-semibold">
           <nav className="hidden md:flex gap-10 tracking-wide">
             <button onClick={() => scrollToSection("home")} className="nav-link">
@@ -137,12 +148,11 @@ const PaceLandingPage: FC = () => {
           onMouseMove={handleHeroMouseMove}
           onMouseLeave={() => setParallax({ x: 0, y: 0 })}
         >
-          {/* LEFT HERO CONTENT */}
+          {/* LEFT CONTENT */}
           <div
             className="md:flex-1 max-w-xl rounded-3xl bg-black/30 px-5 py-6 md:px-7 md:py-7 shadow-[0_24px_60px_rgba(0,0,0,0.6)] backdrop-blur-md border border-white/10"
             data-animate="fade-right"
           >
-            {/* BIG LOGO */}
             <div className="flex justify-center mb-4">
               <img
                 src={PaceLogo}
@@ -158,23 +168,21 @@ const PaceLandingPage: FC = () => {
             </h1>
 
             <p className="mt-4 text-[15px] md:text-[17px] leading-relaxed text-white/90">
-              Empower your institution with efficient, data-driven tools designed to simplify
-              administration, enhance decision-making, and build a future where management and
-              innovation work hand in hand.
+              Empower your institution with efficient, data-driven tools...
             </p>
 
+            {/* START BUTTON */}
             <button
-               onClick={handleGetStarted}
+              onClick={handleGetStarted}
               className="mt-6 inline-flex items-center justify-center rounded-full bg-[#F97316] px-10 py-3 text-[14px] md:text-[15px] font-semibold shadow-xl hover:bg-[#EA580C] hover:-translate-y-[2px] transition"
             >
               Get Started
             </button>
           </div>
 
-          {/* RIGHT ILLUSTRATION */}
+          {/* RIGHT IMAGE */}
           <div className="md:flex-1 flex items-center justify-center" data-animate="fade-left">
             <div className="hero-image-wrapper relative">
-              {/* Soft orange glow behind student */}
               <div className="pointer-events-none absolute inset-auto bottom-0 w-[260px] h-[260px] md:w-[320px] md:h-[320px] translate-y-8 translate-x-4 rounded-full bg-[radial-gradient(circle,rgba(249,115,22,0.9),transparent_60%)] opacity-70 blur-3xl" />
               <img
                 src={HeroStudent}
@@ -200,8 +208,7 @@ const PaceLandingPage: FC = () => {
               Platform Features
             </h2>
             <p className="mt-3 text-center text-[14px] md:text-[15px] text-white/90 max-w-2xl mx-auto">
-              Discover how PACE streamlines academic and career exploration through powerful,
-              intuitive tools for administrators, counselors, and students.
+              Discover how PACE streamlines academic and career exploration...
             </p>
 
             <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-7 md:grid-cols-2 lg:grid-cols-4">
@@ -243,11 +250,7 @@ const PaceLandingPage: FC = () => {
             About PACE
           </h2>
           <p className="mt-4 text-[14px] md:text-[16px] leading-relaxed text-white/90 text-justify">
-            PACE (Personal Academic &amp; Career Evaluation) is an innovative platform designed to
-            help students discover their ideal academic paths and future careers, while giving
-            institutions powerful tools to evaluate, guide, and track learner progress. It combines
-            career assessment, analytics, and institutional insights to bridge the gap between
-            each student&apos;s potential and real academic opportunities.
+            PACE helps students discover their ideal academic paths...
           </p>
         </div>
       </section>
@@ -267,12 +270,7 @@ const PaceLandingPage: FC = () => {
             Our Mission
           </h2>
           <p className="mt-4 text-[14px] md:text-[16px] leading-relaxed text-gray-800 text-justify">
-            Our mission is to empower every learner to confidently discover their path, and every
-            institution to guide them with purpose. PACE makes academic and career exploration
-            accessible, meaningful, and data-driven by combining technology, psychology, and
-            education. We strive to bridge the gap between potential and opportunity, helping
-            students make informed choices while providing schools with tools for impactful,
-            evidence-based guidance.
+            Our mission is to empower every learner...
           </p>
         </div>
       </section>

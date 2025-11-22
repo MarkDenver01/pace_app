@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { HiLockClosed, HiUser, HiEye, HiEyeOff } from "react-icons/hi";
 
 import { login } from "../../libs/ApiResponseService";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import type { LoginResponse } from "../../libs/models/Login";
 import Swal from "sweetalert2";
@@ -17,13 +17,33 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { setAuth } = useAuth();
 
+  const { universityId: routeUniversityId } = useParams(); // /login/university/15
+  const [searchParams] = useSearchParams();
+
+  const queryUniversityId = searchParams.get("universityId"); // ?universityId=15
+  const storedUniversityId = localStorage.getItem("selectedUniversityId");
+
+  /** FINAL RESOLVED UNIVERSITY ID */
+  const universityId =
+    routeUniversityId ||
+    queryUniversityId ||
+    storedUniversityId ||
+    null;
+
+  /** Make sure we always store it if found */
+  if (universityId) {
+    localStorage.setItem("selectedUniversityId", universityId);
+  }
+
+  // FORM STATES
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [searchParams] = useSearchParams();
-  const universityId = searchParams.get("universityId");
 
+  /** ----------------------------------------
+   * LOGIN SUBMIT
+   ---------------------------------------- */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -32,11 +52,12 @@ const Login: React.FC = () => {
       const response: LoginResponse = await login({ email, password });
       setAuth(response);
 
+      /** ADMIN LOGIN */
       if (response.role === "ADMIN") {
         const adminStatus = response.adminResponse.accountStatus;
 
         if (adminStatus === "PENDING") {
-          const result = await Swal.fire({
+          const confirmUpdate = await Swal.fire({
             title: `Hi ${response.username}! Please update your password before LOGIN.`,
             icon: "warning",
             showCancelButton: true,
@@ -45,7 +66,7 @@ const Login: React.FC = () => {
             ...getSwalTheme(),
           });
 
-          if (result.isConfirmed) {
+          if (confirmUpdate.isConfirmed) {
             navigate(
               `/login/update-password?universityId=${universityId}&email=${encodeURIComponent(
                 email
@@ -53,49 +74,59 @@ const Login: React.FC = () => {
               { replace: true }
             );
           }
-        } else if (adminStatus === "VERIFIED" || adminStatus === "ACTIVATE") {
+          return;
+        }
+
+        if (adminStatus === "VERIFIED" || adminStatus === "ACTIVATE") {
           Swal.fire({
             icon: "success",
             title: `Welcome ${response.username}!`,
             text: "Proceed to dashboard.",
             confirmButtonText: "PROCEED",
             ...getSwalTheme(),
-          }).then((result) => {
-            if (result.isConfirmed) navigate("/admin/dashboard");
+          }).then((res) => {
+            if (res.isConfirmed) navigate("/admin/dashboard");
           });
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Access Denied",
-            text: `Your account status (${adminStatus}) does not allow access.`,
-            confirmButtonText: "CLOSE",
-            ...getSwalTheme(),
-          });
+          return;
         }
-      } else if (response.role === "SUPER_ADMIN") {
+
+        Swal.fire({
+          icon: "error",
+          title: "Access Denied",
+          text: `Your account status (${adminStatus}) does not allow access.`,
+          confirmButtonText: "CLOSE",
+          ...getSwalTheme(),
+        });
+        return;
+      }
+
+      /** SUPER ADMIN LOGIN */
+      if (response.role === "SUPER_ADMIN") {
         Swal.fire({
           icon: "success",
           title: `Welcome ${response.username}!`,
           text: "Proceed to Super Admin dashboard.",
           confirmButtonText: "PROCEED",
           ...getSwalTheme(),
-        }).then((result) => {
-          if (result.isConfirmed) navigate("/superadmin/dashboard");
+        }).then((res) => {
+          if (res.isConfirmed) navigate("/superadmin/dashboard");
         });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Unauthorized",
-          text: "Your role is not authorized to access this application.",
-          confirmButtonText: "CLOSE",
-          ...getSwalTheme(),
-        });
+        return;
       }
+
+      /** OTHER ROLE - NOT ALLOWED */
+      Swal.fire({
+        icon: "error",
+        title: "Unauthorized",
+        text: "Your role is not authorized to access this application.",
+        confirmButtonText: "CLOSE",
+        ...getSwalTheme(),
+      });
     } catch (error: any) {
       Swal.fire({
         icon: "error",
         title: "Login Failed",
-        text: error?.message || "Invalid email or password. Please try again.",
+        text: error?.message || "Invalid email or password.",
         confirmButtonText: "CLOSE",
         ...getSwalTheme(),
       });
@@ -109,12 +140,11 @@ const Login: React.FC = () => {
       className="relative min-h-screen w-full bg-cover bg-center bg-no-repeat flex items-center justify-center"
       style={{ backgroundImage: `url(${LoginFullBG})` }}
     >
-      {/* light global blur so BG still visible */}
+      {/* Blur overlay */}
       <div className="absolute inset-0 bg-white/15 backdrop-blur-[2px]" />
 
-      {/* main wrapper to control card width (same feel as grocery UI) */}
       <div className="relative z-10 w-full px-4 sm:px-6">
-        {/* soft glow under the card */}
+        {/* Glow under card */}
         <div className="mx-auto max-w-4xl pointer-events-none">
           <div className="mx-auto h-6 w-3/4 rounded-full bg-orange-500/40 blur-2xl opacity-75" />
         </div>
@@ -129,7 +159,7 @@ const Login: React.FC = () => {
           "
         >
           <div className="grid grid-cols-1 md:grid-cols-5">
-            {/* LEFT PANEL – logo + mascot strip */}
+            {/* LEFT IMAGE PANEL */}
             <div
               className="
                 md:col-span-2 relative flex flex-col items-center justify-center
@@ -157,11 +187,11 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            {/* RIGHT PANEL – form */}
+            {/* RIGHT FORM PANEL */}
             <div className="md:col-span-3 p-6 sm:p-8 bg-white/98">
               <div className="text-center mb-6">
                 <h2 className="text-xl sm:text-2xl font-extrabold text-orange-700">
-                   Smart Management
+                  Smart Management
                 </h2>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-orange-600 tracking-wide">
                   for a Smarter Future
@@ -222,7 +252,7 @@ const Login: React.FC = () => {
                   </div>
                 </div>
 
-                {/* REMEMBER + FORGOT */}
+                {/* FORGOT PASSWORD */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm text-gray-600">
                   <label className="inline-flex items-center gap-2 cursor-pointer select-none">
                     <input type="checkbox" className="accent-orange-600" />
