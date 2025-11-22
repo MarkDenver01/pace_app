@@ -80,7 +80,7 @@ const PaceLandingPage: FC = () => {
               <img
                 src={PaceLogo}
                 alt="PACE Logo"
-                className="h-[240px] w-auto md:h-[260px] drop-shadow-xl"/>
+                className="h-[140px] w-auto md:h-[160px] drop-shadow-xl"/>
               </div>
 
             {/* Removed subtitle completely */}
@@ -99,7 +99,7 @@ const PaceLandingPage: FC = () => {
 
             <button
               onClick={() => navigate("/login")}
-              className="mt-4 rounded-full bg-[#D62828] px-8 py-2.5 text-[12px] font-semibold shadow-lg hover:bg-[#B71F1F] transition"
+              className="mt-4 rounded-full bg-[#D62828] px-8 py-2.5 text-[25px] font-semibold shadow-lg hover:bg-[#B71F1F] transition"
             >
               Get Started
             </button>
