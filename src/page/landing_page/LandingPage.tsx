@@ -134,7 +134,7 @@ const PaceLandingPage: FC = () => {
             data-animate="fade-right"
           >
             {/* BIG LOGO */}
-            <div className="flex justify-start mb-4">
+            <div className="flex justify-center mb-4">
               <img
                 src={PaceLogo}
                 alt="PACE Logo"
