@@ -165,6 +165,29 @@ export async function updatePassword(
   }
 };
 
+/**
+ * Updates the password for a university account.
+ * @param universityId The ID of the university whose password is being updated.
+ * @param newPassword The new password.
+ * @returns Promise<boolean> Returns true if update succeeded, false otherwise.
+ */
+export async function activateAccount(
+  email: string,
+  universityId: number
+): Promise<boolean> {
+  try {
+    const response = await api.put(
+      "/user/public/activate-account",
+      { email, universityId }
+    );
+
+    return response?.data?.success === true;
+  } catch (error: any) {
+    console.error("Error updating password:", error);
+    return false;
+  }
+};
+
 
 /**
  * 
