@@ -154,11 +154,6 @@ const Login: React.FC = () => {
                   alt="Student"
                   className="h-44 sm:h-52 md:h-60 drop-shadow-[0_18px_40px_rgba(0,0,0,0.7)]"
                 />
-                <p className="mt-5 text-center text-sm sm:text-base font-extrabold text-white leading-snug drop-shadow-xl">
-                  Smart Management
-                  <br />
-                  for a Smarter Future
-                </p>
               </div>
             </div>
 
@@ -166,14 +161,11 @@ const Login: React.FC = () => {
             <div className="md:col-span-3 p-6 sm:p-8 bg-white/98">
               <div className="text-center mb-6">
                 <h2 className="text-xl sm:text-2xl font-extrabold text-orange-700">
-                  Welcome Back to
+                   Smart Management
                 </h2>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-orange-600 tracking-wide">
-                  PACE!
+                  for a Smarter Future
                 </h1>
-                <p className="mt-3 text-xs sm:text-sm text-gray-600">
-                  Smart Management for a Smarter Future
-                </p>
               </div>
 
               <form className="space-y-5 sm:space-y-6" onSubmit={handleLogin}>
