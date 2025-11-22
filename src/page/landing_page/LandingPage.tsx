@@ -174,12 +174,6 @@ const PaceLandingPage: FC = () => {
             >
               Our Mission
             </button>
-            <button
-              onClick={() => navigate("/login")}
-              className="ml-3 rounded-full border border-white/80 px-4 py-1.5 text-[11px] font-semibold shadow-sm transition hover:bg-white hover:text-[#B92E09]"
-            >
-              Admin Login
-            </button>
           </nav>
         </header>
 
