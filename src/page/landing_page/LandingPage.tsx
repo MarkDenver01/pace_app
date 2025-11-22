@@ -100,7 +100,7 @@ const PaceLandingPage: FC = () => {
         onMouseLeave={() => setBgParallax({ x: 0, y: 0 })}
       >
         {/* Opacity + blur overlay so BG still shows */}
-        <div className="pointer-events-none absolute inset-0 bg-black/35 backdrop-blur-[2px]" />
+        <div className="pointer-events-none absolute inset-0 bg-black/15 backdrop-blur-[2px]" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/45" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.24),transparent_60%)] opacity-60" />
 
