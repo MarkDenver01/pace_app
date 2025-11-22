@@ -46,7 +46,7 @@ function App() {
             : {}
         }
       >
-        <div className={isAuthPage ? "z-10 w-full max-w-xl mx-auto" : "w-full"}>
+        <div className={isAuthPage ? "z-10 w-full max-w-[650px] mx-auto" : "w-full"}>
           <Routes>
             {/* Homepage → Landing Page */}
             <Route path="/" element={<PaceLandingPage />} />
