@@ -115,7 +115,7 @@ const Login: React.FC = () => {
       {/* No black overlay here → pure orange BG */}
 
       {/* MAIN LOGIN CARD */}
-      <div className="w-full max-w-6xl mx-4 md:mx-0 rounded-[32px] overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.45)] flex bg-white/10 backdrop-blur-[2px] border border-white/30">
+      <div className="w-full max-w-8xl mx-6 md:mx-0 rounded-[32px] overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.45)] flex bg-white/10 backdrop-blur-[2px] border border-white/30">
         {/* LEFT SIDE — LOGO + STUDENT */}
         <div className="hidden md:flex w-1/2 flex-col items-center justify-center bg-gradient-to-b from-[#F9A63A] via-[#F07A1C] to-[#D6451C] px-8 py-10 relative">
           {/* subtle glow at bottom */}
