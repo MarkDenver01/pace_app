@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { HiLockClosed, HiUser, HiEye, HiEyeOff } from "react-icons/hi";
+import {
+  HiLockClosed,
+  HiUser,
+  HiEye,
+  HiEyeOff,
+} from "react-icons/hi";
 
 import { login } from "../../libs/ApiResponseService";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -60,9 +65,7 @@ const Login: React.FC = () => {
             text: "Proceed to dashboard.",
             confirmButtonText: "PROCEED",
             ...getSwalTheme(),
-          }).then((result) => {
-            if (result.isConfirmed) navigate("/admin/dashboard");
-          });
+          }).then(() => navigate("/admin/dashboard"));
         } else {
           Swal.fire({
             icon: "error",
@@ -79,14 +82,12 @@ const Login: React.FC = () => {
           text: "Proceed to Super Admin dashboard.",
           confirmButtonText: "PROCEED",
           ...getSwalTheme(),
-        }).then((result) => {
-          if (result.isConfirmed) navigate("/superadmin/dashboard");
-        });
+        }).then(() => navigate("/superadmin/dashboard"));
       } else {
         Swal.fire({
           icon: "error",
           title: "Unauthorized",
-          text: "Your role is not authorized to access this application.",
+          text: "Your role is not authorized.",
           confirmButtonText: "CLOSE",
           ...getSwalTheme(),
         });
@@ -95,7 +96,7 @@ const Login: React.FC = () => {
       Swal.fire({
         icon: "error",
         title: "Login Failed",
-        text: error?.message || "Invalid email or password. Please try again.",
+        text: error?.message || "Invalid email or password.",
         confirmButtonText: "CLOSE",
         ...getSwalTheme(),
       });
@@ -106,154 +107,137 @@ const Login: React.FC = () => {
 
   return (
     <div
-      className="relative min-h-screen w-full bg-cover bg-center bg-no-repeat flex items-center justify-center"
+      className="min-h-screen w-full flex items-center justify-center bg-cover bg-center bg-no-repeat relative"
       style={{ backgroundImage: `url(${LoginFullBG})` }}
     >
-      {/* light global blur so BG still visible */}
-      <div className="absolute inset-0 bg-white/15 backdrop-blur-[2px]" />
+      {/* Soft overlay */}
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
 
-      {/* main wrapper to control card width (same feel as grocery UI) */}
-      <div className="relative z-10 w-full px-4 sm:px-6">
-        {/* soft glow under the card */}
-        <div className="mx-auto max-w-4xl pointer-events-none">
-          <div className="mx-auto h-6 w-3/4 rounded-full bg-orange-500/40 blur-2xl opacity-75" />
+      {/* CARD */}
+      <div
+        className="
+          relative z-10 w-full max-w-7xl mx-6
+          rounded-[36px] overflow-hidden 
+          shadow-[0_30px_80px_rgba(0,0,0,0.55)]
+          flex bg-white/10 backdrop-blur-xl border border-white/30
+        "
+      >
+
+        {/* LEFT PANEL */}
+        <div
+          className="
+            hidden md:flex flex-col justify-center items-center 
+            w-1/2 px-10 py-14 relative
+          "
+          style={{
+            backgroundImage: `url(${LoginLeftBG})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div className="absolute inset-0 bg-black/25" />
+
+          <img
+            src={PaceLogo}
+            className="h-44 md:h-52 drop-shadow-2xl z-10 mb-4"
+          />
+
+          <img
+            src={HeroStudent}
+            className="h-80 md:h-[24rem] drop-shadow-[0_15px_40px_rgba(0,0,0,0.55)] animate-float z-10"
+          />
         </div>
 
-        {/* LOGIN CARD */}
-        <div  >
-          <div className="grid grid-cols-1 md:grid-cols-5">
-            {/* LEFT PANEL – logo + mascot strip */}
-            <div
-              className="
-                md:col-span-2 relative flex flex-col items-center justify-center
-                p-6 sm:p-7
-              "
-              style={{
-                backgroundImage: `url(${LoginLeftBG})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/35" />
-
-              <div className="relative flex flex-col items-center">
-                <img
-                  src={PaceLogo}
-                  alt="PACE Logo"
-                  className="h-20 sm:h-24 mb-4 drop-shadow-[0_10px_26px_rgba(0,0,0,0.6)]"
-                />
-                <img
-                  src={HeroStudent}
-                  alt="Student"
-                  className="h-44 sm:h-52 md:h-60 drop-shadow-[0_18px_40px_rgba(0,0,0,0.7)]"
-                />
-              </div>
+        {/* RIGHT PANEL – FULL CENTERED FORM */}
+        <div className="w-full md:w-1/2 bg-white/95 flex flex-col justify-center">
+          
+          <div className="w-full max-w-sm mx-auto px-6 md:px-0 py-12">
+            
+            {/* HEADER */}
+            <div className="text-center mb-8">
+              <h2 className="text-[26px] md:text-[30px] font-extrabold text-orange-700">
+                Smart Management
+              </h2>
+              <h1 className="text-[34px] md:text-[38px] font-extrabold text-orange-600 tracking-wide">
+                for a Smarter Future
+              </h1>
             </div>
 
-            {/* RIGHT PANEL – form */}
-            <div className="md:col-span-3 p-6 sm:p-8 bg-white/98">
-              <div className="text-center mb-6">
-                <h2 className="text-xl sm:text-2xl font-extrabold text-orange-700">
-                   Smart Management
-                </h2>
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-orange-600 tracking-wide">
-                  for a Smarter Future
-                </h1>
+            <form className="space-y-6" onSubmit={handleLogin}>
+
+              {/* EMAIL */}
+              <div>
+                <label className="font-medium text-[14px] text-gray-800">
+                  Email
+                </label>
+                <div className="relative mt-1">
+                  <HiUser className="absolute left-3 top-3 text-orange-600 text-xl" />
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="
+                      w-full pl-12 pr-4 py-3 rounded-2xl 
+                      border border-orange-300 bg-orange-50/50
+                      text-sm text-gray-800 
+                      focus:ring-2 focus:ring-orange-500 focus:border-orange-600
+                      outline-none transition
+                    "
+                  />
+                </div>
               </div>
 
-              <form className="space-y-5 sm:space-y-6" onSubmit={handleLogin}>
-                {/* EMAIL */}
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                    Email Address
-                  </label>
-                  <div className="relative group">
-                    <HiUser className="absolute left-3 top-2.5 text-orange-500 group-focus-within:text-orange-600 transition" />
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="
-                        w-full pl-10 pr-3 py-2.5 rounded-xl
-                        bg-white/90 border border-orange-300
-                        text-gray-800 text-sm
-                        focus:ring-2 focus:ring-orange-500 focus:border-orange-500
-                        outline-none transition
-                      "
-                    />
-                  </div>
-                </div>
-
-                {/* PASSWORD */}
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                    Password
-                  </label>
-                  <div className="relative group">
-                    <HiLockClosed className="absolute left-3 top-2.5 text-orange-500 group-focus-within:text-orange-600 transition" />
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="
-                        w-full pl-10 pr-10 py-2.5 rounded-xl
-                        bg-white/90 border border-orange-300
-                        text-gray-800 text-sm
-                        focus:ring-2 focus:ring-orange-500 focus:border-orange-500
-                        outline-none transition
-                      "
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-2.5 text-gray-500 hover:text-orange-600 transition"
-                    >
-                      {showPassword ? <HiEyeOff /> : <HiEye />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* REMEMBER + FORGOT */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm text-gray-600">
-                  <label className="inline-flex items-center gap-2 cursor-pointer select-none">
-                    <input type="checkbox" className="accent-orange-600" />
-                    <span>Remember me</span>
-                  </label>
-
-                  <button
-                    type="button"
-                    className="text-orange-600 hover:text-orange-700 font-medium"
-                    onClick={() => navigate("/forgot-password")}
+              {/* PASSWORD */}
+              <div>
+                <label className="font-medium text-[14px] text-gray-800">
+                  Password
+                </label>
+                <div className="relative mt-1">
+                  <HiLockClosed className="absolute left-3 top-3 text-orange-600 text-xl" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="
+                      w-full pl-12 pr-12 py-3 rounded-2xl 
+                      border border-orange-300 bg-orange-50/50
+                      text-sm text-gray-800 
+                      focus:ring-2 focus:ring-orange-500 focus:border-orange-600
+                      outline-none transition
+                    "
+                  />
+                  <span
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-3 cursor-pointer text-gray-500 text-xl"
                   >
-                    Forgot Password?
-                  </button>
+                    {showPassword ? <HiEyeOff /> : <HiEye />}
+                  </span>
                 </div>
+              </div>
 
-                {/* LOGIN BUTTON */}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="
-                    w-full py-2.5 sm:py-3
-                    rounded-full
-                    bg-gradient-to-r from-orange-500 to-orange-600
-                    text-white text-sm sm:text-base font-semibold
-                    shadow-lg hover:shadow-[0_14px_30px_rgba(249,115,22,0.55)]
-                    hover:translate-y-[-1px]
-                    transition-all disabled:opacity-60
-                  "
-                >
-                  {loading ? "Logging in..." : "Login"}
-                </button>
-              </form>
+              {/* BUTTON */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="
+                  w-full py-3.5 rounded-full 
+                  bg-gradient-to-r from-orange-500 to-red-500 
+                  text-white font-bold shadow-xl 
+                  hover:shadow-orange-400/40 hover:scale-[1.02]
+                  transition disabled:opacity-60
+                "
+              >
+                {loading ? "Logging in..." : "LOGIN"}
+              </button>
+            </form>
 
-              <p className="mt-6 text-[10px] sm:text-xs text-gray-500 text-center">
-                © 2025 PACE System. All rights reserved.
-              </p>
-            </div>
+            <p className="text-center text-[12px] mt-8 text-gray-500">
+              © 2025 PACE System. All rights reserved.
+            </p>
           </div>
+
         </div>
       </div>
     </div>
