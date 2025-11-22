@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { HiLockClosed, HiUser, HiEye, HiEyeOff } from "react-icons/hi";
+
 import { login } from "../../libs/ApiResponseService";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -21,7 +22,7 @@ const Login: React.FC = () => {
   const [searchParams] = useSearchParams();
   const universityId = searchParams.get("universityId");
 
-  // ---- LOGIN LOGIC (UNCHANGED) ----
+  // LOGIN LOGIC (UNCHANGED)
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -35,10 +36,10 @@ const Login: React.FC = () => {
 
         if (adminStatus === "PENDING") {
           const result = await Swal.fire({
-            title: `Hi ${response.username}! Please update your password.`,
+            title: `Hi ${response.username}! Please update your password before LOGIN.`,
             icon: "warning",
             showCancelButton: true,
-            confirmButtonText: "Proceed",
+            confirmButtonText: "Yes, PROCEED",
             cancelButtonText: "Cancel",
             ...getSwalTheme(),
           });
@@ -47,17 +48,28 @@ const Login: React.FC = () => {
             navigate(
               `/login/update-password?universityId=${universityId}&email=${encodeURIComponent(
                 email
-              )}`
+              )}`,
+              { replace: true }
             );
           }
-        } else {
+        } else if (adminStatus === "VERIFIED" || adminStatus === "ACTIVATE") {
           Swal.fire({
             icon: "success",
             title: `Welcome ${response.username}!`,
             text: "Proceed to dashboard.",
             confirmButtonText: "PROCEED",
             ...getSwalTheme(),
-          }).then(() => navigate("/admin/dashboard"));
+          }).then((result) => {
+            if (result.isConfirmed) navigate("/admin/dashboard");
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Access Denied",
+            text: `Your account status (${adminStatus}) does not allow access.`,
+            confirmButtonText: "CLOSE",
+            ...getSwalTheme(),
+          });
         }
       } else if (response.role === "SUPER_ADMIN") {
         Swal.fire({
@@ -66,12 +78,15 @@ const Login: React.FC = () => {
           text: "Proceed to Super Admin dashboard.",
           confirmButtonText: "PROCEED",
           ...getSwalTheme(),
-        }).then(() => navigate("/superadmin/dashboard"));
+        }).then((result) => {
+          if (result.isConfirmed) navigate("/superadmin/dashboard");
+        });
       } else {
         Swal.fire({
           icon: "error",
           title: "Unauthorized",
-          text: "Your role is not allowed.",
+          text: "Your role is not authorized to access this application.",
+          confirmButtonText: "CLOSE",
           ...getSwalTheme(),
         });
       }
@@ -80,6 +95,7 @@ const Login: React.FC = () => {
         icon: "error",
         title: "Login Failed",
         text: error?.message || "Invalid email or password.",
+        confirmButtonText: "CLOSE",
         ...getSwalTheme(),
       });
     } finally {
@@ -87,61 +103,64 @@ const Login: React.FC = () => {
     }
   };
 
-  // ---- UI ----
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-orange-500">
+    <div className="min-h-screen w-full flex items-center justify-center bg-orange-600">
 
-      {/* CARD */}
-      <div className="w-full max-w-6xl bg-white rounded-xl overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-2">
+      {/* MAIN CARD */}
+      <div
+        className="
+          w-full max-w-5xl mx-auto
+          grid grid-cols-1 md:grid-cols-2
+          bg-white shadow-2xl rounded-2xl overflow-hidden
+        "
+      >
 
-        {/* LEFT PANEL (ORANGE LIKE REFERENCE) */}
-        <div className="relative p-8 flex flex-col items-center justify-center text-center bg-gradient-to-br from-orange-500 to-orange-700">
+        {/* LEFT PANEL */}
+        <div className="relative bg-gradient-to-br from-orange-500 to-orange-700 p-10 flex flex-col justify-center items-center text-center">
 
           <img
             src={PaceLogo}
-            className="h-24 mb-3 drop-shadow-xl animate-fadeIn"
+            alt="PACE Logo"
+            className="h-24 mb-4 drop-shadow-xl"
           />
 
-          <p className="text-white/90 text-sm mb-4 animate-slideUp">
+          <p className="text-white text-sm mb-6">
             Personalized Academic <br /> and Career Exploration
           </p>
 
-          {/* MASCOT FLOAT ANIMATION */}
           <img
             src={HeroStudent}
-            className="h-64 animate-floating drop-shadow-[0_20px_30px_rgba(0,0,0,0.4)]"
+            alt="Student Mascot"
+            className="h-64 drop-shadow-[0_18px_40px_rgba(0,0,0,0.65)] animate-floating"
           />
-
-          {/* bottom glow */}
-          <div className="absolute bottom-14 w-40 h-5 bg-white/30 blur-xl" />
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="bg-orange-50 p-10 flex flex-col justify-center">
+        <div className="p-10 bg-white flex flex-col justify-center">
 
-          <h1 className="text-3xl font-extrabold text-center text-gray-900 animate-slideUp">
+          <h1 className="text-3xl font-extrabold text-center text-gray-900">
             WELCOME BACK TO <span className="text-orange-700">PACE!</span>
           </h1>
 
-          <p className="text-center mt-1 mb-8 font-semibold text-gray-800 text-lg animate-slideUp">
+          <p className="text-center mt-1 mb-8 font-semibold text-gray-700">
             Smart Management for a Smarter Future
           </p>
 
           <form className="space-y-5" onSubmit={handleLogin}>
-
             {/* EMAIL */}
             <div>
               <label className="text-sm font-medium">Email</label>
               <div className="relative">
-                <HiUser className="absolute left-3 top-2.5 text-orange-600" />
+                <HiUser className="absolute left-3 top-2.5 text-orange-500" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 rounded-lg 
-                             border border-orange-300 bg-white 
-                             focus:ring-2 focus:ring-orange-500 shadow-sm"
+                  className="
+                    w-full pl-10 pr-3 py-2 rounded-lg border border-orange-300
+                    focus:ring-2 focus:ring-orange-500
+                  "
                 />
               </div>
             </div>
@@ -150,20 +169,21 @@ const Login: React.FC = () => {
             <div>
               <label className="text-sm font-medium">Password</label>
               <div className="relative">
-                <HiLockClosed className="absolute left-3 top-2.5 text-orange-600" />
+                <HiLockClosed className="absolute left-3 top-2.5 text-orange-500" />
                 <input
                   type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2 rounded-lg 
-                             border border-orange-300 bg-white 
-                             focus:ring-2 focus:ring-orange-500 shadow-sm"
+                  className="
+                    w-full pl-10 pr-10 py-2 rounded-lg border border-orange-300
+                    focus:ring-2 focus:ring-orange-500
+                  "
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-gray-600 hover:text-orange-600"
+                  className="absolute right-3 top-2.5 text-gray-600"
                 >
                   {showPassword ? <HiEyeOff /> : <HiEye />}
                 </button>
@@ -176,7 +196,6 @@ const Login: React.FC = () => {
                 <input type="checkbox" className="accent-orange-600" />
                 Remember me
               </label>
-
               <button
                 type="button"
                 className="text-orange-600 hover:underline"
@@ -190,15 +209,16 @@ const Login: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2 bg-orange-600 text-white font-bold 
-                         rounded-lg hover:bg-orange-700 transition 
-                         shadow-md hover:shadow-xl hover:scale-[1.02]"
+              className="
+                w-full py-2 bg-orange-600 text-white font-bold rounded-lg
+                hover:bg-orange-700 transition shadow-md hover:shadow-xl
+              "
             >
               {loading ? "Logging in..." : "LOGIN"}
             </button>
           </form>
 
-          <p className="text-center text-[10px] text-gray-500 mt-6">
+          <p className="text-center text-xs text-gray-500 mt-6">
             © 2025 PACE System. All rights reserved.
           </p>
         </div>
@@ -213,20 +233,6 @@ const Login: React.FC = () => {
         }
         .animate-floating {
           animation: floating 3s ease-in-out infinite;
-        }
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slideUp {
-          animation: slideUp .9s ease forwards;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 1s ease forwards;
         }
       `}</style>
     </div>
