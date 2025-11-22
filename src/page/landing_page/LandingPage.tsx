@@ -219,7 +219,7 @@ const PaceLandingPage: FC = () => {
       {/* ================= ABOUT ================= */}
       <section
         id="about"
-        className="relative px-4 py-16 md:px-6 md:py-20 bg-gradient-to-b from-white via-[#e9c98b] to-[#d6ad66]"
+        className="relative px-4 py-16 md:px-6 md:py-20 bg-gradient-to-b from-white via-[#d6ad66] to-[#d6ad66]"
       >
         <div
           className="relative mx-auto max-w-4xl rounded-3xl bg-white/80 px-6 py-8 md:px-10 md:py-10 shadow-[0_18px_40px_rgba(0,0,0,0.2)] border border-orange-100"
