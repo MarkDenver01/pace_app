@@ -80,9 +80,8 @@ const PaceLandingPage: FC = () => {
               <img
                 src={PaceLogo}
                 alt="PACE Logo"
-                className="h-24 w-auto md:h-28 drop-shadow-xl"
-              />
-            </div>
+                className="h-[240px] w-auto md:h-[260px] drop-shadow-xl"/>
+              </div>
 
             {/* Removed subtitle completely */}
 
