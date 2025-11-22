@@ -55,7 +55,7 @@ export default function AdminUserLayout() {
 
   // Filters
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterUniversity, setFilterUniversity] = useState<string>(""); // uses universityName
+  const [filterUniversity, setFilterUniversity] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [filterRole, setFilterRole] = useState<string>("");
 
@@ -85,7 +85,7 @@ export default function AdminUserLayout() {
         confirmButtonText: "CLOSE",
         ...getSwalTheme(),
       });
-      await fetchUsers(); // refresh table
+      await fetchUsers();
     } catch (error: any) {
       Swal.fire({
         icon: "error",
@@ -107,7 +107,7 @@ export default function AdminUserLayout() {
         confirmButtonText: "CLOSE",
         ...getSwalTheme(),
       });
-      await fetchUsers(); // refresh table
+      await fetchUsers();
     } catch (error: any) {
       Swal.fire({
         icon: "error",
@@ -192,7 +192,6 @@ export default function AdminUserLayout() {
       }).then(() => setLoading(false));
       await fetchUsers();
 
-      // Reset form
       setSelectedUniversity("");
       setUsername("");
       setEmail("");
@@ -233,7 +232,6 @@ export default function AdminUserLayout() {
   // ===== Filtering & Sorting Logic =====
   let filteredUsers = [...users];
 
-  // Search
   if (searchTerm.trim()) {
     const lower = searchTerm.toLowerCase();
     filteredUsers = filteredUsers.filter(
@@ -244,21 +242,18 @@ export default function AdminUserLayout() {
     );
   }
 
-  // University filter
   if (filterUniversity) {
     filteredUsers = filteredUsers.filter(
       (user) => user.universityName === filterUniversity
     );
   }
 
-  // Status filter
   if (filterStatus) {
     filteredUsers = filteredUsers.filter(
       (user) => user.accountStatus === filterStatus
     );
   }
 
-  // Sorting
   const handleSort = (column: SortableColumn) => {
     if (sortColumn !== column) {
       setSortColumn(column);
@@ -266,11 +261,9 @@ export default function AdminUserLayout() {
       return;
     }
 
-    // same column clicked again ⇒ toggle / reset
     if (sortDirection === "asc") {
       setSortDirection("desc");
     } else {
-      // third click: clear sort
       setSortColumn(null);
     }
   };
@@ -512,7 +505,11 @@ export default function AdminUserLayout() {
                     >
                       Account Status{renderSortIndicator("accountStatus")}
                     </th>
-                    <th className="px-4 py-3 text-left font-medium">Action</th>
+
+                    {/* ACTION HEADER CENTERED */}
+                    <th className="px-4 py-3 text-center font-medium">
+                      Action
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 bg-white">
@@ -529,117 +526,146 @@ export default function AdminUserLayout() {
                         <td className="px-4 py-3">{user.userName}</td>
                         <td className="px-4 py-3">{user.email}</td>
                         <td className="px-4 py-3">{user.accountStatus}</td>
+
+                        {/* ✅ REFACTORED ACTION CELL */}
                         <td className="px-4 py-3">
-       <td className="px-4 py-3">
-  <div className="flex flex-col gap-2">
+                          <div className="flex flex-col items-center gap-2">
 
-    {/* CASE 1: PENDING → EDIT + DELETE */}
-    {user.accountStatus === "PENDING" && (
-      <>
-        <ThemedButton
-          size="xs"
-          onClick={() => openEditModal(user)}
-          bgColor="#1c6a1fff"
-          textColor="#fff"
-          padding="0.4rem 0.8rem"
-          borderRadius="0.4rem"
-        >
-          EDIT
-        </ThemedButton>
+                            {/* Each wrapper has fixed width so ALL buttons same size */}
+                            {user.accountStatus === "PENDING" && (
+                              <>
+                                <div className="w-28">
+                                  <ThemedButton
+                                    size="xs"
+                                    onClick={() => openEditModal(user)}
+                                    bgColor="#1c6a1fff"
+                                    textColor="#fff"
+                                    padding="0.4rem 0.8rem"
+                                    borderRadius="0.4rem"
+                                    style={{ width: "100%" }}
+                                  >
+                                    EDIT
+                                  </ThemedButton>
+                                </div>
 
-        <ThemedButton
-          size="xs"
-          onClick={() => handleDeleteAccount(user.email)}
-          bgColor="#f00707ff"
-          textColor="#fff"
-          padding="0.4rem 0.8rem"
-          borderRadius="0.4rem"
-        >
-          DELETE
-        </ThemedButton>
-      </>
-    )}
+                                <div className="w-28">
+                                  <ThemedButton
+                                    size="xs"
+                                    onClick={() =>
+                                      handleDeleteAccount(user.email)
+                                    }
+                                    bgColor="#f00707ff"
+                                    textColor="#fff"
+                                    padding="0.4rem 0.8rem"
+                                    borderRadius="0.4rem"
+                                    style={{ width: "100%" }}
+                                  >
+                                    DELETE
+                                  </ThemedButton>
+                                </div>
+                              </>
+                            )}
 
-    {/* CASE 2: VERIFIED → DEACTIVATE + EDIT + DELETE */}
-    {user.accountStatus === "VERIFIED" && (
-      <>
-        <ThemedButton
-          size="xs"
-          onClick={() => handleToggleStatus(user.adminId)}
-          bgColor="#ea2e21ff"
-          textColor="#fff"
-          padding="0.4rem 0.8rem"
-          borderRadius="0.4rem"
-        >
-          DEACTIVATE
-        </ThemedButton>
+                            {user.accountStatus === "VERIFIED" && (
+                              <>
+                                <div className="w-28">
+                                  <ThemedButton
+                                    size="xs"
+                                    onClick={() =>
+                                      handleToggleStatus(user.adminId)
+                                    }
+                                    bgColor="#ea2e21ff"
+                                    textColor="#fff"
+                                    padding="0.4rem 0.8rem"
+                                    borderRadius="0.4rem"
+                                    style={{ width: "100%" }}
+                                  >
+                                    DEACTIVATE
+                                  </ThemedButton>
+                                </div>
 
-        <ThemedButton
-          size="xs"
-          onClick={() => openEditModal(user)}
-          bgColor="#1c6a1fff"
-          textColor="#fff"
-          padding="0.4rem 0.8rem"
-          borderRadius="0.4rem"
-        >
-          EDIT
-        </ThemedButton>
+                                <div className="w-28">
+                                  <ThemedButton
+                                    size="xs"
+                                    onClick={() => openEditModal(user)}
+                                    bgColor="#1c6a1fff"
+                                    textColor="#fff"
+                                    padding="0.4rem 0.8rem"
+                                    borderRadius="0.4rem"
+                                    style={{ width: "100%" }}
+                                  >
+                                    EDIT
+                                  </ThemedButton>
+                                </div>
 
-        <ThemedButton
-          size="xs"
-          onClick={() => handleDeleteAccount(user.email)}
-          bgColor="#f00707ff"
-          textColor="#fff"
-          padding="0.4rem 0.8rem"
-          borderRadius="0.4rem"
-        >
-          DELETE
-        </ThemedButton>
-      </>
-    )}
+                                <div className="w-28">
+                                  <ThemedButton
+                                    size="xs"
+                                    onClick={() =>
+                                      handleDeleteAccount(user.email)
+                                    }
+                                    bgColor="#f00707ff"
+                                    textColor="#fff"
+                                    padding="0.4rem 0.8rem"
+                                    borderRadius="0.4rem"
+                                    style={{ width: "100%" }}
+                                  >
+                                    DELETE
+                                  </ThemedButton>
+                                </div>
+                              </>
+                            )}
 
-    {/* CASE 3: DEACTIVATE → ACTIVATE + EDIT + DELETE */}
-    {user.accountStatus === "DEACTIVATE" && (
-      <>
-        <ThemedButton
-          size="xs"
-          onClick={() => handleToggleStatus(user.adminId)}
-          bgColor="#1c6a1fff"
-          textColor="#fff"
-          padding="0.4rem 0.8rem"
-          borderRadius="0.4rem"
-        >
-          ACTIVATE
-        </ThemedButton>
+                            {user.accountStatus === "DEACTIVATE" && (
+                              <>
+                                <div className="w-28">
+                                  <ThemedButton
+                                    size="xs"
+                                    onClick={() =>
+                                      handleToggleStatus(user.adminId)
+                                    }
+                                    bgColor="#1c6a1fff"
+                                    textColor="#fff"
+                                    padding="0.4rem 0.8rem"
+                                    borderRadius="0.4rem"
+                                    style={{ width: "100%" }}
+                                  >
+                                    ACTIVATE
+                                  </ThemedButton>
+                                </div>
 
-        <ThemedButton
-          size="xs"
-          onClick={() => openEditModal(user)}
-          bgColor="#1c6a1fff"
-          textColor="#fff"
-          padding="0.4rem 0.8rem"
-          borderRadius="0.4rem"
-        >
-          EDIT
-        </ThemedButton>
+                                <div className="w-28">
+                                  <ThemedButton
+                                    size="xs"
+                                    onClick={() => openEditModal(user)}
+                                    bgColor="#1c6a1fff"
+                                    textColor="#fff"
+                                    padding="0.4rem 0.8rem"
+                                    borderRadius="0.4rem"
+                                    style={{ width: "100%" }}
+                                  >
+                                    EDIT
+                                  </ThemedButton>
+                                </div>
 
-        <ThemedButton
-          size="xs"
-          onClick={() => handleDeleteAccount(user.email)}
-          bgColor="#f00707ff"
-          textColor="#fff"
-          padding="0.4rem 0.8rem"
-          borderRadius="0.4rem"
-        >
-          DELETE
-        </ThemedButton>
-      </>
-    )}
-
-  </div>
-</td>
-
-
+                                <div className="w-28">
+                                  <ThemedButton
+                                    size="xs"
+                                    onClick={() =>
+                                      handleDeleteAccount(user.email)
+                                    }
+                                    bgColor="#f00707ff"
+                                    textColor="#fff"
+                                    padding="0.4rem 0.8rem"
+                                    borderRadius="0.4rem"
+                                    style={{ width: "100%" }}
+                                  >
+                                    DELETE
+                                  </ThemedButton>
+                                </div>
+                              </>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -657,7 +683,6 @@ export default function AdminUserLayout() {
               </table>
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex justify-between mt-4 text-sm text-gray-600">
                 <span>

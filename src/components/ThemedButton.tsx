@@ -1,6 +1,6 @@
-// components/ThemedButton.tsx
 import { Button, Spinner } from "flowbite-react";
 import clsx from "clsx";
+import React from "react";
 
 type ButtonSize = "xs" | "sm" | "md" | "lg";
 
@@ -11,6 +11,7 @@ interface ThemedButtonProps {
   loading?: boolean;
   type?: "button" | "submit" | "reset";
   size?: ButtonSize;
+
   padding?: string;
   width?: string;
   height?: string;
@@ -18,7 +19,11 @@ interface ThemedButtonProps {
   bgColor?: string;
   textColor?: string;
   fontWeight?: number | string;
+
   className?: string;
+
+  /** 🔥 THIS FIXES YOUR ERROR */
+  style?: React.CSSProperties;
 }
 
 export default function ThemedButton({
@@ -28,6 +33,7 @@ export default function ThemedButton({
   loading,
   type = "button",
   size = "md",
+
   padding,
   width,
   height,
@@ -36,6 +42,7 @@ export default function ThemedButton({
   textColor,
   fontWeight = 600,
   className = "",
+  style,
 }: ThemedButtonProps) {
   const sizeStyles: Record<ButtonSize, string> = {
     xs: "px-2 py-1 text-xs",
@@ -65,9 +72,14 @@ export default function ThemedButton({
         width,
         height,
         borderRadius,
+        ...style, // 🔥 allow user custom styles like width: "100%"
       }}
     >
-      {loading ? <Spinner size={size === "lg" ? "lg" : size === "xs" ? "sm" : "md"} /> : children}
+      {loading ? (
+        <Spinner size={size === "lg" ? "lg" : size === "xs" ? "sm" : "md"} />
+      ) : (
+        children
+      )}
     </Button>
   );
 }
