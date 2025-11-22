@@ -138,7 +138,7 @@ const PaceLandingPage: FC = () => {
               <img
                 src={PaceLogo}
                 alt="PACE Logo"
-                className="h-[230px] w-auto md:h-[260px] drop-shadow-2xl"
+                className="h-[260px] md:h-[340px] lg:h-[420px] w-auto drop-shadow-2xl"
               />
             </div>
 
