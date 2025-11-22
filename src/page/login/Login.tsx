@@ -22,7 +22,7 @@ const Login: React.FC = () => {
   const [searchParams] = useSearchParams();
   const universityId = searchParams.get("universityId");
 
-  // LOGIN LOGIC (UNCHANGED)
+  // 🔐 LOGIN LOGIC (UNCHANGED)
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -48,8 +48,7 @@ const Login: React.FC = () => {
             navigate(
               `/login/update-password?universityId=${universityId}&email=${encodeURIComponent(
                 email
-              )}`,
-              { replace: true }
+              )}`
             );
           }
         } else if (adminStatus === "VERIFIED" || adminStatus === "ACTIVATE") {
@@ -59,9 +58,7 @@ const Login: React.FC = () => {
             text: "Proceed to dashboard.",
             confirmButtonText: "PROCEED",
             ...getSwalTheme(),
-          }).then((result) => {
-            if (result.isConfirmed) navigate("/admin/dashboard");
-          });
+          }).then(() => navigate("/admin/dashboard"));
         } else {
           Swal.fire({
             icon: "error",
@@ -78,9 +75,7 @@ const Login: React.FC = () => {
           text: "Proceed to Super Admin dashboard.",
           confirmButtonText: "PROCEED",
           ...getSwalTheme(),
-        }).then((result) => {
-          if (result.isConfirmed) navigate("/superadmin/dashboard");
-        });
+        }).then(() => navigate("/superadmin/dashboard"));
       } else {
         Swal.fire({
           icon: "error",
@@ -94,7 +89,7 @@ const Login: React.FC = () => {
       Swal.fire({
         icon: "error",
         title: "Login Failed",
-        text: error?.message || "Invalid email or password.",
+        text: error?.message || "Invalid email or password. Please try again.",
         confirmButtonText: "CLOSE",
         ...getSwalTheme(),
       });
@@ -106,32 +101,21 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-orange-600">
 
-      {/* MAIN CARD */}
-      <div
-        className="
-          w-full max-w-5xl mx-auto
-          grid grid-cols-1 md:grid-cols-2
-          bg-white shadow-2xl rounded-2xl overflow-hidden
-        "
-      >
+      {/* MAIN LOGIN CARD */}
+      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
 
-        {/* LEFT PANEL */}
-        <div className="relative bg-gradient-to-br from-orange-500 to-orange-700 p-10 flex flex-col justify-center items-center text-center">
+        {/* LEFT PANEL (Orange side) */}
+        <div className="bg-gradient-to-br from-orange-500 to-orange-700 p-10 flex flex-col justify-center items-center text-center">
 
-          <img
-            src={PaceLogo}
-            alt="PACE Logo"
-            className="h-24 mb-4 drop-shadow-xl"
-          />
+          <img src={PaceLogo} className="h-24 mb-3 drop-shadow-xl" />
 
-          <p className="text-white text-sm mb-6">
+          <p className="text-white/90 text-sm mb-6">
             Personalized Academic <br /> and Career Exploration
           </p>
 
           <img
             src={HeroStudent}
-            alt="Student Mascot"
-            className="h-64 drop-shadow-[0_18px_40px_rgba(0,0,0,0.65)] animate-floating"
+            className="h-64 drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)] animate-floating"
           />
         </div>
 
@@ -158,8 +142,8 @@ const Login: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="
-                    w-full pl-10 pr-3 py-2 rounded-lg border border-orange-300
-                    focus:ring-2 focus:ring-orange-500
+                    w-full pl-10 pr-3 py-2 rounded-lg border border-orange-300 
+                    focus:ring-2 focus:ring-orange-500 outline-none
                   "
                 />
               </div>
@@ -177,13 +161,13 @@ const Login: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="
                     w-full pl-10 pr-10 py-2 rounded-lg border border-orange-300
-                    focus:ring-2 focus:ring-orange-500
+                    focus:ring-2 focus:ring-orange-500 outline-none
                   "
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-gray-600"
+                  className="absolute right-3 top-2.5 text-gray-600 hover:text-orange-600"
                 >
                   {showPassword ? <HiEyeOff /> : <HiEye />}
                 </button>
@@ -196,16 +180,17 @@ const Login: React.FC = () => {
                 <input type="checkbox" className="accent-orange-600" />
                 Remember me
               </label>
+
               <button
                 type="button"
-                className="text-orange-600 hover:underline"
                 onClick={() => navigate("/forgot-password")}
+                className="text-orange-600 hover:underline"
               >
                 Forgot Password?
               </button>
             </div>
 
-            {/* LOGIN BUTTON */}
+            {/* SUBMIT BUTTON */}
             <button
               type="submit"
               disabled={loading}
