@@ -120,14 +120,7 @@ const Login: React.FC = () => {
         </div>
 
         {/* LOGIN CARD */}
-        <div
-          className="
-            relative mx-auto mt-3 max-w-4xl
-            rounded-3xl bg-white/96 backdrop-blur-xl
-            border border-white/80 shadow-[0_22px_60px_rgba(0,0,0,0.4)]
-            overflow-hidden
-          "
-        >
+        <div  >
           <div className="grid grid-cols-1 md:grid-cols-5">
             {/* LEFT PANEL – logo + mascot strip */}
             <div
