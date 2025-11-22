@@ -25,13 +25,12 @@ const PaceLandingPage: FC = () => {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  // HERO – mouse-based parallax (student illustration)
+  // HERO parallax
   const handleHeroMouseMove = (e: MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const relX = (e.clientX - (rect.left + rect.width / 2)) / rect.width;
     const relY = (e.clientY - (rect.top + rect.height / 2)) / rect.height;
 
-    // clamp para hindi OA
     const x = Math.max(-0.5, Math.min(0.5, relX));
     const y = Math.max(-0.4, Math.min(0.4, relY));
 
@@ -42,14 +41,14 @@ const PaceLandingPage: FC = () => {
     setParallax({ x: 0, y: 0 });
   };
 
-  // BACKGROUND – subtle/medium parallax
+  // Background parallax
   const handleBgMove = (e: MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const relX = (e.clientX - (rect.left + rect.width / 2)) / rect.width;
     const relY = (e.clientY - (rect.top + rect.height / 2)) / rect.height;
 
     setBgParallax({
-      x: relX * 10, // medium effect
+      x: relX * 10,
       y: relY * 10,
     });
   };
@@ -58,7 +57,7 @@ const PaceLandingPage: FC = () => {
     setBgParallax({ x: 0, y: 0 });
   };
 
-  // Scroll reveal (once per element)
+  // Scroll reveal
   useEffect(() => {
     const animated = document.querySelectorAll<HTMLElement>("[data-animate]");
 
@@ -101,7 +100,6 @@ const PaceLandingPage: FC = () => {
     },
   ];
 
-  // Styles for hero parallax
   const heroImageStyle: CSSProperties = {
     transform: `translate3d(${parallax.x * 18}px, ${parallax.y * 12}px, 0)`,
   };
@@ -114,7 +112,7 @@ const PaceLandingPage: FC = () => {
 
   return (
     <div className="min-h-screen w-full bg-black font-poppins text-gray-900">
-      {/* ================= HERO + NAV ================= */}
+      {/* ============= HERO + NAV ============= */}
       <section
         id="home"
         className="relative overflow-hidden text-white"
@@ -129,16 +127,12 @@ const PaceLandingPage: FC = () => {
           transition: "background-position 0.1s linear",
         }}
       >
-        {/* Darken bottom a bit for readability */}
+        {/* Filters + lighting */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#00000030]" />
-
-        {/* Orange bloom light similar to design */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,rgba(255,180,50,0.35),transparent_70%)]" />
-
-        {/* Extra subtle diagonal highlight */}
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.06)_0%,transparent_18%,transparent_100%)] opacity-20" />
 
-        {/* Background shapes + glow on top of bg */}
+        {/* Shapes */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="hero-shape hero-shape-left bg-gradient-to-br from-[#F9A63A] to-[#D6451C]" />
           <div className="hero-shape hero-shape-right bg-gradient-to-tr from-[#F07A1C] to-[#B92E09]" />
@@ -146,32 +140,24 @@ const PaceLandingPage: FC = () => {
         </div>
 
         {/* NAVBAR */}
-        <header className="relative z-20 mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-3 md:px-6 md:py-4">
-          <img src={PaceLogo} alt="PACE Logo" className="h-12 w-auto md:h-14" /> 
+        <header className="relative z-20 mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 md:px-6">
+          <img
+            src={PaceLogo}
+            alt="PACE Logo"
+            className="h-16 w-auto md:h-20 drop-shadow-lg"
+          />
 
-          <nav className="hidden items-center gap-7 text-[11px] font-semibold tracking-wide md:flex">
-            <button
-              onClick={() => scrollToSection("home")}
-              className="nav-link"
-            >
+          <nav className="hidden items-center gap-8 text-[12px] font-semibold tracking-wide md:flex">
+            <button onClick={() => scrollToSection("home")} className="nav-link">
               Home
             </button>
-            <button
-              onClick={() => scrollToSection("features")}
-              className="nav-link"
-            >
+            <button onClick={() => scrollToSection("features")} className="nav-link">
               Platform Features
             </button>
-            <button
-              onClick={() => scrollToSection("about")}
-              className="nav-link"
-            >
+            <button onClick={() => scrollToSection("about")} className="nav-link">
               About Pace
             </button>
-            <button
-              onClick={() => scrollToSection("mission")}
-              className="nav-link"
-            >
+            <button onClick={() => scrollToSection("mission")} className="nav-link">
               Our Mission
             </button>
           </nav>
@@ -179,43 +165,33 @@ const PaceLandingPage: FC = () => {
 
         {/* HERO CONTENT */}
         <div
-          className="relative z-20 mx-auto flex w-full max-w-5xl flex-col items-center gap-8 px-4 pb-16 pt-3 md:flex-row md:items-center md:justify-between md:px-6 md:pb-20"
+          className="relative z-20 mx-auto flex w-full max-w-6xl flex-col items-center gap-10 px-4 pb-16 pt-10 md:flex-row md:justify-between md:px-6 md:pb-20"
           onMouseMove={handleHeroMouseMove}
           onMouseLeave={handleHeroMouseLeave}
         >
-          {/* Left text block */}
-          <div
-            className="max-w-md space-y-4 md:space-y-5"
-            data-animate="fade-right"
-          >
-            <div className="flex items-center gap-3">
-              <img src={PaceLogo} alt="PACE Logo" className="h-14 w-auto" />
-              <p className="max-w-[180px] text-[11px] md:text-xs">
-                Personalized Academic and Career Exploration
-              </p>
-            </div>
+          {/* Left Section */}
+          <div className="max-w-md space-y-6" data-animate="fade-right">
+            {/* Removed redundant logo + tagline */}
 
-            <h1 className="text-[30px] font-extrabold leading-tight drop-shadow-md md:text-[36px] lg:text-[38px]">
+            <h1 className="text-[34px] font-extrabold leading-tight drop-shadow-lg md:text-[42px]">
               Smart Management for
               <br />
               a Smarter Future
             </h1>
 
-            <p className="text-[11px] leading-relaxed opacity-95 md:text-xs">
-              Empower your institution with efficient, data-driven tools
-              designed to simplify administration, enhance decision-making, and
-              build a future where management and innovation work hand in hand.
+            <p className="text-[12px] leading-relaxed opacity-95 md:text-sm">
+              Empower your institution with efficient, data-driven tools designed to simplify administration, enhance decision-making, and build a future where management and innovation work hand in hand.
             </p>
 
             <button
               onClick={() => navigate("/login")}
-              className="mt-1 rounded-full bg-[#D62828] px-7 py-2 text-[11px] font-semibold shadow-[0_8px_18px_rgba(0,0,0,0.35)] transition hover:-translate-y-[2px] hover:bg-[#B71F1F]"
+              className="mt-2 rounded-full bg-[#D62828] px-8 py-2.5 text-[12px] font-semibold shadow-[0_8px_18px_rgba(0,0,0,0.35)] transition hover:-translate-y-[2px] hover:bg-[#B71F1F]"
             >
               Get Started
             </button>
           </div>
 
-          {/* Right hero illustration */}
+          {/* Right Illustration */}
           <div className="hero-image-wrapper" data-animate="fade-left">
             <img
               src={HeroStudent}
@@ -227,21 +203,16 @@ const PaceLandingPage: FC = () => {
         </div>
       </section>
 
-      {/* ================= PLATFORM FEATURES ================= */}
+      {/* ============= FEATURES ============= */}
       <section
         id="features"
         className="bg-gradient-to-b from-[#F9A63A] via-[#F07A1C] to-[#D6451C] px-4 py-14 md:px-6 md:py-16"
       >
-        <div
-          className="mx-auto max-w-5xl text-center text-white"
-          data-animate="fade-up"
-        >
-          <h2 className="text-2xl font-extrabold md:text-3xl">
-            Platform Features
-          </h2>
+        <div className="mx-auto max-w-5xl text-center text-white" data-animate="fade-up">
+          <h2 className="text-2xl font-extrabold md:text-3xl">Platform Features</h2>
         </div>
 
-        <div className="mx-auto mt-8 grid w-full max-w-5xl grid-cols-1 gap-6 md:mt-10 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mx-auto mt-10 grid w-full max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {featureCards.map((card, index) => (
             <div
               key={card.title}
@@ -250,15 +221,9 @@ const PaceLandingPage: FC = () => {
               style={{ transitionDelay: `${index * 80}ms` }}
             >
               <div className="feature-icon-wrapper">
-                <img
-                  src={card.icon}
-                  alt={card.title}
-                  className="feature-icon"
-                />
+                <img src={card.icon} alt={card.title} className="feature-icon" />
               </div>
-              <h3 className="mt-3 text-sm font-bold md:text-base">
-                {card.title}
-              </h3>
+              <h3 className="mt-3 text-sm font-bold md:text-base">{card.title}</h3>
               <p className="mt-2 text-[11px] leading-relaxed text-gray-600 md:text-xs">
                 {card.desc}
               </p>
@@ -267,54 +232,46 @@ const PaceLandingPage: FC = () => {
         </div>
       </section>
 
-      {/* ================= ABOUT PACE ================= */}
-      <section
-        id="about"
-        className="bg-white px-4 py-14 md:px-6 md:py-16"
-      >
+      {/* ============= ABOUT ============= */}
+      <section id="about" className="bg-white px-4 py-14 md:px-6 md:py-16">
         <div className="mx-auto max-w-4xl" data-animate="fade-up">
           <h2 className="text-center text-2xl font-extrabold text-gray-900 md:text-3xl">
             About Pace
           </h2>
-          <p className="mt-4 text-justify text-[11px] leading-relaxed text-gray-700 md:mt-5 md:text-sm">
-            PACE (Personal Academic &amp; Career Evaluation) is an innovative
+          <p className="mt-4 text-justify text-[11px] leading-relaxed text-gray-700 md:text-sm">
+            PACE (Personal Academic & Career Evaluation) is an innovative
             platform designed to help students discover their ideal academic
             paths and future careers—while giving institutions the tools to
             evaluate, guide, and track learner progress. It combines career
             assessment, data analytics, and institutional insights to build a
-            bridge between students&apos; potential and academic opportunities.
+            bridge between students' potential and academic opportunities.
           </p>
         </div>
       </section>
 
-      {/* ================= OUR MISSION ================= */}
+      {/* ============= MISSION ============= */}
       <section
         id="mission"
         className="bg-gradient-to-b from-[#FFE08A] via-[#FFC65A] to-[#F9A63A] px-4 py-14 md:px-6 md:py-16"
       >
         <div className="mx-auto max-w-4xl text-center" data-animate="fade-up">
-          <h2 className="text-2xl font-extrabold text-gray-900 md:text-3xl">
-            Our Mission
-          </h2>
-          <p className="mt-4 text-[11px] leading-relaxed text-gray-800 md:mt-5 md:text-sm">
+          <h2 className="text-2xl font-extrabold text-gray-900 md:text-3xl">Our Mission</h2>
+          <p className="mt-4 text-[11px] leading-relaxed text-gray-800 md:text-sm">
             Our mission is to empower every learner to discover their path and
             every institution to guide them with purpose. PACE aims to make
             academic and career exploration accessible, meaningful, and
-            data-driven by combining technology, psychology, and education. We
-            strive to bridge the gap between potential and opportunity, helping
-            students make confident choices while providing schools and
-            administrators the tools to support informed, impactful guidance for
-            a smarter future.
+            data-driven by combining technology, psychology, and education.
+            We strive to bridge the gap between potential and opportunity,
+            helping students make confident choices while providing schools and
+            administrators the tools they need for informed, impactful guidance.
           </p>
         </div>
       </section>
 
-      {/* ================= FOOTER ================= */}
+      {/* ============= FOOTER ============= */}
       <footer className="bg-[#D6451C] py-6 text-center text-xs text-white md:text-sm">
         <p className="font-semibold">PACE - Your Choice, Your Future</p>
-        <p className="mt-1 opacity-90">
-          © 2025 PACE System. All rights reserved.
-        </p>
+        <p className="mt-1 opacity-90">© 2025 PACE System. All rights reserved.</p>
       </footer>
     </div>
   );
