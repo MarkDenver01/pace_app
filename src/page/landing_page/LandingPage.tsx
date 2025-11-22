@@ -143,9 +143,9 @@ const PaceLandingPage: FC = () => {
             </div>
 
             <h1 className="text-[40px] md:text-[52px] font-extrabold leading-tight drop-shadow-2xl">
-              Smart Management for
+              Smart Management 
               <br />
-              a Smarter Future
+              for a Smarter Future
             </h1>
 
             <p className="mt-4 text-[15px] md:text-[17px] leading-relaxed opacity-90">
