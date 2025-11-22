@@ -232,6 +232,20 @@ export async function addUniversity(data: UniversityRequest): Promise<University
  }
 };
 
+export async function findUniversity(universityId: number): Promise<{ universityName: string }> {
+  try {
+    const response = await api.get("/user/public/university/find", {
+      params: { university_id: universityId },
+    });
+
+    return response.data; // expect: { universityName: "UST" }
+  } catch (error: any) {
+    console.error("Error finding university:", error);
+    return { universityName: "your university" }; // fallback
+  }
+}
+
+
 /**
  * Updates an existing university.
  * @param id The ID of the university to update.

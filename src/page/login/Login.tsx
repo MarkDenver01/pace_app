@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { HiLockClosed, HiUser, HiEye, HiEyeOff } from "react-icons/hi";
 
-import { login } from "../../libs/ApiResponseService";
+import { login, activateAccount, findUniversity } from "../../libs/ApiResponseService";
 import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import type { LoginResponse } from "../../libs/models/Login";
@@ -17,23 +17,17 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { setAuth } = useAuth();
 
-  const { universityId: routeUniversityId } = useParams(); // /login/university/15
+  const { universityId: routeId } = useParams();
   const [searchParams] = useSearchParams();
 
-  const queryUniversityId = searchParams.get("universityId"); // ?universityId=15
-  const storedUniversityId = localStorage.getItem("selectedUniversityId");
+  const queryId = searchParams.get("universityId");
+  const storedId = localStorage.getItem("selectedUniversityId");
 
-  /** FINAL RESOLVED UNIVERSITY ID */
-  const universityId =
-    routeUniversityId ||
-    queryUniversityId ||
-    storedUniversityId ||
-    null;
+  /** Final university Id selection */
+  const universityId = routeId || queryId || storedId || null;
 
   /** Make sure we always store it if found */
-  if (universityId) {
-    localStorage.setItem("selectedUniversityId", universityId);
-  }
+  if (universityId) localStorage.setItem("selectedUniversityId", universityId);
 
   // FORM STATES
   const [email, setEmail] = useState("");
@@ -41,93 +35,122 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  /** ----------------------------------------
-   * LOGIN SUBMIT
-   ---------------------------------------- */
+    /** --------------------------
+   * LOGIN FLOW WITH ACTIVATION
+   --------------------------- */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       const response: LoginResponse = await login({ email, password });
+
+      /** Store auth temporarily so dashboard can use it later */
       setAuth(response);
 
-      /** ADMIN LOGIN */
+      /** 🟧 ADMIN LOGIN */
       if (response.role === "ADMIN") {
         const adminStatus = response.adminResponse.accountStatus;
 
+        /** ------------------------------------------
+         * 🔥 CASE 1: Admin is PENDING → Ask to activate
+         ------------------------------------------- */
         if (adminStatus === "PENDING") {
+          // GET UNIVERSITY NAME
+          let universityName = "your university";
+          try {
+            const uni = await findUniversity(Number(universityId));
+            universityName = uni.universityName;
+          } catch (e) {}
+
           const confirmUpdate = await Swal.fire({
-            title: `Hi ${response.username}! Please update your password before LOGIN.`,
+            title: `Hi ${response.username}!`,
+            html: `
+              Your admin account under <strong>"${universityName}"</strong> is not yet activated.
+              <br/><br/>
+              Tap <strong>Proceed</strong> to activate your account automatically.
+            `,
             icon: "warning",
             showCancelButton: true,
-            confirmButtonText: "Yes, PROCEED",
+            confirmButtonText: "Proceed",
             cancelButtonText: "Cancel",
             ...getSwalTheme(),
           });
 
           if (confirmUpdate.isConfirmed) {
-            navigate(
-              `/login/update-password?universityId=${universityId}&email=${encodeURIComponent(
-                email
-              )}`,
-              { replace: true }
+            const activationSuccess = await activateAccount(
+              response.adminResponse.email,
+              Number(universityId)
             );
+
+            if (!activationSuccess) {
+              Swal.fire({
+                icon: "error",
+                title: "Activation Failed",
+                text: "Please contact system administrator.",
+                ...getSwalTheme(),
+              });
+              return;
+            }
+
+            Swal.fire({
+              icon: "success",
+              title: "Account Activated!",
+              text: "Your account has been successfully activated.",
+              confirmButtonText: "Continue",
+              ...getSwalTheme(),
+            }).then(() => {
+              navigate("/admin/dashboard");
+            });
           }
+
           return;
         }
 
-        if (adminStatus === "VERIFIED" || adminStatus === "ACTIVATE") {
+        /** CASE 2: Already active / verified */
+        if (adminStatus === "VERIFIED" || adminStatus === "ACTIVE") {
           Swal.fire({
             icon: "success",
             title: `Welcome ${response.username}!`,
-            text: "Proceed to dashboard.",
             confirmButtonText: "PROCEED",
             ...getSwalTheme(),
-          }).then((res) => {
-            if (res.isConfirmed) navigate("/admin/dashboard");
-          });
+          }).then(() => navigate("/admin/dashboard"));
           return;
         }
 
+        /** Invalid status */
         Swal.fire({
           icon: "error",
           title: "Access Denied",
-          text: `Your account status (${adminStatus}) does not allow access.`,
-          confirmButtonText: "CLOSE",
+          text: `Your account status (${adminStatus}) does not allow login.`,
           ...getSwalTheme(),
         });
         return;
       }
 
-      /** SUPER ADMIN LOGIN */
+      /** 🟩 SUPER ADMIN */
       if (response.role === "SUPER_ADMIN") {
         Swal.fire({
           icon: "success",
           title: `Welcome ${response.username}!`,
-          text: "Proceed to Super Admin dashboard.",
           confirmButtonText: "PROCEED",
           ...getSwalTheme(),
-        }).then((res) => {
-          if (res.isConfirmed) navigate("/superadmin/dashboard");
-        });
+        }).then(() => navigate("/superadmin/dashboard"));
         return;
       }
 
-      /** OTHER ROLE - NOT ALLOWED */
+      /** ❌ Other roles */
       Swal.fire({
         icon: "error",
         title: "Unauthorized",
-        text: "Your role is not authorized to access this application.",
-        confirmButtonText: "CLOSE",
+        text: "You are not allowed to access this system.",
         ...getSwalTheme(),
       });
     } catch (error: any) {
       Swal.fire({
         icon: "error",
         title: "Login Failed",
-        text: error?.message || "Invalid email or password.",
-        confirmButtonText: "CLOSE",
+        text: error?.message || "Invalid credentials.",
         ...getSwalTheme(),
       });
     } finally {
