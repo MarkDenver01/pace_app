@@ -5,7 +5,6 @@ import {
   HiEye,
   HiEyeOff,
 } from "react-icons/hi";
-
 import { login } from "../../libs/ApiResponseService";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -83,14 +82,6 @@ const Login: React.FC = () => {
           confirmButtonText: "PROCEED",
           ...getSwalTheme(),
         }).then(() => navigate("/superadmin/dashboard"));
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Unauthorized",
-          text: "Your role is not authorized.",
-          confirmButtonText: "CLOSE",
-          ...getSwalTheme(),
-        });
       }
     } catch (error: any) {
       Swal.fire({
@@ -107,33 +98,36 @@ const Login: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center bg-cover bg-center bg-no-repeat relative"
+      className="
+        min-h-screen w-full flex items-center justify-center 
+        bg-cover bg-center bg-no-repeat relative
+      "
       style={{ backgroundImage: `url(${LoginFullBG})` }}
     >
-      {/* Premium gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/5 via-transparent to-black/10" />
 
-      {/* Animated decorative glow */}
+      {/* --- POLISHED LIGHT OVERLAYS --- */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10 pointer-events-none" />
+
+      {/* --- PREMIUM GLOW SPHERES --- */}
       <div className="absolute top-20 left-20 w-72 h-72 bg-orange-400/30 blur-3xl rounded-full animate-pulse" />
-      <div className="absolute bottom-20 right-20 w-72 h-72 bg-yellow-400/30 blur-3xl rounded-full animate-pulse" />
+      <div className="absolute bottom-20 right-20 w-80 h-80 bg-yellow-300/25 blur-3xl rounded-full animate-pulse" />
 
-      {/* LOGIN CARD */}
+      {/* --- LOGIN CARD (LARGE WIDTH) --- */}
       <div
         className="
-          relative z-10 w-full max-w-7xl mx-6 
-          rounded-[38px] overflow-hidden 
-          shadow-[0_35px_90px_rgba(0,0,0,0.55)]
-          flex backdrop-blur-xl bg-white/15 
-          border border-white/30
-          animate-[fadeIn_0.8s_ease-out]
+          relative z-10 w-full max-w-[1400px] mx-6 
+          rounded-[40px] overflow-hidden 
+          shadow-[0_40px_90px_rgba(0,0,0,0.50)]
+          flex backdrop-blur-xl bg-white/20 
+          border border-white/40
         "
       >
 
-        {/* LEFT PANE */}
+        {/* LEFT PANEL — WIDER, CLEANER, PREMIUM */}
         <div
           className="
             hidden md:flex flex-col justify-center items-center 
-            w-1/2 px-10 py-14 relative
+            w-[55%] px-14 py-16 relative
           "
           style={{
             backgroundImage: `url(${LoginLeftBG})`,
@@ -141,45 +135,38 @@ const Login: React.FC = () => {
             backgroundPosition: "center",
           }}
         >
+          {/* dark overlay */}
           <div className="absolute inset-0 bg-black/20" />
 
-          {/* Floating glow behind logo */}
-          <div className="absolute top-20 w-64 h-64 bg-orange-300/30 blur-2xl rounded-full animate-floatingGlow" />
+          {/* floating warm glow */}
+          <div className="absolute top-32 w-72 h-72 bg-orange-300/30 blur-2xl rounded-full animate-floatingGlow" />
 
           <img
             src={PaceLogo}
-            className="h-44 md:h-52 drop-shadow-[0_12px_28px_rgba(0,0,0,0.45)] z-10 animate-[slideDown_0.8s_ease-out]"
+            className="h-48 drop-shadow-[0_12px_32px_rgba(0,0,0,0.5)] z-10"
           />
 
           <img
             src={HeroStudent}
-            className="h-80 md:h-[26rem] drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)] animate-float z-10"
+            className="h-[25rem] drop-shadow-[0_18px_45px_rgba(0,0,0,0.6)] animate-float z-10"
           />
 
-          <h3 className="mt-6 text-center text-[22px] md:text-[24px] font-extrabold text-white leading-tight drop-shadow-2xl z-10">
+          <h3 className="mt-6 text-center text-[24px] text-white font-extrabold leading-tight drop-shadow-2xl z-10">
             Smart Management
-            <br />for a Smarter Future
+            <br />
+            for a Smarter Future
           </h3>
         </div>
 
-        {/* RIGHT PANE */}
-        <div className="w-full md:w-1/2 bg-white/95 px-10 md:px-14 py-14">
-          <div className="text-center mb-8 animate-[slideUp_0.8s_ease-out]">
-            <h2 className="text-[28px] md:text-[32px] font-extrabold text-orange-700">
-              Welcome Back to
-            </h2>
-            <h1 className="text-[36px] md:text-[40px] font-extrabold text-orange-600 tracking-wide">
-              PACE!
-            </h1>
-            <p className="mt-3 text-[15px] text-gray-600 font-medium">
-              Smart Management for a Smarter Future
-            </p>
+        {/* RIGHT PANEL — EXPANDED WIDTH */}
+        <div className="w-full md:w-[45%] bg-white/95 px-12 md:px-16 py-16">
+          <div className="text-center mb-8">
+            <h2 className="text-[32px] font-extrabold text-orange-700">Welcome Back to</h2>
+            <h1 className="text-[42px] font-extrabold text-orange-600">PACE!</h1>
+            <p className="text-[16px] text-gray-600 mt-3">Smart Management for a Smarter Future</p>
           </div>
 
-          <form
-            className="space-y-7 animate-[fadeIn_1.2s_ease-out]"
-            onSubmit={handleLogin}
-          >
+          <form className="space-y-7" onSubmit={handleLogin}>
             {/* EMAIL */}
             <div>
               <label className="font-semibold text-[15px]">Email</label>
@@ -189,12 +176,11 @@ const Login: React.FC = () => {
                   type="email"
                   required
                   className="
-                    w-full pl-12 pr-4 py-3.5 
+                    w-full pl-12 pr-4 py-3.5
                     rounded-2xl border border-orange-300 
-                    bg-orange-50/50 text-sm text-gray-800 
+                    bg-orange-50/50 text-sm
                     focus:ring-2 focus:ring-orange-500 
-                    focus:border-orange-600 outline-none
-                    transition
+                    outline-none
                   "
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -211,12 +197,11 @@ const Login: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   required
                   className="
-                    w-full pl-12 pr-12 py-3.5 
+                    w-full pl-12 pr-12 py-3.5
                     rounded-2xl border border-orange-300 
-                    bg-orange-50/50 text-sm text-gray-800 
+                    bg-orange-50/50 text-sm
                     focus:ring-2 focus:ring-orange-500 
-                    focus:border-orange-600 outline-none
-                    transition
+                    outline-none
                   "
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -231,31 +216,30 @@ const Login: React.FC = () => {
             </div>
 
             {/* REMEMBER + FORGOT */}
-            <div className="flex justify-between items-center text-[14px] text-gray-600">
+            <div className="flex justify-between text-[14px] text-gray-600">
               <label className="flex items-center gap-2">
                 <input type="checkbox" className="accent-orange-600" />
                 Remember me
               </label>
+
               <button
                 type="button"
-                className="hover:text-orange-700 font-medium"
                 onClick={() => navigate("/forgot-password")}
+                className="hover:text-orange-700 font-medium"
               >
                 Forgot Password?
               </button>
             </div>
 
-            {/* PREMIUM GRADIENT BUTTON */}
+            {/* LOGIN BUTTON */}
             <button
               type="submit"
               disabled={loading}
               className="
-                w-full py-3.5 rounded-full 
-                bg-gradient-to-r from-orange-500 to-red-500 
-                text-white font-bold shadow-xl 
-                hover:shadow-[0_10px_26px_rgba(0,0,0,0.35)]
-                hover:scale-[1.02] transition-all
-                disabled:opacity-60
+                w-full py-3.5 rounded-full text-white font-bold 
+                bg-gradient-to-r from-orange-500 to-red-500
+                shadow-xl hover:scale-[1.03]
+                transition-all disabled:opacity-60
               "
             >
               {loading ? "Logging in..." : "LOGIN"}
