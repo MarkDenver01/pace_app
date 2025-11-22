@@ -530,50 +530,115 @@ export default function AdminUserLayout() {
                         <td className="px-4 py-3">{user.email}</td>
                         <td className="px-4 py-3">{user.accountStatus}</td>
                         <td className="px-4 py-3">
-                          <div className="flex flex-col gap-2">
+       <td className="px-4 py-3">
+  <div className="flex flex-col gap-2">
 
-  {/* Always show EDIT */}
-  <ThemedButton
-    size="xs"
-    onClick={() => openEditModal(user)}
-    bgColor="#1c6a1fff"
-    textColor="#fff"
-    padding="0.5rem 1rem"
-    borderRadius="0.5rem"
-  >
-    EDIT
-  </ThemedButton>
+    {/* CASE 1: PENDING → EDIT + DELETE */}
+    {user.accountStatus === "PENDING" && (
+      <>
+        <ThemedButton
+          size="xs"
+          onClick={() => openEditModal(user)}
+          bgColor="#1c6a1fff"
+          textColor="#fff"
+          padding="0.4rem 0.8rem"
+          borderRadius="0.4rem"
+        >
+          EDIT
+        </ThemedButton>
 
-  {/* Status Toggle */}
-  <ThemedButton
-    size="xs"
-    onClick={() => handleToggleStatus(user.adminId)}
-    bgColor={
-      user.accountStatus === "ACTIVATE" || user.accountStatus === "VERIFIED"
-        ? "#ea2e21ff"   // red → deactivate
-        : "#1c6a1fff"  // green → activate
-    }
-    textColor="#fff"
-    padding="0.5rem 1rem"
-    borderRadius="0.5rem"
-  >
-    {user.accountStatus === "ACTIVATE" || user.accountStatus === "VERIFIED"
-      ? "DEACTIVATE"
-      : "ACTIVATE"}
-  </ThemedButton>
+        <ThemedButton
+          size="xs"
+          onClick={() => handleDeleteAccount(user.email)}
+          bgColor="#f00707ff"
+          textColor="#fff"
+          padding="0.4rem 0.8rem"
+          borderRadius="0.4rem"
+        >
+          DELETE
+        </ThemedButton>
+      </>
+    )}
 
-  {/* DELETE */}
-  <ThemedButton
-    size="xs"
-    onClick={() => handleDeleteAccount(user.email)}
-    bgColor="#f00707ff"
-    textColor="#fff"
-    padding="0.5rem 1rem"
-    borderRadius="0.5rem"
-  >
-    DELETE
-  </ThemedButton>
-</div>
+    {/* CASE 2: VERIFIED → DEACTIVATE + EDIT + DELETE */}
+    {user.accountStatus === "VERIFIED" && (
+      <>
+        <ThemedButton
+          size="xs"
+          onClick={() => handleToggleStatus(user.adminId)}
+          bgColor="#ea2e21ff"
+          textColor="#fff"
+          padding="0.4rem 0.8rem"
+          borderRadius="0.4rem"
+        >
+          DEACTIVATE
+        </ThemedButton>
+
+        <ThemedButton
+          size="xs"
+          onClick={() => openEditModal(user)}
+          bgColor="#1c6a1fff"
+          textColor="#fff"
+          padding="0.4rem 0.8rem"
+          borderRadius="0.4rem"
+        >
+          EDIT
+        </ThemedButton>
+
+        <ThemedButton
+          size="xs"
+          onClick={() => handleDeleteAccount(user.email)}
+          bgColor="#f00707ff"
+          textColor="#fff"
+          padding="0.4rem 0.8rem"
+          borderRadius="0.4rem"
+        >
+          DELETE
+        </ThemedButton>
+      </>
+    )}
+
+    {/* CASE 3: DEACTIVATE → ACTIVATE + EDIT + DELETE */}
+    {user.accountStatus === "DEACTIVATE" && (
+      <>
+        <ThemedButton
+          size="xs"
+          onClick={() => handleToggleStatus(user.adminId)}
+          bgColor="#1c6a1fff"
+          textColor="#fff"
+          padding="0.4rem 0.8rem"
+          borderRadius="0.4rem"
+        >
+          ACTIVATE
+        </ThemedButton>
+
+        <ThemedButton
+          size="xs"
+          onClick={() => openEditModal(user)}
+          bgColor="#1c6a1fff"
+          textColor="#fff"
+          padding="0.4rem 0.8rem"
+          borderRadius="0.4rem"
+        >
+          EDIT
+        </ThemedButton>
+
+        <ThemedButton
+          size="xs"
+          onClick={() => handleDeleteAccount(user.email)}
+          bgColor="#f00707ff"
+          textColor="#fff"
+          padding="0.4rem 0.8rem"
+          borderRadius="0.4rem"
+        >
+          DELETE
+        </ThemedButton>
+      </>
+    )}
+
+  </div>
+</td>
+
 
                         </td>
                       </tr>
