@@ -116,29 +116,46 @@ const Login: React.FC = () => {
 
       {/* MAIN LOGIN CARD */}
       <div className="w-full max-w-8xl mx-6 md:mx-0 rounded-[32px] overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.45)] flex bg-white/10 backdrop-blur-[2px] border border-white/30">
-        {/* LEFT SIDE — LOGO + STUDENT */}
-        <div className="hidden md:flex w-1/2 flex-col items-center justify-center bg-gradient-to-b from-[#F9A63A] via-[#F07A1C] to-[#D6451C] px-8 py-10 relative">
-          {/* subtle glow at bottom */}
-          <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-[radial-gradient(circle,rgba(0,0,0,0.45),transparent_60%)] opacity-70" />
+    {/* LEFT SIDE — LOGO + STUDENT WITH BACKGROUND IMAGE */}
+<div
+  className="
+    hidden md:flex w-1/2 flex-col items-center justify-center 
+    px-10 py-12 relative overflow-hidden
+  "
+  style={{
+    backgroundImage: `url(${HeroBg})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  }}
+>
 
-          <img
-            src={PaceLogo}
-            alt="PACE Logo"
-            className="h-32 md:h-36 drop-shadow-2xl mb-4 relative z-10"
-          />
+  {/* subtle dark overlay for readability */}
+  <div className="absolute inset-0 bg-black/20" />
 
-          <img
-            src={HeroStudent}
-            alt="Student"
-            className="h-72 md:h-80 drop-shadow-2xl animate-float relative z-10"
-          />
+  {/* bottom glow */}
+  <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-72 h-40 
+                  bg-[radial-gradient(circle,rgba(0,0,0,0.45),transparent_70%)] opacity-80" />
 
-          <h3 className="mt-6 text-center text-[18px] md:text-[20px] font-extrabold text-white leading-tight drop-shadow-lg relative z-10">
-            Smart Management
-            <br />
-            for a Smarter Future
-          </h3>
-        </div>
+  <img
+    src={PaceLogo}
+    alt="PACE Logo"
+    className="h-40 md:h-44 drop-shadow-2xl mb-4 relative z-10"
+  />
+
+  <img
+    src={HeroStudent}
+    alt="Student"
+    className="h-80 md:h-[22rem] drop-shadow-2xl animate-float relative z-10"
+  />
+
+  <h3 className="mt-6 text-center text-[20px] md:text-[22px] font-extrabold text-white 
+                leading-tight drop-shadow-2xl relative z-10 tracking-wide">
+    Smart Management
+    <br />
+    for a Smarter Future
+  </h3>
+</div>
+
 
         {/* RIGHT SIDE — LOGIN FORM */}
         <div className="w-full md:w-1/2 bg-white/95 px-8 md:px-10 py-10 flex flex-col">
