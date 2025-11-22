@@ -147,7 +147,7 @@ const Login: React.FC = () => {
                 <img
                   src={PaceLogo}
                   alt="PACE Logo"
-                  className="h-[260px] md:h-[340px] lg:h-[420px] w-auto drop-shadow-2xl"
+                  className="h-[200px] md:h-[240px] lg:h-[320px] w-auto drop-shadow-2xl"
                 />
                 <img
                   src={HeroStudent}
