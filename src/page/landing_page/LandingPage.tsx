@@ -241,7 +241,7 @@ const PaceLandingPage: FC = () => {
       {/* ================= MISSION ================= */}
       <section
         id="mission"
-        className="relative px-4 py-16 md:px-6 md:py-20 bg-gradient-to-b from-[#FFE08A] via-[#d6ad66] to-[#d6ad66]"
+        className="relative px-4 py-16 md:px-6 md:py-20 bg-gradient-to-b from-white via-[#d6ad66] to-[#d6ad66]"
       >
         <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
 
