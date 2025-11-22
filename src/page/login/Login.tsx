@@ -8,7 +8,7 @@ import type { LoginResponse } from "../../libs/models/Login";
 import Swal from "sweetalert2";
 import { getSwalTheme } from "../../utils/getSwalTheme";
 
-import PaceLogo from "../../assets/pace/logo_final.png";
+import PaceLogo from "../../assets/pace/transpa_logo.png";
 import HeroStudent from "../../assets/pace/hero_student.png";
 import LoginLeftBG from "../../assets/pace/login_half_bg.jpg";
 import LoginFullBG from "../../assets/pace/login_half_bg.jpg";

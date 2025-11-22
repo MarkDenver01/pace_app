@@ -2,7 +2,7 @@ import type { FC, MouseEvent, CSSProperties } from "react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import PaceLogo from "../../assets/pace/f_logo.png";
+import PaceLogo from "../../assets/pace/transpa_logo.png";
 import HeroStudent from "../../assets/pace/hero_student.png";
 
 import IconUserData from "../../assets/pace/icon_user_data.png";
