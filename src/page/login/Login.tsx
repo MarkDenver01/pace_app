@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-  HiLockClosed,
-  HiUser,
-  HiEye,
-  HiEyeOff,
-} from "react-icons/hi";
+import { HiLockClosed, HiUser, HiEye, HiEyeOff } from "react-icons/hi";
 
 import { login } from "../../libs/ApiResponseService";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -15,7 +10,8 @@ import { getSwalTheme } from "../../utils/getSwalTheme";
 
 import PaceLogo from "../../assets/pace/logo_final.png";
 import HeroStudent from "../../assets/pace/hero_student.png";
-import LoginBG from "../../assets/pace/login_half_bg.jpg";
+import LoginLeftBG from "../../assets/pace/login_half_bg.jpg";
+import LoginFullBG from "../../assets/pace/login_half_bg.jpg";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -51,7 +47,9 @@ const Login: React.FC = () => {
 
           if (result.isConfirmed) {
             navigate(
-              `/login/update-password?universityId=${universityId}&email=${encodeURIComponent(email)}`,
+              `/login/update-password?universityId=${universityId}&email=${encodeURIComponent(
+                email
+              )}`,
               { replace: true }
             );
           }
@@ -62,13 +60,33 @@ const Login: React.FC = () => {
             text: "Proceed to dashboard.",
             confirmButtonText: "PROCEED",
             ...getSwalTheme(),
-          }).then(() => navigate("/admin/dashboard"));
+          }).then((result) => {
+            if (result.isConfirmed) navigate("/admin/dashboard");
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Access Denied",
+            text: `Your account status (${adminStatus}) does not allow access.`,
+            confirmButtonText: "CLOSE",
+            ...getSwalTheme(),
+          });
         }
+      } else if (response.role === "SUPER_ADMIN") {
+        Swal.fire({
+          icon: "success",
+          title: `Welcome ${response.username}!`,
+          text: "Proceed to Super Admin dashboard.",
+          confirmButtonText: "PROCEED",
+          ...getSwalTheme(),
+        }).then((result) => {
+          if (result.isConfirmed) navigate("/superadmin/dashboard");
+        });
       } else {
         Swal.fire({
           icon: "error",
           title: "Unauthorized",
-          text: "Your role is not authorized.",
+          text: "Your role is not authorized to access this application.",
           confirmButtonText: "CLOSE",
           ...getSwalTheme(),
         });
@@ -77,7 +95,7 @@ const Login: React.FC = () => {
       Swal.fire({
         icon: "error",
         title: "Login Failed",
-        text: error?.message || "Invalid email or password.",
+        text: error?.message || "Invalid email or password. Please try again.",
         confirmButtonText: "CLOSE",
         ...getSwalTheme(),
       });
@@ -88,121 +106,169 @@ const Login: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center bg-cover bg-center bg-no-repeat px-4"
-      style={{ backgroundImage: `url(${LoginBG})` }}
+      className="relative min-h-screen w-full bg-cover bg-center bg-no-repeat flex items-center justify-center"
+      style={{ backgroundImage: `url(${LoginFullBG})` }}
     >
-      {/* CLEAN, CORPORATE LOGIN CARD */}
-      <div
-        className="
-          flex w-full max-w-6xl rounded-2xl overflow-hidden 
-          bg-white shadow-[0_8px_30px_rgba(0,0,0,0.25)]
-          border border-gray-200
-        "
-      >
+      {/* light global blur so BG still visible */}
+      <div className="absolute inset-0 bg-white/15 backdrop-blur-[2px]" />
 
-        {/* LEFT PANEL (40%) */}
-        <div
-          className="w-[40%] hidden md:flex flex-col justify-center items-center px-8 py-10 relative"
-          style={{
-            backgroundImage: `url(${LoginBG})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          <div className="absolute inset-0 bg-black/20" />
-
-          <img src={PaceLogo} className="h-32 z-10 mb-5" />
-          <img src={HeroStudent} className="h-72 z-10 drop-shadow-xl" />
-
-          <h3 className="mt-6 text-center text-xl text-white font-extrabold z-10">
-            Smart Management <br /> for a Smarter Future
-          </h3>
+      {/* main wrapper to control card width (same feel as grocery UI) */}
+      <div className="relative z-10 w-full px-4 sm:px-6">
+        {/* soft glow under the card */}
+        <div className="mx-auto max-w-4xl pointer-events-none">
+          <div className="mx-auto h-6 w-3/4 rounded-full bg-orange-500/40 blur-2xl opacity-75" />
         </div>
 
-        {/* RIGHT PANEL (60%) */}
-        <div className="w-[60%] bg-white px-10 py-12">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-orange-700">
-              Welcome Back
-            </h2>
-            <h1 className="text-4xl font-extrabold text-orange-600">
-              to PACE!
-            </h1>
-
-            <p className="mt-3 text-gray-600 text-sm">
-              Smart Management for a Smarter Future
-            </p>
-          </div>
-
-          <form className="space-y-6" onSubmit={handleLogin}>
-            {/* EMAIL */}
-            <div>
-              <label className="font-semibold text-sm">Email Address</label>
-              <div className="relative mt-1">
-                <HiUser className="absolute left-3 top-3 text-orange-600 text-xl" />
-                <input
-                  type="email"
-                  required
-                  className="w-full pl-12 pr-4 py-3 border rounded-xl bg-gray-50"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* PASSWORD */}
-            <div>
-              <label className="font-semibold text-sm">Password</label>
-              <div className="relative mt-1">
-                <HiLockClosed className="absolute left-3 top-3 text-orange-600 text-xl" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  required
-                  className="w-full pl-12 pr-12 py-3 border rounded-xl bg-gray-50"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <span
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-3 cursor-pointer text-gray-600 text-xl"
-                >
-                  {showPassword ? <HiEyeOff /> : <HiEye />}
-                </span>
-              </div>
-            </div>
-
-            {/* REMEMBER ME */}
-            <div className="flex justify-between items-center text-sm text-gray-600">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="accent-orange-600" />
-                Remember me
-              </label>
-
-              <button
-                type="button"
-                onClick={() => navigate("/forgot-password")}
-                className="text-orange-600 hover:underline"
-              >
-                Forgot Password?
-              </button>
-            </div>
-
-            {/* LOGIN BUTTON */}
-            <button
-              type="submit"
+        {/* LOGIN CARD */}
+        <div
+          className="
+            relative mx-auto mt-3 max-w-4xl
+            rounded-3xl bg-white/96 backdrop-blur-xl
+            border border-white/80 shadow-[0_22px_60px_rgba(0,0,0,0.4)]
+            overflow-hidden
+          "
+        >
+          <div className="grid grid-cols-1 md:grid-cols-5">
+            {/* LEFT PANEL – logo + mascot strip */}
+            <div
               className="
-                w-full py-3 rounded-xl bg-orange-600 
-                text-white font-bold text-lg
-                hover:bg-orange-700 transition
+                md:col-span-2 relative flex flex-col items-center justify-center
+                p-6 sm:p-7
               "
+              style={{
+                backgroundImage: `url(${LoginLeftBG})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
             >
-              {loading ? "Logging in..." : "Login"}
-            </button>
-          </form>
+              <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/35" />
 
-          <p className="text-center text-xs text-gray-500 mt-8">
-            © 2025 PACE System. All rights reserved.
-          </p>
+              <div className="relative flex flex-col items-center">
+                <img
+                  src={PaceLogo}
+                  alt="PACE Logo"
+                  className="h-20 sm:h-24 mb-4 drop-shadow-[0_10px_26px_rgba(0,0,0,0.6)]"
+                />
+                <img
+                  src={HeroStudent}
+                  alt="Student"
+                  className="h-44 sm:h-52 md:h-60 drop-shadow-[0_18px_40px_rgba(0,0,0,0.7)]"
+                />
+                <p className="mt-5 text-center text-sm sm:text-base font-extrabold text-white leading-snug drop-shadow-xl">
+                  Smart Management
+                  <br />
+                  for a Smarter Future
+                </p>
+              </div>
+            </div>
+
+            {/* RIGHT PANEL – form */}
+            <div className="md:col-span-3 p-6 sm:p-8 bg-white/98">
+              <div className="text-center mb-6">
+                <h2 className="text-xl sm:text-2xl font-extrabold text-orange-700">
+                  Welcome Back to
+                </h2>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-orange-600 tracking-wide">
+                  PACE!
+                </h1>
+                <p className="mt-3 text-xs sm:text-sm text-gray-600">
+                  Smart Management for a Smarter Future
+                </p>
+              </div>
+
+              <form className="space-y-5 sm:space-y-6" onSubmit={handleLogin}>
+                {/* EMAIL */}
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                    Email Address
+                  </label>
+                  <div className="relative group">
+                    <HiUser className="absolute left-3 top-2.5 text-orange-500 group-focus-within:text-orange-600 transition" />
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="
+                        w-full pl-10 pr-3 py-2.5 rounded-xl
+                        bg-white/90 border border-orange-300
+                        text-gray-800 text-sm
+                        focus:ring-2 focus:ring-orange-500 focus:border-orange-500
+                        outline-none transition
+                      "
+                    />
+                  </div>
+                </div>
+
+                {/* PASSWORD */}
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                    Password
+                  </label>
+                  <div className="relative group">
+                    <HiLockClosed className="absolute left-3 top-2.5 text-orange-500 group-focus-within:text-orange-600 transition" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="
+                        w-full pl-10 pr-10 py-2.5 rounded-xl
+                        bg-white/90 border border-orange-300
+                        text-gray-800 text-sm
+                        focus:ring-2 focus:ring-orange-500 focus:border-orange-500
+                        outline-none transition
+                      "
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-2.5 text-gray-500 hover:text-orange-600 transition"
+                    >
+                      {showPassword ? <HiEyeOff /> : <HiEye />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* REMEMBER + FORGOT */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm text-gray-600">
+                  <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" className="accent-orange-600" />
+                    <span>Remember me</span>
+                  </label>
+
+                  <button
+                    type="button"
+                    className="text-orange-600 hover:text-orange-700 font-medium"
+                    onClick={() => navigate("/forgot-password")}
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+
+                {/* LOGIN BUTTON */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="
+                    w-full py-2.5 sm:py-3
+                    rounded-full
+                    bg-gradient-to-r from-orange-500 to-orange-600
+                    text-white text-sm sm:text-base font-semibold
+                    shadow-lg hover:shadow-[0_14px_30px_rgba(249,115,22,0.55)]
+                    hover:translate-y-[-1px]
+                    transition-all disabled:opacity-60
+                  "
+                >
+                  {loading ? "Logging in..." : "Login"}
+                </button>
+              </form>
+
+              <p className="mt-6 text-[10px] sm:text-xs text-gray-500 text-center">
+                © 2025 PACE System. All rights reserved.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
