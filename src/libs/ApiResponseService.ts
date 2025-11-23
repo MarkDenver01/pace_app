@@ -999,3 +999,12 @@ export async function resetPassword(
   }
 }
 
+export async function updateUniversityInfo(payload: {
+  universityId: number;
+  universityName?: string;
+  domainEmail?: string;
+  newPassword?: string;
+  confirmPassword?: string;
+}) {
+  return await api.patch("/admin/api/link/update_domain", payload);
+}

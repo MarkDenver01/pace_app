@@ -14,6 +14,7 @@ import {
   getUniversityStats,
   getTopCourses,
   getTopCompetitors,
+  updateUniversityInfo,
 } from "../../../libs/ApiResponseService";
 import { type UniversityStatsResponse } from "../../../libs/models/response/UniversityStats";
 import { type TopCourseResponse } from "../../../libs/models/response/TopCourseResponse";
@@ -49,16 +50,17 @@ export default function Dashboard() {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // editable values
+  // Editable values in modal
   const [newUniversityName, setNewUniversityName] = useState(universityName);
   const [newDomainEmail, setNewDomainEmail] = useState(domainEmail);
 
-  // NEW STATE: change password toggle
+  // Change password (optional)
   const [changePassword, setChangePassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  // stats
+  // Stats
   const [universityStats, setUniversityStats] =
     useState<UniversityStatsResponse | null>(null);
   const [topCourses, setTopCourses] = useState<string[]>([]);
@@ -72,6 +74,8 @@ export default function Dashboard() {
       const res = await fetchStudents(universityId);
       setStudents(res);
       setLastUpdated(new Date());
+    } catch (error) {
+      console.error("Failed to fetch students:", error);
     } finally {
       setLoading(false);
     }
@@ -79,30 +83,46 @@ export default function Dashboard() {
 
   const loadActiveCourses = async () => {
     if (!user?.adminResponse?.universityId) return;
-    const count = await totalActiveCourseByUniversity(
-      Number(user.adminResponse.universityId)
-    );
-    setActiveCourseCount(count);
+    try {
+      const count = await totalActiveCourseByUniversity(
+        Number(user.adminResponse.universityId)
+      );
+      setActiveCourseCount(count);
+    } catch (error) {
+      console.error("Failed to fetch active courses:", error);
+    }
   };
 
   const loadUniversityStats = async () => {
     if (!universityId) return;
-    const stats = await getUniversityStats(universityId);
-    setUniversityStats(stats);
+    try {
+      const stats = await getUniversityStats(universityId);
+      setUniversityStats(stats);
+    } catch (error) {
+      console.error("Failed to fetch university stats:", error);
+    }
   };
 
   const loadTopCourses = async () => {
     if (!universityId) return;
-    const month = new Date().getMonth() + 1;
-    const courses: TopCourseResponse[] = await getTopCourses(universityId, month);
-    setTopCourses(courses.map((c) => c.courseDescription));
+    try {
+      const month = new Date().getMonth() + 1;
+      const courses: TopCourseResponse[] = await getTopCourses(universityId, month);
+      setTopCourses(courses.map((c) => c.courseDescription));
+    } catch (error) {
+      console.error("Failed to fetch top courses:", error);
+    }
   };
 
   const loadTopCompetitors = async () => {
     if (!universityId) return;
-    const competitors: TopCompetitorResponse[] =
-      await getTopCompetitors(universityId);
-    setTopCompetitorSchools(competitors.map((c) => c.competitorName));
+    try {
+      const competitors: TopCompetitorResponse[] =
+        await getTopCompetitors(universityId);
+      setTopCompetitorSchools(competitors.map((c) => c.competitorName));
+    } catch (error) {
+      console.error("Failed to fetch top competitors:", error);
+    }
   };
 
   useEffect(() => {
@@ -161,38 +181,68 @@ export default function Dashboard() {
       Swal.fire({
         icon: "error",
         title: "Failed",
-        text: error.message,
+        text: error?.message || "Something went wrong.",
       });
     }
   };
 
-  const handleSaveUniversityInfo = () => {
-    if (changePassword) {
-      if (newPassword !== confirmPassword) {
-        Swal.fire({
-          icon: "error",
-          title: "Password Error",
-          text: "New password and confirm password must match.",
-        });
-        return;
-      }
+  const handleSaveUniversityInfo = async () => {
+    if (!universityId) {
+      Swal.fire({
+        icon: "error",
+        title: "Missing University",
+        text: "No university ID found. Please re-login.",
+      });
+      return;
     }
 
-    setUniversityName(newUniversityName);
-    setDomainEmail(newDomainEmail);
+    if (changePassword && newPassword !== confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Password Error",
+        text: "New password and confirm password must match.",
+      });
+      return;
+    }
 
-    // You can also call your backend update endpoint here:
-    // updateUniversityInfo({...})
+    try {
+      setSaving(true);
 
-    Swal.fire({
-      icon: "success",
-      title: "Updated",
-      text: "University information updated.",
-      timer: 2000,
-      showConfirmButton: false,
-    });
+      await updateUniversityInfo({
+        universityId,
+        universityName: newUniversityName,
+        domainEmail: newDomainEmail,
+        newPassword: changePassword ? newPassword : undefined,
+        confirmPassword: changePassword ? confirmPassword : undefined,
+      });
 
-    setIsEditModalOpen(false);
+      // update local UI
+      setUniversityName(newUniversityName);
+      setDomainEmail(newDomainEmail);
+
+      Swal.fire({
+        icon: "success",
+        title: "Updated",
+        text: "University information updated.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      // reset modal state
+      setIsEditModalOpen(false);
+      setChangePassword(false);
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error: any) {
+      console.error("Error updating university info:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: error?.message || "Failed to update university information.",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const cardClass =
@@ -204,7 +254,14 @@ export default function Dashboard() {
       icon: <University size={28} />,
       value: universityName,
       description: domainEmail,
-      onClick: () => setIsEditModalOpen(true),
+      onClick: () => {
+        setNewUniversityName(universityName);
+        setNewDomainEmail(domainEmail);
+        setChangePassword(false);
+        setNewPassword("");
+        setConfirmPassword("");
+        setIsEditModalOpen(true);
+      },
       isUppercase: true,
       extraDesc: "Tap to edit details",
     },
@@ -364,8 +421,12 @@ export default function Dashboard() {
         </ModalBody>
 
         <ModalFooter>
-          <Button color="blue" onClick={handleSaveUniversityInfo}>
-            Save Changes
+          <Button
+            color="blue"
+            onClick={handleSaveUniversityInfo}
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Save Changes"}
           </Button>
           <Button color="gray" onClick={() => setIsEditModalOpen(false)}>
             Cancel

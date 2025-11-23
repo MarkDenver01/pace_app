@@ -6,3 +6,4 @@ export interface UniversityResponse {
 export interface UniversityRequest {
   universityName: string;
 }
+
