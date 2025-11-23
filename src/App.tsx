@@ -13,6 +13,8 @@ import ReleaseApk from "./page/apk/ReleaseApk";
 import AppLinkRedirect from "./page/link/AppLinkRedirect";
 
 import PaceLandingPage from "./page/landing_page/LandingPage";
+import ForgotPassword from "./page/forgot_password/ForgotPassword";
+import ResetPassword from "./page/forgot_password/ResetPassword";
 
 function App() {
   const location = useLocation();
@@ -50,6 +52,10 @@ function App() {
             {/* Landing Page */}
             <Route path="/" element={<PaceLandingPage />} />
             <Route path="/university/:universityId" element={<PaceLandingPage />} />
+
+            {/* Forgot Password */}
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset_password" element={<ResetPassword />} />
 
             {/* Login Page */}
             <Route path="/login" element={<Login />} />

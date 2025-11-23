@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { HiLockClosed, HiUser, HiEye, HiEyeOff } from "react-icons/hi";
 
-import { login, activateAccount, findUniversity } from "../../libs/ApiResponseService";
+import {
+  login,
+  activateAccount,
+  findUniversity,
+} from "../../libs/ApiResponseService";
 import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import type { LoginResponse } from "../../libs/models/Login";
@@ -35,7 +39,7 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-    /** --------------------------
+  /** --------------------------
    * LOGIN FLOW WITH ACTIVATION
    --------------------------- */
   const handleLogin = async (e: React.FormEvent) => {
@@ -52,16 +56,16 @@ const Login: React.FC = () => {
       if (response.role === "ADMIN") {
         const adminStatus = response.adminResponse.accountStatus;
 
-          // GET UNIVERSITY NAME
-          let universityName = "your university";
-          try {
-            const uni = await findUniversity(Number(universityId));
-            universityName = uni.universityName ?? "your university";
-          } catch (e) {}
+        // GET UNIVERSITY NAME
+        let universityName = "your university";
+        try {
+          const uni = await findUniversity(Number(universityId));
+          universityName = uni.universityName ?? "your university";
+        } catch (e) {
+          // ignore
+        }
 
-        /** ------------------------------------------
-         * 🔥 CASE 1: Admin is PENDING → Ask to activate
-         ------------------------------------------- */
+        /** CASE 1: Admin is PENDING → Ask to activate */
         if (adminStatus === "PENDING") {
           const confirmUpdate = await Swal.fire({
             title: `Hi ${response.username}!`,
@@ -108,10 +112,14 @@ const Login: React.FC = () => {
         }
 
         /** CASE 2: Already active / verified */
-        if (adminStatus === "VERIFIED" || adminStatus === "ACTIVE") {
+        if (
+          adminStatus === "VERIFIED" ||
+          adminStatus === "ACTIVATE" ||
+          adminStatus === "ACTIVE" // in case you renamed
+        ) {
           Swal.fire({
             icon: "success",
-            title: `Welcome to <strong>"${universityName}"</strong>,  ${response.username}!`,
+            title: `Welcome to "${universityName}", ${response.username}!`,
             confirmButtonText: "PROCEED",
             ...getSwalTheme(),
           }).then(() => navigate("/admin/dashboard"));
@@ -156,6 +164,21 @@ const Login: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  /** Forgot Password: must have email filled first */
+  const handleForgotPasswordClick = async () => {
+    if (!email.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Email required",
+        text: "Please enter your registered email address first.",
+        ...getSwalTheme(),
+      });
+      return;
+    }
+
+    navigate(`/forgot-password?email=${encodeURIComponent(email.trim())}`);
   };
 
   return (
@@ -285,7 +308,7 @@ const Login: React.FC = () => {
                   <button
                     type="button"
                     className="text-orange-600 hover:text-orange-700 font-medium"
-                    onClick={() => navigate("/forgot-password")}
+                    onClick={handleForgotPasswordClick}
                   >
                     Forgot Password?
                   </button>

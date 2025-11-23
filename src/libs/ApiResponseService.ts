@@ -973,3 +973,29 @@ export async function updateAdmin(
     throw error.response?.data || { message: "Failed to update admin account" };
   }
 }
+
+// Forgot password: send reset link
+export async function requestPasswordReset(email: string): Promise<void> {
+  try {
+    await api.post("/user/public/forgot_password", null, {
+      params: { email },
+    });
+  } catch (error: any) {
+    console.error("Error requesting password reset:", error);
+    throw error.response?.data || { message: "Failed to request password reset" };
+  }
+}
+
+// Reset password: apply new password using token
+export async function resetPassword(
+  token: string,
+  newPassword: string
+): Promise<void> {
+  try {
+    await api.post("/user/public/reset_password", { token, newPassword });
+  } catch (error: any) {
+    console.error("Error resetting password:", error);
+    throw error.response?.data || { message: "Failed to reset password" };
+  }
+}
+
