@@ -13,12 +13,12 @@ import { useAuth } from "../../../context/AuthContext";
 const NORMAL_THEMES: Theme[] = [
   "light",
   "dark",
-  "redish",
-  "purplelish",
-  "brownish",
-  "greenish",
-  "blueish",
-  "maroonish"
+  "red-velvet",
+  "violet-dream",
+  "wood-brown",
+  "olive-green",
+  "ocean-pulse",
+  "burgundy",
 ];
 
 // Full list for validation including super_admin and custom_admin

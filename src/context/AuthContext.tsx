@@ -23,12 +23,12 @@ function isTheme(value: string): value is Theme {
   const ALL_THEMES: Theme[] = [
     "light",
     "dark",
-    "redish",
-    "purplelish",
-    "brownish",
-    "greenish",
-    "blueish",
-    "maroonish",
+    "red-velvet",
+    "violet-dream",
+    "wood-brown",
+    "olive-green",
+    "ocean-pulse",
+    "burgundy",
     "super_admin",
     "custom_admin",
   ];

@@ -4,12 +4,12 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 export type Theme =
   | "light"
   | "dark"
-  | "redish"
-  | "purplelish"
-  | "brownish"
-  |  "greenish"
-  | "blueish"
-  | "maroonish"
+  | "red-velvet"
+  | "violet-dream"
+  | "wood-brown"
+  |  "olive-green"
+  | "ocean-pulse"
+  | "burgundy"
   | "super_admin"
   | "custom_admin";
 
@@ -23,12 +23,12 @@ const defaultTheme: Theme = "light";
 const ALL_THEMES: Theme[] = [
   "light",
   "dark",
-  "redish",
-  "purplelish",
-  "brownish",
-  "greenish",
-  "blueish",
-  "maroonish",
+  "red-velvet",
+  "violet-dream",
+  "wood-brown",
+  "olive-green",
+  "ocean-pulse",
+  "burgundy",
   "super_admin",
   "custom_admin",
 ];

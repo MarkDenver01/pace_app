@@ -75,7 +75,7 @@ html, body, #root {
 }
 
 /* ========== Redish Theme ========== */
-[data-theme="redish"] {
+[data-theme="red-velvet"] {
     --button-color: #dc2626;
     --bg-color: #fef2f2;
     --text-color: #7f1d1d;
@@ -96,7 +96,7 @@ html, body, #root {
 }
 
 /* ========== Purplelish Theme ========== */
-[data-theme="purplelish"] {
+[data-theme="violet-dream"] {
     --button-color: #7c3aed;
     --bg-color: #f5f3ff;
     --text-color: #4c1d95;
@@ -117,7 +117,7 @@ html, body, #root {
 }
 
 /* ========== Brownish Theme ========== */
-[data-theme="brownish"] {
+[data-theme="wood-brown"] {
     --button-color: #92400e;
     --bg-color: #fffbeb;
     --text-color: #78350f;
@@ -137,7 +137,7 @@ html, body, #root {
     --muted-text-color: #78350f;
 }
 
-[data-theme="greenish"] {
+[data-theme="olive-green"] {
     --button-color: #00703c9f;           /* La Salle green button with transparency */
     --bg-color: #f8fff8;                 /* very light green/white background */
     --text-color: #0b3d2e;               /* dark green text */
@@ -154,7 +154,7 @@ html, body, #root {
     --muted-text-color: #0b3d2e;          /* muted dark green text */
 }
 
-[data-theme="blueish"] {
+[data-theme="ocean-pulse"] {
     --button-color: #003DA59F;           /* NU blue button with transparency */
     --bg-color: #F5F7FF;                 /* very light blue / off-white background */
     --text-color: #00297A;               /* dark blue text */
@@ -174,7 +174,7 @@ html, body, #root {
     --muted-text-color: #00297A;          /* muted dark blue text */
 }
 
-[data-theme="maroonish"] {
+[data-theme="burgundy"] {
     --button-color: #D500329F;           /* LPU red button with transparency */
     --bg-color: #FFF5F5;                 /* very light red/white background */
     --text-color: #7A001F;               /* dark red text */

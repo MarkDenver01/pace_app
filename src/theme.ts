@@ -67,17 +67,17 @@ export function getThemeByName(name: string): Theme {
   switch (name) {
     case "dark":
       return darkTheme;
-    case "redish":
+    case "red-velvet":
       return redishTheme;
-    case "purplelish":
+    case "violet-dream":
       return purplelishTheme;
-    case "brownish":
+    case "wood-brown":
       return brownishTheme;
-      case "greenish":
+      case "olive-green":
         return greenishTheme;
-      case "blueish":
+      case "ocean-pulse":
         return blueishTheme;
-      case "maroonish":
+      case "burgundy":
         return maroonishTheme;
     case "light":
     default:
