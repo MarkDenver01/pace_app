@@ -566,7 +566,7 @@ export default function AdminUserLayout() {
                               </>
                             )}
 
-                            {user.accountStatus === "VERIFIED" && (
+                            {user.accountStatus === "VERIFIED" || user.accountStatus === 'ACTIVATE' && (
                               <>
                                 <div className="w-28">
                                   <ThemedButton
