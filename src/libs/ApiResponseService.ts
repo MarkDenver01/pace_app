@@ -1001,7 +1001,7 @@ export async function resetPassword(
 
 export async function updateUniversityInfo(payload: {
   universityId: number;
-  email: String;
+  email: string;
   universityName?: string;
   domainEmail?: string;
   newPassword?: string;
