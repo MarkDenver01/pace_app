@@ -210,6 +210,7 @@ export default function Dashboard() {
 
       await updateUniversityInfo({
         universityId,
+        email: user?.adminResponse?.email || "",
         universityName: newUniversityName,
         domainEmail: newDomainEmail,
         newPassword: changePassword ? newPassword : undefined,
