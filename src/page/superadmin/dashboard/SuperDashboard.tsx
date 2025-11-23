@@ -143,11 +143,14 @@ export default function SuperAdminDashboard() {
       {/* RIGHT CHARACTER IMAGE */}
       <div className="hidden lg:flex justify-center items-center w-[40%] relative">
         <img
-          src={Mascot}
-          alt="Mascot"
-          className="w-[380px] absolute right-6 bottom-0 select-none"
-        />
-      </div>
+        src={Mascot}
+        alt="Mascot"
+        className="w-[520px] h-auto select-none object-contain"
+        style={{
+          transform: "translateY(-20px)", // slight lift para exact center
+          }}
+          />
+        </div>
     </div>
   );
 }
