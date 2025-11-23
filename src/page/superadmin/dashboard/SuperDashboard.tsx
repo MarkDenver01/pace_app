@@ -49,16 +49,28 @@ export default function SuperAdminDashboard() {
 
   if (loading) return <p className="p-6 text-lg">Loading dashboard...</p>;
 
-  // === Card style classes === //
   const cardBase =
     "w-full bg-white rounded-2xl shadow-xl p-6 border-4 flex flex-col gap-3";
 
   return (
-    <div className="relative flex flex-col lg:flex-row min-h-screen p-6">
-
+    <div
+      className="relative flex flex-col lg:flex-row min-h-screen p-6"
+      style={{
+        background: `
+          linear-gradient(
+            135deg,
+            #FFE5EC 0%,
+            #FFF7CC 30%,
+            #D7F1FF 70%,
+            #E6D7FF 100%
+          )
+        `,
+        backgroundAttachment: "fixed",
+      }}
+    >
       {/* LEFT CONTENT */}
       <div className="flex flex-col gap-6 w-full lg:w-[60%]">
-
+        
         {/* 🔴 Total Universities */}
         <div className={`${cardBase} border-red-400`}>
           <div className="flex items-center gap-3">
