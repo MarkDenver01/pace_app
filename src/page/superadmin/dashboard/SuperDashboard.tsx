@@ -7,7 +7,7 @@ import {
 } from "../../../libs/ApiResponseService";
 import type { UniversityResponse } from "../../../libs/models/University";
 import type { CourseResponse } from "../../../libs/models/Course";
-import mascotUrl from "../../assets/superadmin-hero-bg.png";
+import Mascot from "../../../assets/pace/super_admin_hero.png";
 
 export default function SuperAdminDashboard() {
   const [universities, setUniversities] = useState<UniversityResponse[]>([]);
@@ -131,7 +131,7 @@ export default function SuperAdminDashboard() {
       {/* RIGHT CHARACTER IMAGE */}
       <div className="hidden lg:flex justify-center items-center w-[40%] relative">
         <img
-          src={mascotUrl}
+          src={Mascot}
           alt="Mascot"
           className="w-[380px] absolute right-6 bottom-0 select-none"
         />
