@@ -113,7 +113,6 @@ const Login: React.FC = () => {
 
         /** CASE 2: Already active / verified */
         if (
-          adminStatus === "VERIFIED" ||
           adminStatus === "ACTIVATE" ||
           adminStatus === "ACTIVE" // in case you renamed
         ) {

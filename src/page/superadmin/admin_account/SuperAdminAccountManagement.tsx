@@ -227,7 +227,7 @@ export default function AdminUserLayout() {
     new Set(users.map((u) => u.universityName))
   ).sort();
 
-  const statusFilterOptions = ["PENDING", "VERIFIED", "ACTIVATE", "DEACTIVATE"];
+  const statusFilterOptions = ["PENDING", "ACTIVATE", "DEACTIVATE"];
 
   // ===== Filtering & Sorting Logic =====
   let filteredUsers = [...users];
@@ -566,7 +566,7 @@ export default function AdminUserLayout() {
                               </>
                             )}
 
-                            {user.accountStatus === "VERIFIED" || user.accountStatus === 'ACTIVATE' && (
+                            {user.accountStatus === 'ACTIVATE' && (
                               <>
                                 <div className="w-28">
                                   <ThemedButton
