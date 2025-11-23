@@ -250,7 +250,8 @@ const PaceLandingPage: FC = () => {
             About PACE
           </h2>
           <p className="mt-4 text-[14px] md:text-[16px] leading-relaxed text-white/90 text-justify">
-            PACE helps students discover their ideal academic paths...
+            PACE (Personal Academic & Career Evaluation) is an innovative platform designed to help students discover their ideal academic paths and future careers — while giving institutions the tools to evaluate, guide, and track learner progress.
+            It combines career assessment, data analytics, and institutional insights to build a bridge between students’ potential and academic opportunities.
           </p>
         </div>
       </section>
@@ -270,7 +271,8 @@ const PaceLandingPage: FC = () => {
             Our Mission
           </h2>
           <p className="mt-4 text-[14px] md:text-[16px] leading-relaxed text-gray-800 text-justify">
-            Our mission is to empower every learner...
+            Our mission is to empower every learner to discover their path and every institution to guide them with purpose. 
+            PACE aims to make academic and career exploration accessible, meaningful, and data-driven by combining technology, psychology, and education. We strive to bridge the gap between potential and opportunity, helping students make confident choices while providing schools and administrators the tools to support informed, impactful guidance for a smarter future.
           </p>
         </div>
       </section>
