@@ -129,7 +129,7 @@ export default function SuperAdminDashboard() {
             {Object.entries(coursesPerUniversity).map(([uni, count]) => (
               <li key={uni} className="flex justify-between py-1">
                 <span>{uni}</span>
-                <span className="font-semibold text-yellow-600">{count} Students</span>
+                <span className="font-semibold text-yellow-600">{count} Course</span>
               </li>
             ))}
           </ul>
